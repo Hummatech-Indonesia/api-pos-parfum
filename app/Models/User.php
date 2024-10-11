@@ -5,15 +5,19 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Base\Interfaces\HasArticles;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements HasArticles
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasUuids, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -34,6 +38,7 @@ class User extends Authenticatable implements HasArticles
     protected $hidden = [
         'password',
         'remember_token',
+        'is_delete'
     ];
 
     /**
@@ -55,5 +60,18 @@ class User extends Authenticatable implements HasArticles
     public function articles(): HasMany
     {
         return $this->hasMany(Article::class);
+    }
+
+    /**
+     * One to one relationship with data store
+     */
+    public function store(): HasOne
+    {
+        return $this->hasOne(Store::class);
+    }
+
+    public function role()
+    {
+        return $this->hasMany(Role::class);
     }
 }

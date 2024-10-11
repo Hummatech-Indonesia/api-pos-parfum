@@ -4,7 +4,7 @@ namespace App\Contracts\Interfaces\Eloquent;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 
-interface PaginateInterface
+interface CustomPaginateInterface
 {
     /**
      * Handle paginate data event from models.
@@ -14,5 +14,5 @@ interface PaginateInterface
      * @return LengthAwarePaginator
      */
 
-    public function paginate(int $pagination = 10, int $page = 1): LengthAwarePaginator;
+    public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed;
 }
