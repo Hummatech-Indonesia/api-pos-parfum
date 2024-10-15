@@ -69,9 +69,4 @@ class User extends Authenticatable implements HasArticles
     {
         return $this->hasOne(Store::class);
     }
-
-    public function role()
-    {
-        return $this->hasMany(Role::class);
-    }
 }

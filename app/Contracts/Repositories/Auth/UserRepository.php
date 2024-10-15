@@ -51,7 +51,9 @@ class UserRepository extends BaseRepository implements UserInterface
         $type_role = null;
         try{
             $role = $data["role"];
-            $type_role = $data["type_role"];
+            unset($data["role"]);
+            // $type_role = $data["type_role"];
+            // unset($data["type_role"]);
         }catch(\Throwable $th){ }
 
         return $this->model->query()
@@ -61,9 +63,7 @@ class UserRepository extends BaseRepository implements UserInterface
             }
         })
         ->when($role, function ($query) use ($role, $type_role){
-            if(!$type_role && !is_array($role)) $query->whereRelation('role','name',$role);
-            else if ($type_role == "in") $query->whereRelationIn('role','name',$role);
-            else if ($type_role == "not") $query->whereRelationNotIn('role','name',$role);
+            $query->role($role);
         })
         ->paginate($pagination, ['*'], 'page', $page);
         // ->appends(['search' => $request->search, 'year' => $request->year]);

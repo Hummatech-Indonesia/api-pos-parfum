@@ -29,14 +29,12 @@ class UserController extends Controller
         $per_page = $request->per_page ?? 10;
         $page = $request->page ?? 1;
         $payload = [
-            "role" => ['manager','auditor','warehouse','outlet','cashier'],
-            "type_role" => "in"
+            "role" => ['manager','auditor','warehouse','outlet','cashier']
         ];
 
         if($request->role) $payload['role'] = $request->role;
-        if($request->type_role) $payload['type_role'] = $request->tyoe_role;
 
-        $user = $this->user->customPaginate($per_page, $page, []);
+        $user = $this->user->customPaginate($per_page, $page, $payload);
         return BaseResponse::Ok('Berhasil mengambil list data user!', $user);
     }
 
