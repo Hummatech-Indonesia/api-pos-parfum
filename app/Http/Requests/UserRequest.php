@@ -27,9 +27,9 @@ class UserRequest extends FormRequest
     {
         return [
             "name" => 'required',
-            "email" => 'required|email',
+            "email" => 'required|email|unique:users,email',
             'password' => 'required|min:8',
-            'role' => 'required'
+            'role' => 'required|array'
         ];
     }
 
@@ -39,7 +39,9 @@ class UserRequest extends FormRequest
             'name.required' => 'Nama tidak boleh kosong',
             'email.required' => 'Email tidak boleh kosong!',
             'email.email' => 'Format yang dikirimkan harus berupa email!',
-            'role.required' => 'Role user tidak boleh kosong!'
+            'email.unique' => 'Email telah digunakan, silahkan masukan kembali email anda!',
+            'role.required' => 'Role user tidak boleh kosong!',
+            'role.array' => 'Isikan field "role" berupa array data!'
         ];
     }
 

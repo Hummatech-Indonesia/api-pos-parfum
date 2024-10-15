@@ -32,8 +32,11 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('me', [AuthController::class, 'getMe'])->name('get-me');
 
+    Route::middleware('role:owner')->group(function (){
+        // API FOR DATA USER
+        Route::resource("users", UserController::class)->only(['store','destroy','update']);
+    });
+    
     // API FOR DATA USER
-    Route::resources([
-        "users" => UserController::class
-    ]);
+    Route::resource("users", UserController::class)->except(['store','destroy','update']);
 });

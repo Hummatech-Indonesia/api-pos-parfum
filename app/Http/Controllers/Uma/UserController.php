@@ -56,17 +56,12 @@ class UserController extends Controller
         DB::beginTransaction();
         try {
             $user = $this->userService->mappingDataUser($data);
+            $data["store_id"] = auth()?->user()?->store?->id;
             $result_user = $this->user->store($user);
     
             $result_user->syncRoles($request->role);
-            // if(is_array($request->role)) {
-            //     foreach($request->role as $role) $result_user->assignRole($request->role); 
-            // }else {
-            //     $result_user->assignRole($request->role);
-            // }
-
             DB::commit();
-            return BaseResponse::Ok('Berhasil membuat user', null);
+            return BaseResponse::Ok('Berhasil membuat user', $result_user);
         }catch(\Throwable $th){
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
@@ -78,10 +73,12 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        $check = $this->user->show($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data user!");
+        $check_user = $this->user->show($id);
+        if(!$check_user) return BaseResponse::Notfound("Tidak dapat menemukan data user!");
 
-        return BaseResponse::Ok("Berhasil mengambil detail user!", $check);
+        $check_user->role = $check_user->getRoleNames();
+
+        return BaseResponse::Ok("Berhasil mengambil detail user!", $check_user);
     }
 
     /**

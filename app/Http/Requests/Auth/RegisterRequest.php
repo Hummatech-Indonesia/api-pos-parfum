@@ -27,7 +27,7 @@ class RegisterRequest extends FormRequest
     {
         return [
             "name" => 'required',
-            "email" => 'required|email',
+            "email" => 'required|email|unique:users,email',
             'password' => 'required|min:8',
             'password_confirmation' => 'required|same:password',
             'name_store' => 'required',
@@ -42,6 +42,7 @@ class RegisterRequest extends FormRequest
             'name.required' => 'Nama tidak boleh kosong',
             'email.required' => 'Email tidak boleh kosong!',
             'email.email' => 'Format yang dikirimkan harus berupa email!',
+            'email.unique' => 'Email telah digunakan, silahkan masukan kembali email anda!',
             'password.required' => 'Password tidak boleh kosong!',
             'password.min' => 'Password yang diisikan minimal 8 huruf!',
             'password_confirmation.required' => 'Password konfirmasi tidak boleh kosong!',

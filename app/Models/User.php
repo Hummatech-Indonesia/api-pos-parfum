@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Base\Interfaces\HasArticles;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -28,6 +29,8 @@ class User extends Authenticatable implements HasArticles
         'name',
         'email',
         'password',
+        'store_id',
+        'is_delete'
     ];
 
     /**
@@ -68,5 +71,13 @@ class User extends Authenticatable implements HasArticles
     public function store(): HasOne
     {
         return $this->hasOne(Store::class);
+    }
+
+    /**
+     * user in this store
+     */
+    public function stores(): BelongsTo
+    {
+        return $this->belongsTo(Store::class);
     }
 }

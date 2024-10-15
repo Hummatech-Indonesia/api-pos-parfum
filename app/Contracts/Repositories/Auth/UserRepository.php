@@ -48,35 +48,36 @@ class UserRepository extends BaseRepository implements UserInterface
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         $role = null;
-        $type_role = null;
         try{
             $role = $data["role"];
             unset($data["role"]);
-            // $type_role = $data["type_role"];
-            // unset($data["type_role"]);
         }catch(\Throwable $th){ }
 
         return $this->model->query()
         ->when(count($data) > 0, function ($query) use ($data){
+            if(isset($data["search"])){
+                $query->where('');
+            }
+            
             foreach ($data as $index => $value){
                 $query->where($index, $value);
             }
         })
-        ->when($role, function ($query) use ($role, $type_role){
+        ->when($role, function ($query) use ($role){
             $query->role($role);
         })
-        ->paginate($pagination, ['*'], 'page', $page);
-        // ->appends(['search' => $request->search, 'year' => $request->year]);
+        ->paginate($pagination, ['*'], 'page', $page)
+        ->appends(['search' => isset($data["search"]) ?? '']);
     }
 
     public function show(mixed $id): mixed
     {
-        return $this->model->with('store')->find($id);
+        return $this->model->with('store','stores')->find($id);
     }
     
     public function checkUserActive(mixed $id): mixed
     {
-        return $this->model->with('store')->where('is_delete',0)->find($id);
+        return $this->model->with('store','stores')->where('is_delete',0)->find($id);
     }
 
     public function update(mixed $id, array $data): mixed
