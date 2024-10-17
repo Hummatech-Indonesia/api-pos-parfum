@@ -6,10 +6,14 @@ use App\Contracts\Interfaces\ArticleInterface;
 use App\Contracts\Interfaces\Auth\StoreInterface;
 use App\Contracts\Interfaces\Auth\UserInterface;
 use App\Contracts\Interfaces\CategoryInterface;
+use App\Contracts\Interfaces\Master\OutletInterface;
+use App\Contracts\Interfaces\Master\WarehouseInterface;
 use App\Contracts\Repositories\ArticleRepository;
 use App\Contracts\Repositories\Auth\StoreRepository;
 use App\Contracts\Repositories\Auth\UserRepository;
 use App\Contracts\Repositories\CategoryRepository;
+use App\Contracts\Repositories\Master\OutletRepository;
+use App\Contracts\Repositories\Master\WarehouseRepository;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,7 +23,9 @@ class AppServiceProvider extends ServiceProvider
         CategoryInterface::class => CategoryRepository::class,
         ArticleInterface::class => ArticleRepository::class,
         UserInterface::class => UserRepository::class,
-        StoreInterface::class => StoreRepository::class 
+        StoreInterface::class => StoreRepository::class,
+        WarehouseInterface::class => WarehouseRepository::class,
+        OutletInterface::class => OutletRepository::class
     ];
 
     /**

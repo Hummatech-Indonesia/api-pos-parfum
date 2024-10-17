@@ -1,18 +1,19 @@
 <?php
 
-namespace App\Contracts\Repositories\Auth;
+namespace App\Contracts\Repositories\Master;
 
-use App\Contracts\Interfaces\Auth\UserInterface;
+use App\Contracts\Interfaces\Master\OutletInterface;
 use App\Contracts\Repositories\BaseRepository;
-use App\Models\User;
+use App\Models\Outlet;
 
-class UserRepository extends BaseRepository implements UserInterface
+class OutletRepository extends BaseRepository implements OutletInterface
 {
 
-    public function __construct(User $user){
-        $this->model = $user;
+    public function __construct(Outlet $outlet)
+    {
+        $this->model = $outlet;
     }
-    
+
     public function get(): mixed
     {
         return $this->model->get();
@@ -25,38 +26,19 @@ class UserRepository extends BaseRepository implements UserInterface
 
     public function customQuery(array $data): mixed
     {
-        $role = null;
-        try{
-            $role = $data["role"];
-            unset($data["role"]);
-        }catch(\Throwable $th){ }
-
         return $this->model->query()
+        ->with('store','user')
         ->when(count($data) > 0, function ($query) use ($data){
-            if(isset($data["user_id"])){
-                $query->whereIn('id',$data["user_id"]);
-                unset($data["user_id"]);
-            }
-
             foreach ($data as $index => $value){
                 $query->where($index, $value);
             }
-        })
-        ->when($role, function ($query) use ($role){
-            $query->role($role);
         });
     }
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
-        $role = null;
-        try{
-            $role = $data["role"];
-            unset($data["role"]);
-        }catch(\Throwable $th){ }
-
         return $this->model->query()
-        ->with('store','related_store','roles')
+        ->with('store','user')
         ->when(count($data) > 0, function ($query) use ($data){
             if(isset($data["search"])){
                 $query->where(function ($query2) use ($data) {
@@ -70,21 +52,18 @@ class UserRepository extends BaseRepository implements UserInterface
                 $query->where($index, $value);
             }
         })
-        ->when($role, function ($query) use ($role){
-            $query->role($role);
-        })
-        ->paginate($pagination, ['*'], 'page', $page)
-        ->appends(['search' => isset($data["search"]) ?? '']);
+        ->paginate($pagination, ['*'], 'page', $page);
+        // ->appends(['search' => $request->search, 'year' => $request->year]);
     }
 
     public function show(mixed $id): mixed
     {
-        return $this->model->with('store','related_store','roles')->find($id);
+        return $this->model->with('store','user')->find($id);
     }
-    
-    public function checkUserActive(mixed $id): mixed
+
+    public function checkActive(mixed $id): mixed
     {
-        return $this->model->with('store','related_store','roles')->where('is_delete',0)->find($id);
+        return $this->model->with('store','user')->where('is_delete',0)->find($id);
     }
 
     public function update(mixed $id, array $data): mixed
@@ -92,8 +71,9 @@ class UserRepository extends BaseRepository implements UserInterface
         return $this->show($id)->update($data);
     }
 
-    public function delete(mixed $id): mixed 
+    public function delete(mixed $id): mixed
     {
-        return $this->show($id)->update(['is_delete' => 1]);
+        return $this->show($id)->update(["is_delete" => 1]);
     }
+
 }

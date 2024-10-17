@@ -2,6 +2,8 @@
 
 use App\Helpers\BaseResponse;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Master\OutletController;
+use App\Http\Controllers\Master\WarehouseController;
 use App\Http\Controllers\Uma\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -28,15 +30,23 @@ Route::get('unauthorized', function (){
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::post('register', [AuthController::class, 'register'])->name('register');
 
+// API FOR AUTHENTIKASI
 Route::middleware('auth:sanctum')->group(function() {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('me', [AuthController::class, 'getMe'])->name('get-me');
 
+    // API FOR ROLE OWNER
     Route::middleware('role:owner')->group(function (){
         // API FOR DATA USER
         Route::resource("users", UserController::class)->only(['store','destroy','update']);
+        // API FOR DATA OUTLET
+        Route::resource("outlets", OutletController::class)->only(['store','destroy','update']);
+        Route::resource("warehouses", WarehouseController::class)->only(['store','destroy','update']);
     });
     
     // API FOR DATA USER
     Route::resource("users", UserController::class)->except(['store','destroy','update']);
+    // API FOR DATA OUTLET
+    Route::resource("outlets", OutletController::class)->except(['store','destroy','update']);
+    Route::resource("warehouses", WarehouseController::class)->except(['store','destroy','update']);
 });

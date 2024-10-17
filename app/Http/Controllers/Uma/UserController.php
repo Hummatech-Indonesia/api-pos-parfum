@@ -32,10 +32,13 @@ class UserController extends Controller
             "role" => ['manager','auditor','warehouse','outlet','cashier']
         ];
 
+        // check if have store_id
+        if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+        // check if has request query for check role
         if($request->role) $payload['role'] = $request->role;
 
-        $user = $this->user->customPaginate($per_page, $page, $payload);
-        return BaseResponse::Ok('Berhasil mengambil list data user!', $user);
+        $result_user = $this->user->customPaginate($per_page, $page, $payload);
+        return BaseResponse::Ok('Berhasil mengambil list data user!', $result_user);
     }
 
     /**
@@ -105,12 +108,6 @@ class UserController extends Controller
             $result_user = $this->user->update($id, $user);
     
             $result_user->syncRoles($request->role);
-
-            // if(is_array($request->role)) {
-            //     foreach($request->role as $role) $result_user->assignRole($request->role); 
-            // }else {
-            //     $result_user->assignRole($request->role);
-            // }
 
             DB::commit();
             return BaseResponse::Ok('Berhasil update user', null);

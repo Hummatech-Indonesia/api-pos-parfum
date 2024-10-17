@@ -30,6 +30,8 @@ class User extends Authenticatable implements HasArticles
         'email',
         'password',
         'store_id',
+        'warehouse_id',
+        'outlet_id',
         'is_delete'
     ];
 
@@ -76,8 +78,24 @@ class User extends Authenticatable implements HasArticles
     /**
      * user in this store
      */
-    public function stores(): BelongsTo
+    public function related_store(): BelongsTo
     {
         return $this->belongsTo(Store::class);
+    }
+
+    /**
+     * user in this outlet
+     */
+    public function outlet(): BelongsTo
+    {
+        return $this->belongsTo(Outlet::class);
+    }
+
+    /**
+     * user in this outlet
+     */
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class);
     }
 }
