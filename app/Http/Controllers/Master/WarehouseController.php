@@ -35,7 +35,7 @@ class WarehouseController extends Controller
         if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
 
         $data = $this->warehouse->customPaginate($per_page, $page, $payload);
-        return BaseResponse::Ok('Berhasil mengambil list data outlet!', $data);
+        return BaseResponse::Ok('Berhasil mengambil list data warehouse!', $data);
     }
 
     /**
@@ -60,15 +60,15 @@ class WarehouseController extends Controller
             unset($data["user_id"]);
 
             $data["store_id"] = auth()?->user()?->store?->id;
-            $result_outlet = $this->warehouse->store($user);
+            $result_warehouse = $this->warehouse->store($data);
 
             if($user){
                 $result_user = $this->user->customQuery($user);
-                foreach($result_user as $dataUser) $dataUser->update(["outlet_id" => $result_outlet->id]);
+                foreach($result_user as $dataUser) $dataUser->update(["warehouse_id" => $result_warehouse->id]);
             }
     
             DB::commit();
-            return BaseResponse::Ok('Berhasil membuat user', $result_outlet);
+            return BaseResponse::Ok('Berhasil membuat warehouse', $result_warehouse);
         }catch(\Throwable $th){
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
@@ -80,12 +80,12 @@ class WarehouseController extends Controller
      */
     public function show(string $id)
     {
-        $check_outlet = $this->warehouse->show($id);
-        if(!$check_outlet) return BaseResponse::Notfound("Tidak dapat menemukan data outlet!");
+        $check_warehouse = $this->warehouse->show($id);
+        if(!$check_warehouse) return BaseResponse::Notfound("Tidak dapat menemukan data warehouse!");
 
-        $check_outlet->role = $check_outlet->getRoleNames();
+        $check_warehouse->role = $check_warehouse->getRoleNames();
 
-        return BaseResponse::Ok("Berhasil mengambil detail outlet!", $check_outlet);
+        return BaseResponse::Ok("Berhasil mengambil detail warehouse!", $check_warehouse);
     }
 
     /**
@@ -104,7 +104,7 @@ class WarehouseController extends Controller
         $data = $request->validated();
 
         $check = $this->warehouse->checkActive($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data outlet!");
+        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data warehouse!");
 
         DB::beginTransaction();
         try {
@@ -115,12 +115,12 @@ class WarehouseController extends Controller
             $result_outlet = $this->warehouse->store($user);
 
             if($user){
-                $result_user = $this->user->customQuery($user);
-                foreach($result_user as $dataUser) $dataUser->update(["outlet_id" => $result_outlet->id]);
+                $result_user = $this->user->customQuery($data);
+                foreach($result_user as $dataUser) $dataUser->update(["warehouse_id" => $result_outlet->id]);
             }
     
             DB::commit();
-            return BaseResponse::Ok('Berhasil update data outlet', $result_outlet);
+            return BaseResponse::Ok('Berhasil update data warehouse', $result_outlet);
         }catch(\Throwable $th){
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
@@ -134,7 +134,7 @@ class WarehouseController extends Controller
     {
         
         $check = $this->warehouse->checkActive($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data outlet!");
+        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data warehouse!");
 
         try {
             $this->warehouse->delete($id);

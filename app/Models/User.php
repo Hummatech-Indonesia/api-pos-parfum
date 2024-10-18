@@ -80,7 +80,7 @@ class User extends Authenticatable implements HasArticles
      */
     public function related_store(): BelongsTo
     {
-        return $this->belongsTo(Store::class);
+        return $this->belongsTo(Store::class, 'store_id','id');
     }
 
     /**

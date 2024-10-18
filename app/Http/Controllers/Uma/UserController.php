@@ -59,7 +59,7 @@ class UserController extends Controller
         DB::beginTransaction();
         try {
             $user = $this->userService->mappingDataUser($data);
-            $data["store_id"] = auth()?->user()?->store?->id;
+            $user["store_id"] = auth()?->user()?->store?->id;
             $result_user = $this->user->store($user);
     
             $result_user->syncRoles($request->role);

@@ -60,7 +60,7 @@ class OutletController extends Controller
             unset($data["user_id"]);
 
             $data["store_id"] = auth()?->user()?->store?->id;
-            $result_outlet = $this->outlet->store($user);
+            $result_outlet = $this->outlet->store($data);
 
             if($user){
                 $result_user = $this->user->customQuery($user);
@@ -112,7 +112,7 @@ class OutletController extends Controller
             $user = $data["user_id"];
             unset($data["user_id"]);
 
-            $result_outlet = $this->outlet->store($user);
+            $result_outlet = $this->outlet->store($data);
 
             if($user){
                 $result_user = $this->user->customQuery($user);
