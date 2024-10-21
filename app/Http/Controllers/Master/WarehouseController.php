@@ -42,7 +42,7 @@ class WarehouseController extends Controller
         $result = $data["data"];
         unset($data["data"]);
 
-        return BaseResponse::Ok('Berhasil mengambil list data warehouse!', $result, $data);
+        return BaseResponse::Paginate('Berhasil mengambil list data warehouse!', $result, $data);
     }
 
     /**
