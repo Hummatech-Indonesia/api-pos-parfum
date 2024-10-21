@@ -50,4 +50,14 @@ class BaseResponse
             "data" => $data
         ])->setStatusCode($code);
     }
+
+    public static function Paginate(string $message, mixed $data, mixed $paginate): JsonResponse
+    {
+        return response()->json([
+            "success" => true,
+            "message" => $message,
+            "data" => $data,
+            "pagination" => $paginate
+        ])->setStatusCode(200);
+    }
 }

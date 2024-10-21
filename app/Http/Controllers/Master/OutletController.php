@@ -28,14 +28,21 @@ class OutletController extends Controller
     {
         $per_page = $request->per_page ?? 10;
         $page = $request->page ?? 1;
-        $payload = [];
+        $payload = [
+            "is_delete" => 0
+        ];
 
         // check query filter
         if($request->search) $payload["search"] = $request->search;
+        if($request->is_delete) $payload["is_delete"] = $request->is_delete;
         if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
 
-        $data = $this->outlet->customPaginate($per_page, $page, $payload);
-        return BaseResponse::Ok('Berhasil mengambil list data outlet!', $data);
+        $data = $this->outlet->customPaginate($per_page, $page, $payload)->toArray();
+        
+        $result = $data["data"];
+        unset($data["data"]);
+
+        return BaseResponse::Ok('Berhasil mengambil list data outlet!', $result, $data);
     }
 
     /**
