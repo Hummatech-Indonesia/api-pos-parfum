@@ -75,7 +75,7 @@ class OutletController extends Controller
             }
     
             DB::commit();
-            return BaseResponse::Ok('Berhasil membuat user', $result_outlet);
+            return BaseResponse::Ok('Berhasil membuat outlet', $result_outlet);
         }catch(\Throwable $th){
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);

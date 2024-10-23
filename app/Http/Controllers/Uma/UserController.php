@@ -144,6 +144,6 @@ class UserController extends Controller
     {
         $user = $this->user->customQuery($request->all());
 
-        
+        return BaseResponse::Ok("Behasil mengambil data user!", $user);
     }
 }
