@@ -139,4 +139,11 @@ class UserController extends Controller
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
+
+    public function listUser(Request $request)
+    {
+        $user = $this->user->customQuery($request->all());
+
+        
+    }
 }

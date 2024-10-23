@@ -32,10 +32,29 @@ class UserRepository extends BaseRepository implements UserInterface
         }catch(\Throwable $th){ }
 
         return $this->model->query()
+        ->with('store','related_store','roles','warehouse','outlet')
         ->when(count($data) > 0, function ($query) use ($data){
             if(isset($data["user_id"])){
                 $query->whereIn('id',$data["user_id"]);
                 unset($data["user_id"]);
+            }
+
+            if(isset($data["warehouse"])){
+                if($data["warehouse"] == "false"){
+                    $query->whereNotHas("warehouse");
+                }else if ($data["warehouse"] == "true"){
+                    $query->whereHas('warehouse');
+                }
+                unset($data["warehouse"]);
+            }
+
+            if(isset($data["outlet"])){
+                if($data["outlet"] == "false"){
+                    $query->whereNotHas("outlet");
+                }else if ($data["outlet"] == "true"){
+                    $query->whereHas('outlet');
+                }
+                unset($data["outlet"]);
             }
 
             foreach ($data as $index => $value){
@@ -56,7 +75,7 @@ class UserRepository extends BaseRepository implements UserInterface
         }catch(\Throwable $th){ }
 
         return $this->model->query()
-        ->with('store','related_store','roles')
+        ->with('store','related_store','roles','warehouse','outlet')
         ->when(count($data) > 0, function ($query) use ($data){
             if(isset($data["search"])){
                 $query->where(function ($query2) use ($data) {

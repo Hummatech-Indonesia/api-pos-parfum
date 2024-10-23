@@ -38,6 +38,7 @@ Route::middleware('auth:sanctum')->group(function() {
     // API FOR ROLE OWNER
     Route::middleware('role:owner')->group(function (){
         // API FOR DATA USER
+        Route::get('users/no-paginate', [UserController::class, 'listUser'])->name('list-users-no-paginate');
         Route::resource("users", UserController::class)->only(['store','destroy','update']);
         // API FOR DATA OUTLET
         Route::resource("outlets", OutletController::class)->only(['store','destroy','update']);
