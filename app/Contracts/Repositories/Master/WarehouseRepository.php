@@ -43,7 +43,7 @@ class WarehouseRepository extends BaseRepository implements WarehouseInterface
             if(isset($data["search"])){
                 $query->where(function ($query2) use ($data) {
                     $query2->where('name', 'like', '%' . $data["search"] . '%')
-                    ->orwhere('email', 'like', '%' . $data["search"] . '%');
+                    ->orwhere('address', 'like', '%' . $data["search"] . '%');
                 });
                 unset($data["search"]);
             }
