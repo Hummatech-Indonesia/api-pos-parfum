@@ -161,7 +161,7 @@ class OutletController extends Controller
             $payload = [];
 
             if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
-            $data = $this->outlet->customQuery($payload);
+            $data = $this->outlet->customQuery($payload)->get();
 
             return BaseResponse::Ok("Berhasil mengambil data outlet", $data);
         }catch(\Throwable $th) {
