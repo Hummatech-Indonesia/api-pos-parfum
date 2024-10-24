@@ -39,6 +39,7 @@ class UserController extends Controller
         if($request->role) $payload['role'] = $request->role;
         if($request->search) $payload['search'] = $request->search;
         if($request->is_delete) $payload['is_delete'] = $request->is_delete;
+        if($request->outlet_id) $payload['outlet_id'] = $request->outlet_id;
 
         try{
             $result_user = $this->user->customPaginate($per_page, $page, $payload)->toArray();
