@@ -156,4 +156,16 @@ class UserController extends Controller
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
+
+    public function listRole(Request $request)
+    {
+        try{
+
+            $role = $this->userService->mapRole();
+
+            return BaseResponse::Ok("Behasil mengambil data role!", $role);
+        }catch(\Throwable $th){
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
 }

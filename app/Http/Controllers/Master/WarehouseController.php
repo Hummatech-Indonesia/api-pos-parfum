@@ -150,4 +150,18 @@ class WarehouseController extends Controller
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
+
+    public function listWarehouse(Request $request)
+    {
+        try{
+            $payload = [];
+
+            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+            $data = $this->warehouse->customQuery($payload);
+
+            return BaseResponse::Ok("Berhasil mengambil data warehouse", $data);
+        }catch(\Throwable $th) {
+          return BaseResponse::Error($th->getMessage(), null);  
+        }
+    }
 }

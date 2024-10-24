@@ -34,6 +34,7 @@ Route::post('register', [AuthController::class, 'register'])->name('register');
 Route::middleware('auth:sanctum')->group(function() {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('me', [AuthController::class, 'getMe'])->name('get-me');
+    Route::get('roles', [UserController::class, 'listRole'])->name('get-roles');
 
     // API FOR ROLE OWNER
     Route::middleware('role:owner')->group(function (){
@@ -41,7 +42,10 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::get('users/no-paginate', [UserController::class, 'listUser'])->name('list-users-no-paginate');
         Route::resource("users", UserController::class)->only(['store','destroy','update']);
         // API FOR DATA OUTLET
+        Route::get('outlets/no-paginate', [OutletController::class, 'listOutlet'])->name('list-outlets-no-paginate');
         Route::resource("outlets", OutletController::class)->only(['store','destroy','update']);
+        // API FOR DATA WAREHOUSE
+        Route::get('warehouses/no-paginate', [WarehouseController::class, 'listWarehouse'])->name('list-warehouses-no-paginate');
         Route::resource("warehouses", WarehouseController::class)->only(['store','destroy','update']);
     });
     
@@ -49,5 +53,6 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::resource("users", UserController::class)->except(['store','destroy','update']);
     // API FOR DATA OUTLET
     Route::resource("outlets", OutletController::class)->except(['store','destroy','update']);
+    // API FOR DATA WAREHOUSE
     Route::resource("warehouses", WarehouseController::class)->except(['store','destroy','update']);
 });

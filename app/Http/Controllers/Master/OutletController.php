@@ -37,12 +37,16 @@ class OutletController extends Controller
         if($request->is_delete) $payload["is_delete"] = $request->is_delete;
         if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
 
-        $data = $this->outlet->customPaginate($per_page, $page, $payload)->toArray();
-        
-        $result = $data["data"];
-        unset($data["data"]);
-
-        return BaseResponse::Paginate('Berhasil mengambil list data outlet!', $result, $data);
+        try{
+            $data = $this->outlet->customPaginate($per_page, $page, $payload)->toArray();
+            
+            $result = $data["data"];
+            unset($data["data"]);
+    
+            return BaseResponse::Paginate('Berhasil mengambil list data outlet!', $result, $data);
+        }catch(\Throwable $th){
+            return BaseResponse::Error($th->getMessage(), null);
+        }
     }
 
     /**
@@ -148,6 +152,20 @@ class OutletController extends Controller
             return BaseResponse::Ok('Berhasil menghapus data', null);
         }catch(\Throwable $th){
             return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+    public function listOutlet(Request $request)
+    {
+        try{
+            $payload = [];
+
+            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+            $data = $this->outlet->customQuery($payload);
+
+            return BaseResponse::Ok("Berhasil mengambil data outlet", $data);
+        }catch(\Throwable $th) {
+          return BaseResponse::Error($th->getMessage(), null);  
         }
     }
 }

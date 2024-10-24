@@ -3,6 +3,7 @@
 namespace App\Services\Auth;
 
 use App\Traits\UploadTrait;
+use Spatie\Permission\Models\Role;
 
 class UserService 
 {
@@ -38,5 +39,9 @@ class UserService
             "address" => $data->address_store,
             "logo" => $data->logo 
         ];
+    }
+
+    public function mapRole () {
+        return Role::all();
     }
 }
