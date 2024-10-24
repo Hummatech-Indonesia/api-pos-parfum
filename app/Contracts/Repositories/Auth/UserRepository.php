@@ -29,7 +29,12 @@ class UserRepository extends BaseRepository implements UserInterface
         try{
             $role = $data["role"];
             unset($data["role"]);
-        }catch(\Throwable $th){ }
+
+            $role = str_replace(["[", "]", "'"], "", $role);
+            $role = explode(",", $role);
+        }catch(\Throwable $th){ 
+            $role = [];
+        }
 
         return $this->model->query()
         ->with('store','related_store','roles','warehouse','outlet')
@@ -41,7 +46,7 @@ class UserRepository extends BaseRepository implements UserInterface
 
             if(isset($data["warehouse"])){
                 if($data["warehouse"] == "false"){
-                    $query->whereNotHas("warehouse");
+                    $query->whereDoesntHave("warehouse");
                 }else if ($data["warehouse"] == "true"){
                     $query->whereHas('warehouse');
                 }
@@ -50,7 +55,7 @@ class UserRepository extends BaseRepository implements UserInterface
 
             if(isset($data["outlet"])){
                 if($data["outlet"] == "false"){
-                    $query->whereNotHas("outlet");
+                    $query->whereDoesntHave("outlet");
                 }else if ($data["outlet"] == "true"){
                     $query->whereHas('outlet');
                 }
@@ -72,7 +77,12 @@ class UserRepository extends BaseRepository implements UserInterface
         try{
             $role = $data["role"];
             unset($data["role"]);
-        }catch(\Throwable $th){ }
+
+            $role = str_replace(["[", "]", "'"], "", $role);
+            $role = explode(",", $role);
+        }catch(\Throwable $th){ 
+            $role = [];
+        }
 
         return $this->model->query()
         ->with('store','related_store','roles','warehouse','outlet')

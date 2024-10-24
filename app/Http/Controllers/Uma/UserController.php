@@ -37,14 +37,19 @@ class UserController extends Controller
         if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
         // check if has request query for check role
         if($request->role) $payload['role'] = $request->role;
+        if($request->search) $payload['search'] = $request->search;
         if($request->is_delete) $payload['is_delete'] = $request->is_delete;
 
-        $result_user = $this->user->customPaginate($per_page, $page, $payload)->toArray();
-
-        $data = $result_user["data"];
-        unset($result_user["data"]);
-
-        return BaseResponse::Paginate('Berhasil mengambil list data user!', $data, $result_user);
+        try{
+            $result_user = $this->user->customPaginate($per_page, $page, $payload)->toArray();
+    
+            $data = $result_user["data"];
+            unset($result_user["data"]);
+    
+            return BaseResponse::Paginate('Berhasil mengambil list data user!', $data, $result_user);
+        }catch(\Throwable $th){
+            return BaseResponse::Error($th->getMessage(), null);
+        }
     }
 
     /**
@@ -142,8 +147,13 @@ class UserController extends Controller
 
     public function listUser(Request $request)
     {
-        $user = $this->user->customQuery($request->all());
+        try{
 
-        return BaseResponse::Ok("Behasil mengambil data user!", $user);
+            $user = $this->user->customQuery($request->all())->get();
+    
+            return BaseResponse::Ok("Behasil mengambil data user!", $user);
+        }catch(\Throwable $th){
+            return BaseResponse::Error($th->getMessage(), null);
+        }
     }
 }
