@@ -70,7 +70,7 @@ class WarehouseController extends Controller
             $result_warehouse = $this->warehouse->store($data);
 
             if($user){
-                $result_user = $this->user->customQuery($user);
+                $result_user = $this->user->customQuery(["user_id" => $user])->get();
                 foreach($result_user as $dataUser) $dataUser->update(["warehouse_id" => $result_warehouse->id]);
             }
     
@@ -122,7 +122,7 @@ class WarehouseController extends Controller
             $result_outlet = $this->warehouse->store($user);
 
             if($user){
-                $result_user = $this->user->customQuery($data);
+                $result_user = $this->user->customQuery(["user_id" => $user])->get();
                 foreach($result_user as $dataUser) $dataUser->update(["warehouse_id" => $result_outlet->id]);
             }
     

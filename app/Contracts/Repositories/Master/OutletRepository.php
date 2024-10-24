@@ -27,7 +27,7 @@ class OutletRepository extends BaseRepository implements OutletInterface
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
-        ->with('store','user')
+        ->with('store','users')
         ->when(count($data) > 0, function ($query) use ($data){
             foreach ($data as $index => $value){
                 $query->where($index, $value);
@@ -38,7 +38,7 @@ class OutletRepository extends BaseRepository implements OutletInterface
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-        ->with('store','user')
+        ->with('store','users')
         ->when(count($data) > 0, function ($query) use ($data){
             if(isset($data["search"])){
                 $query->where(function ($query2) use ($data) {
@@ -58,12 +58,12 @@ class OutletRepository extends BaseRepository implements OutletInterface
 
     public function show(mixed $id): mixed
     {
-        return $this->model->with('store','user')->find($id);
+        return $this->model->with('store','users')->find($id);
     }
 
     public function checkActive(mixed $id): mixed
     {
-        return $this->model->with('store','user')->where('is_delete',0)->find($id);
+        return $this->model->with('store','users')->where('is_delete',0)->find($id);
     }
 
     public function update(mixed $id, array $data): mixed

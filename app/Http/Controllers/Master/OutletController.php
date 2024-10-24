@@ -74,7 +74,7 @@ class OutletController extends Controller
             $result_outlet = $this->outlet->store($data);
 
             if($user){
-                $result_user = $this->user->customQuery($user);
+                $result_user = $this->user->customQuery(["user_id" => $user])->get();
                 foreach($result_user as $dataUser) $dataUser->update(["outlet_id" => $result_outlet->id]);
             }
     
@@ -126,7 +126,7 @@ class OutletController extends Controller
             $result_outlet = $this->outlet->store($data);
 
             if($user){
-                $result_user = $this->user->customQuery($user);
+                $result_user = $this->user->customQuery(["user_id" => $user])->get();
                 foreach($result_user as $dataUser) $dataUser->update(["outlet_id" => $result_outlet->id]);
             }
     
