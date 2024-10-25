@@ -6,7 +6,7 @@ use App\Contracts\Interfaces\Master\WarehouseInterface;
 use App\Contracts\Repositories\BaseRepository;
 use App\Models\Warehouse;
 
-class WarehouseRsepository extends BaseRepository implements WarehouseInterface
+class WarehouseRepository extends BaseRepository implements WarehouseInterface
 {
 
     public function __construct(Warehouse $warehouse)
