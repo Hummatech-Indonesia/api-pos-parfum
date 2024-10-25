@@ -147,10 +147,15 @@ class OutletController extends Controller
         $check = $this->outlet->checkActive($id);
         if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data outlet!");
 
+        DB::beginTransaction();
         try {
             $this->outlet->delete($id);
+            $this->user->customQuery(["outlet_id" => $id])->update(["outlet_id" => null]);
+
+            DB::commit();
             return BaseResponse::Ok('Berhasil menghapus data', null);
         }catch(\Throwable $th){
+            DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
     }

@@ -143,10 +143,15 @@ class WarehouseController extends Controller
         $check = $this->warehouse->checkActive($id);
         if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data warehouse!");
 
+        DB::beginTransaction();
         try {
             $this->warehouse->delete($id);
+            $this->user->customQuery(["warehouse_id" => $id])->update(["warehouse_id" => null]);
+
+            DB::commit();
             return BaseResponse::Ok('Berhasil menghapus data', null);
         }catch(\Throwable $th){
+            DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
