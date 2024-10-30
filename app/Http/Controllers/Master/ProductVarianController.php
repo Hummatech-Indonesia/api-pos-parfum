@@ -67,8 +67,10 @@ class ProductVarianController extends Controller
 
         DB::beginTransaction();
         try {
-            $result_product = $this->productVarian->store(["name" => $request->name]);
-    
+            $store_id = null;
+            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+            $result_product = $this->productVarian->store(["name" => $request->name, "store_id" => $store_id]);
+
             DB::commit();
             return BaseResponse::Ok('Berhasil membuat product varian', $result_product);
         }catch(\Throwable $th){
