@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Contracts\Interfaces;
+namespace App\Contracts\Interfaces\Master;
 
 use App\Contracts\Interfaces\Eloquent\CustomPaginateInterface;
 use App\Contracts\Interfaces\Eloquent\CustomQueryInterface;
@@ -10,8 +10,7 @@ use App\Contracts\Interfaces\Eloquent\ShowInterface;
 use App\Contracts\Interfaces\Eloquent\StoreInterface;
 use App\Contracts\Interfaces\Eloquent\UpdateInterface;
 
-interface CategoryInterface extends GetInterface, StoreInterface, CustomQueryInterface, CustomPaginateInterface, ShowInterface, UpdateInterface, DeleteInterface
-
+interface ProductVarianInterface extends GetInterface, StoreInterface, CustomQueryInterface, CustomPaginateInterface, ShowInterface, UpdateInterface, DeleteInterface
 {
     public function checkActive(mixed $id): mixed;
 }

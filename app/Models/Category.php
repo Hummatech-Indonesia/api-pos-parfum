@@ -13,7 +13,7 @@ class Category extends Model implements HasArticles
 
     public $incrementing = false;
     public $fillable = ['id', 'name'];
-    public $keyType = 'char';
+    public $keyType = 'string';
     protected $table = 'categories';
     protected $primaryKey = 'id';
 
@@ -26,5 +26,13 @@ class Category extends Model implements HasArticles
     public function articles(): HasMany
     {
         return $this->hasMany(Article::class);
+    }
+
+    /**
+     * Get data relation one to many with product detail
+     */
+    public function productDetails(): HasMany
+    {
+        return $this->hasMany(ProductDetail::class);
     }
 }

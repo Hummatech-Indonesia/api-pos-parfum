@@ -1,25 +1,22 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard;
+namespace App\Http\Controllers\Master;
 
-use App\Contracts\Interfaces\CategoryInterface;
+use App\Contracts\Interfaces\Master\ProductVarianInterface;
 use App\Enums\UploadDiskEnum;
 use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
-use App\Services\CategoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class CategoryController extends Controller
+class ProductVarianController extends Controller
 {
-    private CategoryService $categoryService;
-    private CategoryInterface $category;
+    private ProductVarianInterface $productVarian;
 
-    public function __construct(CategoryService $categoryService, CategoryInterface $category)
+    public function __construct(ProductVarianInterface $productVarian)
     {
-        $this->categoryService = $categoryService;
-        $this->category = $category;
+        $this->productVarian = $productVarian;
     }
 
     /**
@@ -38,12 +35,12 @@ class CategoryController extends Controller
         if($request->is_delete) $payload["is_delete"] = $request->is_delete;
         if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
 
-        $data = $this->category->customPaginate($per_page, $page, $payload)->toArray();
+        $data = $this->productVarian->customPaginate($per_page, $page, $payload)->toArray();
 
         $result = $data["data"];
         unset($data["data"]);
 
-        return BaseResponse::Paginate('Berhasil mengambil list data category!', $result, $data);
+        return BaseResponse::Paginate('Berhasil mengambil list data product varian!', $result, $data);
     }
 
     /**
@@ -61,7 +58,7 @@ class CategoryController extends Controller
     {
         
         $validator = Validator::make($request->all(), [
-            "name" => "required|unique:categories,name",
+            "name" => "required|unique:product_varians,name",
         ]);
         
         if ($validator->fails()) {
@@ -70,10 +67,10 @@ class CategoryController extends Controller
 
         DB::beginTransaction();
         try {
-            $result_category = $this->category->store(["name" => $request->name]);
+            $result_product = $this->productVarian->store(["name" => $request->name]);
     
             DB::commit();
-            return BaseResponse::Ok('Berhasil membuat category', $result_category);
+            return BaseResponse::Ok('Berhasil membuat product varian', $result_product);
         }catch(\Throwable $th){
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
@@ -85,12 +82,10 @@ class CategoryController extends Controller
      */
     public function show(string $id)
     {
-        $check_category = $this->category->show($id);
-        if(!$check_category) return BaseResponse::Notfound("Tidak dapat menemukan data category!");
+        $check_product = $this->productVarian->show($id);
+        if(!$check_product) return BaseResponse::Notfound("Tidak dapat menemukan data product varian!");
 
-        $check_category->role = $check_category->getRoleNames();
-
-        return BaseResponse::Ok("Berhasil mengambil detail category!", $check_category);
+        return BaseResponse::Ok("Berhasil mengambil detail product varian!", $check_product);
     }
 
     /**
@@ -107,23 +102,23 @@ class CategoryController extends Controller
     public function update(Request $request, string $id)
     {
         $validator = Validator::make($request->all(), [
-            "name" => "required|unique:categories,name," . $id,
+            "name" => "required|unique:product_varians,name," . $id,
         ]);
         
         if ($validator->fails()) {
             return BaseResponse::error("Kesalahan dalam input data!", $validator->fails());
         }
 
-        $check = $this->category->checkActive($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data category!");
+        $check = $this->productVarian->checkActive($id);
+        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data product varian!");
 
         DB::beginTransaction();
         try {
 
-            $result_category = $this->category->update($id, ["name" => $request->name]);
+            $result_product = $this->productVarian->update($id, ["name" => $request->name]);
     
             DB::commit();
-            return BaseResponse::Ok('Berhasil update data category', $result_category);
+            return BaseResponse::Ok('Berhasil update data product varian', $result_product);
         }catch(\Throwable $th){
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
@@ -136,12 +131,12 @@ class CategoryController extends Controller
     public function destroy(string $id)
     {
         
-        $check = $this->category->checkActive($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data category!");
+        $check = $this->productVarian->checkActive($id);
+        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data product varian!");
 
         DB::beginTransaction();
         try {
-            $this->category->delete($id);
+            $this->productVarian->delete($id);
 
             DB::commit();
             return BaseResponse::Ok('Berhasil menghapus data', null);
@@ -151,15 +146,15 @@ class CategoryController extends Controller
         }
     }
 
-    public function listCategory(Request $request)
+    public function listProductVarian(Request $request)
     {
         try{
             $payload = [];
 
             if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
-            $data = $this->category->customQuery($payload)->get();
+            $data = $this->productVarian->customQuery($payload)->get();
 
-            return BaseResponse::Ok("Berhasil mengambil data category", $data);
+            return BaseResponse::Ok("Berhasil mengambil data product varian", $data);
         }catch(\Throwable $th) {
           return BaseResponse::Error($th->getMessage(), null);  
         }

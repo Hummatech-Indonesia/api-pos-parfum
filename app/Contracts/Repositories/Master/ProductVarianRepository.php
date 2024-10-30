@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Contracts\Repositories;
+namespace App\Contracts\Repositories\Master;
 
-use App\Contracts\Interfaces\CategoryInterface;
-use App\Models\Category;
-use Illuminate\Database\QueryException;
+use App\Contracts\Interfaces\Master\ProductVarianInterface;
+use App\Contracts\Repositories\BaseRepository;
+use App\Models\ProductVarian;
 
-class CategoryRepository extends BaseRepository implements CategoryInterface
+class ProductVarianRepository extends BaseRepository implements ProductVarianInterface
 {
-    public function __construct(Category $category)
+
+    public function __construct(ProductVarian $productVarian)
     {
-        $this->model = $category;
+        $this->model = $productVarian;
     }
 
     public function get(): mixed
@@ -41,7 +42,8 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
         ->when(count($data) > 0, function ($query) use ($data){
             if(isset($data["search"])){
                 $query->where(function ($query2) use ($data) {
-                    $query2->where('name', 'like', '%' . $data["search"] . '%');
+                    $query2->where('name', 'like', '%' . $data["search"] . '%')
+                    ->orwhere('address', 'like', '%' . $data["search"] . '%');
                 });
                 unset($data["search"]);
             }
@@ -73,4 +75,5 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
     {
         return $this->show($id)->update(["is_delete" => 1]);
     }
+
 }

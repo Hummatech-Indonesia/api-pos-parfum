@@ -2,7 +2,9 @@
 
 use App\Helpers\BaseResponse;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Dashboard\CategoryController;
 use App\Http\Controllers\Master\OutletController;
+use App\Http\Controllers\Master\ProductVarianController;
 use App\Http\Controllers\Master\WarehouseController;
 use App\Http\Controllers\Uma\UserController;
 use Illuminate\Http\Request;
@@ -47,6 +49,12 @@ Route::middleware('auth:sanctum')->group(function() {
         // API FOR DATA WAREHOUSE
         Route::get('warehouses/no-paginate', [WarehouseController::class, 'listWarehouse'])->name('list-warehouses-no-paginate');
         Route::resource("warehouses", WarehouseController::class)->only(['store','destroy','update']);
+        // API FOR DATA CATEGORY
+        Route::get('categories/no-paginate', [CategoryController::class, 'listCategory'])->name('list-categories-no-paginate');
+        Route::resource("categories", CategoryController::class)->only(['store','destroy','update']);
+        // API FOR DATA PRODUCT VARIAN
+        Route::get('product-varians/no-paginate', [ProductVarianController::class, 'listProductVarian'])->name('list-product-varians-no-paginate');
+        Route::resource("product-varians", ProductVarianController::class)->only(['store','destroy','update']);
     });
     
     // API FOR DATA USER
@@ -55,4 +63,8 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::resource("outlets", OutletController::class)->except(['store','destroy','update']);
     // API FOR DATA WAREHOUSE
     Route::resource("warehouses", WarehouseController::class)->except(['store','destroy','update']);
+    // API FOR DATA CATEGORY
+    Route::resource("categories", CategoryController::class)->except(['store','destroy','update']);
+    // API FOR DATA WAREHOUSE
+    Route::resource("product-varians", ProductVarianController::class)->except(['store','destroy','update']);
 });

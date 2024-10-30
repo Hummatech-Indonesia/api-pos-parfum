@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Store extends Model
+class Product extends Model
 {
     use HasFactory, HasUuids;
 
@@ -18,29 +18,29 @@ class Store extends Model
 
     protected $guarded = [];
 
-    public function user(): BelongsTo
+    /**
+     * Get data relation belongs to with store
+     */
+    public function store(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Store::class);
     }
 
-    public function users(): HasMany
+    /**
+     * 
+     */
+    public function details(): HasMany
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(ProductDetail::class);
     }
 
-    public function products(): HasMany
+    public function discountVoucher(): HasMany
     {
-        return $this->hasMany(Product::class);
-    }
-
-    public function discountVouchers(): HasMany
-    {
-        return $this->hasMany(DiscountVoucher::class);
+        return $this->hasMany(ProductDetail::class);
     }
 
     public function discountVoucherActive(): HasMany
     {
         return $this->where('is_delete',0)->where('is_active',1)->hasMany(ProductDetail::class);
     }
-
 }
