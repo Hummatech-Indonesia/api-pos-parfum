@@ -2,16 +2,16 @@
 
 namespace App\Contracts\Repositories\Master;
 
-use App\Contracts\Interfaces\Master\ProductVarianInterface;
+use App\Contracts\Interfaces\Master\ProductDetailInterface;
 use App\Contracts\Repositories\BaseRepository;
-use App\Models\ProductVarian;
+use App\Models\ProductDetail;
 
-class ProductVarianRepository extends BaseRepository implements ProductVarianInterface
+class ProductDetailRepository extends BaseRepository implements ProductDetailInterface
 {
 
-    public function __construct(ProductVarian $productVarian)
+    public function __construct(ProductDetail $productDetail)
     {
-        $this->model = $productVarian;
+        $this->model = $productDetail;
     }
 
     public function get(): mixed
@@ -42,8 +42,7 @@ class ProductVarianRepository extends BaseRepository implements ProductVarianInt
         ->when(count($data) > 0, function ($query) use ($data){
             if(isset($data["search"])){
                 $query->where(function ($query2) use ($data) {
-                    $query2->where('name', 'like', '%' . $data["search"] . '%')
-                    ->orwhere('address', 'like', '%' . $data["search"] . '%');
+                    $query2->where('name', 'like', '%' . $data["search"] . '%');
                 });
                 unset($data["search"]);
             }
