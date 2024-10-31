@@ -59,10 +59,13 @@ class ProductVarianController extends Controller
         
         $validator = Validator::make($request->all(), [
             "name" => "required|unique:product_varians,name",
+        ],[
+            'name.required' => 'Nama kategori harus diisi!',
+            'name.unique' => 'Nama kategori telah digunakan!'
         ]);
         
         if ($validator->fails()) {
-            return BaseResponse::error("Kesalahan dalam input data!", $validator->fails());
+            return BaseResponse::error("Kesalahan dalam input data!", $validator->errors());
         }
 
         DB::beginTransaction();
@@ -105,10 +108,13 @@ class ProductVarianController extends Controller
     {
         $validator = Validator::make($request->all(), [
             "name" => "required|unique:product_varians,name," . $id,
+        ],[
+            'name.required' => 'Nama kategori harus diisi!',
+            'name.unique' => 'Nama kategori telah digunakan!'
         ]);
         
         if ($validator->fails()) {
-            return BaseResponse::error("Kesalahan dalam input data!", $validator->fails());
+            return BaseResponse::error("Kesalahan dalam input data!", $validator->errors());
         }
 
         $check = $this->productVarian->checkActive($id);

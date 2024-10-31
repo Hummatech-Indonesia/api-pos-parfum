@@ -12,10 +12,12 @@ class Category extends Model implements HasArticles
     use HasFactory;
 
     public $incrementing = false;
-    public $fillable = ['id', 'name'];
+
     public $keyType = 'string';
     protected $table = 'categories';
     protected $primaryKey = 'id';
+
+    protected $guarded = [];
 
     /**
      * One-to-Many relationship with Article Model

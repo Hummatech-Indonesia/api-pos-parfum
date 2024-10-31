@@ -59,19 +59,21 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        
         $validator = Validator::make($request->all(), [
             "name" => "required|unique:categories,name",
+        ],[
+            'name.required' => 'Nama kategori harus diisi!',
+            'name.unique' => 'Nama kategori telah digunakan!'
         ]);
         
         if ($validator->fails()) {
-            return BaseResponse::error("Kesalahan dalam input data!", $validator->fails());
+            return BaseResponse::error("Kesalahan dalam input data!", $validator->errors());
         }
 
         DB::beginTransaction();
         try {
             $store_id = null;
-            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id; 
             $result_category = $this->category->store(["name" => $request->name, "store_id" => $store_id]);
     
             DB::commit();
@@ -110,10 +112,13 @@ class CategoryController extends Controller
     {
         $validator = Validator::make($request->all(), [
             "name" => "required|unique:categories,name," . $id,
+        ],[
+            'name.required' => 'Nama kategori harus diisi!',
+            'name.unique' => 'Nama kategori telah digunakan!'
         ]);
         
         if ($validator->fails()) {
-            return BaseResponse::error("Kesalahan dalam input data!", $validator->fails());
+            return BaseResponse::error("Kesalahan dalam input data!", $validator->errors());
         }
 
         $check = $this->category->checkActive($id);
