@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Base\Interfaces\HasArticles;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model implements HasArticles
@@ -36,5 +37,10 @@ class Category extends Model implements HasArticles
     public function productDetails(): HasMany
     {
         return $this->hasMany(ProductDetail::class);
+    }
+
+    public function store(): BelongsTo
+    {
+        return $this->belongsTo(Store::class);
     }
 }
