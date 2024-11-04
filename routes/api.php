@@ -58,8 +58,8 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::get('categories/no-paginate', [CategoryController::class, 'listCategory'])->name('list-categories-no-paginate');
         Route::resource("categories", CategoryController::class)->only(['store','destroy','update']);
         // API FOR DATA PRODUCT VARIAN
-        Route::get('product-variants/no-paginate', [ProductVarianController::class, 'listProductVarian'])->name('list-product-variants-no-paginate');
-        Route::resource("product-variants", ProductVarianController::class)->only(['store','destroy','update']);
+        Route::get('variants/no-paginate', [ProductVarianController::class, 'listProductVarian'])->name('list-variants-no-paginate');
+        Route::resource("variants", ProductVarianController::class)->only(['store','destroy','update']);
         // API FOR DATA DISCOUNT VOUCHER
         Route::get('discount-vouchers/no-paginate', [DiscountVoucherController::class, 'listDiscountVoucher'])->name('list-discount-vouchers-no-paginate');
         Route::resource("discount-vouchers", DiscountVoucherController::class)->only(['store','destroy','update']);
@@ -76,7 +76,7 @@ Route::middleware('auth:sanctum')->group(function() {
     // API FOR DATA CATEGORY
     Route::resource("categories", CategoryController::class)->except(['store','destroy','update']);
     // API FOR DATA PRODUCT VARIANTS
-    Route::resource("product-variants", ProductVarianController::class)->except(['store','destroy','update']);
+    Route::resource("variants", ProductVarianController::class)->except(['store','destroy','update']);
     // API FOR DATA DISCOUNT VOUCHER
     Route::resource("discount-vouchers", DiscountVoucherController::class)->except(['store','destroy','update']);
 });

@@ -43,4 +43,9 @@ class Category extends Model implements HasArticles
     {
         return $this->belongsTo(Store::class);
     }
+
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
 }
