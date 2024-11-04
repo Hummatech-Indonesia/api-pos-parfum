@@ -26,6 +26,7 @@ class UserRepository extends BaseRepository implements UserInterface
     public function customQuery(array $data): mixed
     {
         $role = null;
+        if(isset($data["_token"])) unset($data["_token"]);
         try{
             $role = $data["role"];
             unset($data["role"]);
@@ -39,11 +40,6 @@ class UserRepository extends BaseRepository implements UserInterface
         return $this->model->query()
         ->with('store','related_store','roles','warehouse','outlet')
         ->when(count($data) > 0, function ($query) use ($data){
-            if(isset($data["user_id"])){
-                $query->whereIn('id',$data["user_id"]);
-                unset($data["user_id"]);
-            }
-
             if(isset($data["warehouse"])){
                 if($data["warehouse"] == "false"){
                     $query->whereDoesntHave("warehouse");
@@ -51,6 +47,11 @@ class UserRepository extends BaseRepository implements UserInterface
                     $query->whereHas('warehouse');
                 }
                 unset($data["warehouse"]);
+
+                if(isset($data["user_id"])){
+                    $query->orWhere("user_id", $data["user_id"]);
+                    unset($data["user_id"]);
+                }
             }
 
             if(isset($data["outlet"])){
@@ -60,6 +61,16 @@ class UserRepository extends BaseRepository implements UserInterface
                     $query->whereHas('outlet');
                 }
                 unset($data["outlet"]);
+
+                if(isset($data["user_id"])){
+                    $query->orWhere("user_id", $data["user_id"]);
+                    unset($data["user_id"]);
+                }    
+            }
+
+            if(isset($data["user_id"])){
+                $query->whereIn('id',$data["user_id"]);
+                unset($data["user_id"]);
             }
 
             foreach ($data as $index => $value){
@@ -74,6 +85,7 @@ class UserRepository extends BaseRepository implements UserInterface
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         $role = null;
+        if(isset($data["_token"])) unset($data["_token"]);
         try{
             $role = $data["role"];
             unset($data["role"]);

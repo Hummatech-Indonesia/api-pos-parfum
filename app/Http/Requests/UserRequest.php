@@ -25,9 +25,14 @@ class UserRequest extends FormRequest
      */
     public function rules(): array
     {
+        $id = $this->request->get('id');
+        if($this->method() == "PUT" || $this->method() == "PATCH"){
+            $url = explode(",", $this->url());
+            $id = $url[count($url) - 1];
+        } 
         return [
             "name" => 'required',
-            "email" => 'required|email|unique:users,email',
+            "email" => 'required|email|unique:users,email,' . $id,
             'password' => 'required|min:8',
             'role' => 'required|array'
         ];
