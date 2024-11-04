@@ -26,7 +26,7 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
-        ->with('store')
+        ->with('store')->withCount('products')
         ->when(count($data) > 0, function ($query) use ($data){
             foreach ($data as $index => $value){
                 $query->where($index, $value);
@@ -37,7 +37,7 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-        ->with('store')
+        ->with('store')->withCount('products')
         ->when(count($data) > 0, function ($query) use ($data){
             if(isset($data["search"])){
                 $query->where(function ($query2) use ($data) {
@@ -56,12 +56,12 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
 
     public function show(mixed $id): mixed
     {
-        return $this->model->with('store')->find($id);
+        return $this->model->with('store')->withCount('products')->find($id);
     }
 
     public function checkActive(mixed $id): mixed
     {
-        return $this->model->with('store')->where('is_delete',0)->find($id);
+        return $this->model->with('store')->withCount('products')->where('is_delete',0)->find($id);
     }
 
     public function update(mixed $id, array $data): mixed
