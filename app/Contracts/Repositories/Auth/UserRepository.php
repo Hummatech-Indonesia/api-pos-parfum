@@ -86,6 +86,8 @@ class UserRepository extends BaseRepository implements UserInterface
     {
         $role = null;
         if(isset($data["_token"])) unset($data["_token"]);
+        if(isset($data["page"])) unset($data["page"]);
+        if(isset($data["per_page"])) unset($data["per_page"]);
         try{
             $role = $data["role"];
             unset($data["role"]);
