@@ -85,12 +85,16 @@ class UserRepository extends BaseRepository implements UserInterface
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         $role = null;
+        $search = null;
         if(isset($data["_token"])) unset($data["_token"]);
         if(isset($data["page"])) unset($data["page"]);
         if(isset($data["per_page"])) unset($data["per_page"]);
         try{
             $role = $data["role"];
             unset($data["role"]);
+
+            $search = $data["search"];
+            unset($data["search"]);
 
             $role = str_replace(["[", "]", "'"], "", $role);
             $role = explode(",", $role);
@@ -100,13 +104,12 @@ class UserRepository extends BaseRepository implements UserInterface
 
         return $this->model->query()
         ->with('store','related_store','roles','warehouse','outlet')
-        ->when(count($data) > 0, function ($query) use ($data){
-            if(isset($data["search"])){
-                $query->where(function ($query2) use ($data) {
-                    $query2->where('name', 'like', '%' . $data["search"] . '%')
-                    ->orwhere('email', 'like', '%' . $data["search"] . '%');
+        ->when(count($data) > 0, function ($query) use ($data, $search){
+            if($search && $search != ''){
+                $query->where(function ($query2) use ($search) {
+                    $query2->where('name', 'like', '%' . $search . '%')
+                    ->orwhere('email', 'like', '%' . $search . '%');
                 });
-                unset($data["search"]);
             }
             
             foreach ($data as $index => $value){
