@@ -59,4 +59,10 @@ class ProductRequest extends FormRequest
     public function failedValidation(Validator $validator){
         throw new HttpResponseException(BaseResponse::Error("Kesalahan dalam input data!", $validator->errors()));
     }
+
+    public function prepareForValidation()
+    {
+        if(!$this->product_details) $this->merge(["product_details" => []]);
+        if(!$this->qr_code) $this->merge(["qr_code" => null]);
+    }
 }
