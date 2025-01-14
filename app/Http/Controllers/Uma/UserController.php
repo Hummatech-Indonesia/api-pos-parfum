@@ -112,9 +112,10 @@ class UserController extends Controller
         DB::beginTransaction();
         try {
             $user = $this->userService->mappingDataUser($data);
-            $result_user = $this->user->update($id, $user);
-    
-            $result_user->syncRoles($request->role);
+            $this->user->update($id, $user);
+
+            $selectUser = $this->user->show($id);
+            $selectUser->syncRoles($request->role);
 
             DB::commit();
             return BaseResponse::Ok('Berhasil update user', null);
