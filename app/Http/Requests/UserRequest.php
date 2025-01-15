@@ -30,7 +30,8 @@ class UserRequest extends FormRequest
             "name" => 'required',
             "email" => 'required|email|unique:users,email,' . $id,
             'password' => 'required|min:8',
-            'role' => 'required|array'
+            'role' => 'required|array',
+            'image' => 'nullable|image|max:1024'
         ];
     }
 
@@ -42,7 +43,9 @@ class UserRequest extends FormRequest
             'email.email' => 'Format yang dikirimkan harus berupa email!',
             'email.unique' => 'Email telah digunakan, silahkan masukan kembali email anda!',
             'role.required' => 'Role user tidak boleh kosong!',
-            'role.array' => 'Isikan field "role" berupa array data!'
+            'role.array' => 'Isikan field "role" berupa array data!',
+            'image.image' => 'Gambar profil harus berupa image',
+            'image.max' => 'Gambar memiliki max 1mb!'
         ];
     }
 
