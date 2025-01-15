@@ -89,9 +89,7 @@ class WarehouseController extends Controller
     {
         $check_warehouse = $this->warehouse->show($id);
         if(!$check_warehouse) return BaseResponse::Notfound("Tidak dapat menemukan data warehouse!");
-
-        $check_warehouse->role = $check_warehouse->getRoleNames();
-
+        
         return BaseResponse::Ok("Berhasil mengambil detail warehouse!", $check_warehouse);
     }
 

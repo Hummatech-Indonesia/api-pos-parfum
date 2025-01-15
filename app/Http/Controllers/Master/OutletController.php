@@ -94,8 +94,6 @@ class OutletController extends Controller
         $check_outlet = $this->outlet->show($id);
         if(!$check_outlet) return BaseResponse::Notfound("Tidak dapat menemukan data outlet!");
 
-        $check_outlet->role = $check_outlet->getRoleNames();
-
         return BaseResponse::Ok("Berhasil mengambil detail outlet!", $check_outlet);
     }
 

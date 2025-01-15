@@ -92,8 +92,6 @@ class CategoryController extends Controller
         $check_category = $this->category->show($id);
         if(!$check_category) return BaseResponse::Notfound("Tidak dapat menemukan data category!");
 
-        $check_category->role = $check_category->getRoleNames();
-
         return BaseResponse::Ok("Berhasil mengambil detail category!", $check_category);
     }
 
