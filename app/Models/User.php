@@ -32,7 +32,8 @@ class User extends Authenticatable implements HasArticles
         'store_id',
         'warehouse_id',
         'outlet_id',
-        'is_delete'
+        'is_delete',
+        'image'
     ];
 
     /**

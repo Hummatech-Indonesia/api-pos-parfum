@@ -90,11 +90,15 @@ class UserRepository extends BaseRepository implements UserInterface
         if(isset($data["page"])) unset($data["page"]);
         if(isset($data["per_page"])) unset($data["per_page"]);
         try{
-            $role = $data["role"];
-            unset($data["role"]);
+            if(isset($data["role"])){
+                $role = $data["role"];
+                unset($data["role"]);
+            }
 
-            $search = $data["search"];
-            unset($data["search"]);
+            if(isset($data["search"])){
+                $search = $data["search"];
+                unset($data["search"]);
+            }
 
             $role = str_replace(["[", "]", "'"], "", $role);
             $role = explode(",", $role);

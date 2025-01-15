@@ -13,31 +13,43 @@ class UserService
     {
         $data = (object)$data;
 
-        return [
+        $image = null;
+        try{
+            if(isset($data->image)) {
+                $image = $this->upload("users", $data->image);
+            }
+        }catch(\Throwable $th){ }
+
+        $result = [
             "name" => $data->name,
             "email" => $data->email,
             "password" => bcrypt($data->password)
         ];
+
+        if($image) {
+            $result["image"] = $image;
+        }
+
+        return $result;
     }
 
     public function addStore(array $data): array
     {
         $data = (object)$data;
 
-        $logo = null;
+        $image = null;
         try{
-            if(isset($data->logo)) {
-                $logo = $this->upload("store", $data->logo);
+            if(isset($data->image)) {
+                $image = $this->upload("users", $data->image);
             }
         }catch(\Throwable $th){ }
-        $data->logo = $logo;
 
 
         return [
             "user_id" => $data->user_id,
             "name" => $data->name_store,
             "address" => $data->address_store,
-            "logo" => $data->logo 
+            "image" => $image 
         ];
     }
 
