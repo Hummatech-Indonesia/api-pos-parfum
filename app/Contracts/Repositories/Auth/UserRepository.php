@@ -102,9 +102,7 @@ class UserRepository extends BaseRepository implements UserInterface
 
             $role = str_replace(["[", "]", "'"], "", $role);
             $role = explode(",", $role);
-        }catch(\Throwable $th){ 
-            $role = [];
-        }
+        }catch(\Throwable $th){ }
 
         return $this->model->query()
         ->with('store','related_store','roles','warehouse','outlet')
@@ -124,7 +122,7 @@ class UserRepository extends BaseRepository implements UserInterface
             $query->role($role);
         })
         ->paginate($pagination, ['*'], 'page', $page)
-        ->appends(['search' => isset($data["search"]) ?? '']);
+        ->withQueryString();
     }
 
     public function show(mixed $id): mixed
