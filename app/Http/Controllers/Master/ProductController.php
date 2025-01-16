@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Master;
 
+use App\Contracts\Interfaces\CategoryInterface;
 use App\Contracts\Interfaces\Master\ProductDetailInterface;
 use App\Contracts\Interfaces\Master\ProductInterface;
+use App\Contracts\Interfaces\Master\ProductVarianInterface;
 use App\Enums\UploadDiskEnum;
 use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
@@ -18,11 +20,16 @@ class ProductController extends Controller
     private ProductInterface $product;
     private ProductDetailInterface $productDetail;
     private ProductService $productService;
+    private ProductVarianInterface $productVarian;
+    private CategoryInterface $category;
 
-    public function __construct(ProductInterface $product, ProductDetailInterface $productDetail, ProductService $productService)
+    public function __construct(ProductInterface $product, ProductDetailInterface $productDetail, ProductService $productService,
+    ProductVarianInterface $productVarian, CategoryInterface $category)
     {
         $this->product = $product;
         $this->productDetail = $productDetail;
+        $this->productVarian = $productVarian;
+        $this->category = $category;
         $this->productService = $productService;
     }
 
@@ -74,6 +81,27 @@ class ProductController extends Controller
 
             foreach($data["product_details"] as $detail){
                 $detail["product_id"] = $result_product->id;
+                
+                /**
+                 * Pengecekan apakah data varian yang dikirim sudah ada atau belum
+                 */
+                $check_varian = $this->productVarian->show($detail["product_varian_id"]);
+                if(!$check_varian) {
+                    $this->productVarian->store(["name" => $detail["product_varian_id"]]);
+                    $store_varian = $this->productVarian->customQuery(["name" => $detail["product_varian_id"]])->first();
+                    $detail["product_varian_id"] = $store_varian->id;
+                } 
+
+                /**
+                 * Pengecekan apakah data kategori sudah ada atau belum
+                 */
+                $check_category = $this->category->show($detail["category_id"]);
+                if(!$check_category) {
+                    $this->category->store(["name" => $detail["category_id"]]);
+                    $store_category = $this->category->customQuery(["name" => $detail["category_id"]])->first();
+                    $detail["category_id"] = $store_category->id;
+                } 
+
                 $this->productDetail->store($detail);
             }
 

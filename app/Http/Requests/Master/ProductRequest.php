@@ -31,8 +31,8 @@ class ProductRequest extends FormRequest
             "qr_code" => "nullable",
             "product_details" => "sometimes|array",
             "product_details.*.product_id" => "nullable",
-            "product_details.*.category_id" => "sometimes",
-            "product_details.*.product_varian_id" => "sometimes",
+            "product_details.*.category_id" => "sometimes|unique:categories,name",
+            "product_details.*.product_varian_id" => "sometimes|unique:product_varians,name",
             "product_details.*.material" => "nullable",
             "product_details.*.unit" => "nullable",
             "product_details.*.capacity" => "nullable",
@@ -52,7 +52,9 @@ class ProductRequest extends FormRequest
             'image.max' => "Gambar maximal adalah 2mb",
             'unit_type.required' => 'Tipe unit harus diisi!',
             'unit_type.in' => 'Tipe unit yang bidsa dipakai adalah weight, volume, atau unit!',
-            'product_details.array' => 'Data produk varian tidak valid!'
+            'product_details.array' => 'Data produk varian tidak valid!',
+            'product_details.*.product_varian_id.unique' => 'Varian ini telah ada, silahkan pilih varian tanpa memembuat ulang!',
+            'product_details.*.category_id.unique' => 'Kategori ini telah ada, silahkan pilih kategori tanpa memembuat ulang!'
         ];
     }
 

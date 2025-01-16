@@ -15,8 +15,9 @@ class CategoryRequest extends BaseRequest
 
     public function rules(): array
     {
+        $id = $this->categories;
         return [
-            'name' => 'required|max:255'
+            'name' => 'required|max:255|unique:categories,name,except,'.$id
         ];
     }
 
