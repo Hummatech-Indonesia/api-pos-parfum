@@ -157,7 +157,9 @@ class ProductVarianController extends Controller
     public function listProductVarian(Request $request)
     {
         try{
-            $payload = [];
+            $payload = [
+                "is_delete" => 0
+            ];
 
             if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
             $data = $this->productVarian->customQuery($payload)->get();
