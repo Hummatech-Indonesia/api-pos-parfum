@@ -115,7 +115,7 @@ class UserRepository extends BaseRepository implements UserInterface
             }
             
             foreach ($data as $index => $value){
-                $query->where($index, $value);
+                if($value && $value != "") $query->where($index, $value);
             }
         })
         ->when($role, function ($query) use ($role){

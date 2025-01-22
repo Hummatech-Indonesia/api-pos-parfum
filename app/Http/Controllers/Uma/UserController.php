@@ -9,6 +9,7 @@ use App\Http\Requests\UserRequest;
 use App\Services\Auth\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -49,7 +50,8 @@ class UserController extends Controller
     
             return BaseResponse::Paginate('Berhasil mengambil list data user!', $data, $result_user);
         }catch(\Throwable $th){
-            return BaseResponse::Error($th->getMessage(), null);
+            Log::error("Gagal dalam mengambil list paginate user => ", $th->getMessage());
+            return BaseResponse::Error("Gagal dalam mengambil list paginate user!", null);
         }
     }
 
