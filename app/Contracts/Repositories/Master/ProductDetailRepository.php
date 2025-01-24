@@ -27,7 +27,6 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
-        ->with('store')
         ->when(count($data) > 0, function ($query) use ($data){
             foreach ($data as $index => $value){
                 $query->where($index, $value);
@@ -57,12 +56,12 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
 
     public function show(mixed $id): mixed
     {
-        return $this->model->with('store')->find($id);
+        return $this->model->find($id);
     }
 
     public function checkActive(mixed $id): mixed
     {
-        return $this->model->with('store')->where('is_delete',0)->find($id);
+        return $this->model->where('is_delete',0)->find($id);
     }
 
     public function update(mixed $id, array $data): mixed

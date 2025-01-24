@@ -106,7 +106,7 @@ class ProductController extends Controller
             }
 
             DB::commit();
-            return BaseResponse::Ok('Berhasil membuat product ', $result_product);
+            return BaseResponse::Ok('Berhasil membuat product ', $result_product->load(['details']));
         }catch(\Throwable $th){
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
@@ -145,8 +145,50 @@ class ProductController extends Controller
             if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $data["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
             $mapProduct = $this->productService->dataProduct($data);
             
-            $result_product = $this->product->update($id, $mapProduct);
+            $this->product->update($id, $mapProduct);
+            $select_product = $this->product->show($id);
+            $products = $select_product->details->where('is_delete', 0);
 
+            foreach($data["product_details"] as $detail){
+                $detail["product_id"] = $id;
+
+                /**
+                 * Pengecekan apakah data varian yang dikirim sudah ada atau belum
+                 */
+                $check_varian = $this->productVarian->show($detail["product_varian_id"]);
+                if(!$check_varian) {
+                    $this->productVarian->store(["name" => $detail["product_varian_id"]]);
+                    $store_varian = $this->productVarian->customQuery(["name" => $detail["product_varian_id"]])->first();
+                    $detail["product_varian_id"] = $store_varian->id;
+                } 
+
+                /**
+                 * Pengecekan apakah data kategori sudah ada atau belum
+                 */
+                $check_category = $this->category->show($detail["category_id"]);
+                if(!$check_category) {
+                    $this->category->store(["name" => $detail["category_id"]]);
+                    $store_category = $this->category->customQuery(["name" => $detail["category_id"]])->first();
+                    $detail["category_id"] = $store_category->id;
+                } 
+                
+                if(isset($detail["product_detail_id"])){
+                    $products = collect($products)->map(function($item) use ($detail) {
+                        return $item->id != $detail["product_detail_id"];
+                    });
+
+                    $this->productDetail->update($detail["product_detail_id"], $detail);
+                } else {
+                    $this->productDetail->store($detail);
+                }
+            }
+
+            foreach($products as $product_detail){
+                $product_detail->is_delete = 1;
+                $product_detail->save();
+            } 
+            
+            $result_product = $this->product->checkActive($id);
             DB::commit();
             return BaseResponse::Ok('Berhasil update product', $result_product);
         }catch(\Throwable $th){

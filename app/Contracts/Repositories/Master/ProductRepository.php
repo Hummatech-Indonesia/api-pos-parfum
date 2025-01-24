@@ -57,12 +57,14 @@ class ProductRepository extends BaseRepository implements ProductInterface
 
     public function show(mixed $id): mixed
     {
-        return $this->model->with('store')->find($id);
+        return $this->model->with('store','details')->find($id);
     }
 
     public function checkActive(mixed $id): mixed
     {
-        return $this->model->with('store')->where('is_delete',0)->find($id);
+        return $this->model->with(['store','details' => function ($query) {
+            $query->where('is_delete',0);
+        }])->whereRelation('details','is_delete', 0)->where('is_delete',0)->find($id);
     }
 
     public function update(mixed $id, array $data): mixed
