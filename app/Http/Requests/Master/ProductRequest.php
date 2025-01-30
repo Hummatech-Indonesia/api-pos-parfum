@@ -34,18 +34,8 @@ class ProductRequest extends FormRequest
             "product_details" => "sometimes|array",
             "product_details.*.product_detail_id" => "nullable",
             "product_details.*.product_id" => "nullable",
-            "product_details.*.category_id" => [
-                'sometimes',
-                Rule::unique('categories', 'name')->where(function ($query) use ($store_id) {
-                    return $query->where('store_id', $store_id);
-                }),
-            ],
-            "product_details.*.product_varian_id" => [
-                'sometimes',
-                Rule::unique('product_varians','name')->where(function ($query) use ($store_id) {
-                    return $query->where('store_id', $store_id);
-                }),
-            ],
+            "product_details.*.category_id" => 'sometimes',
+            "product_details.*.product_varian_id" => 'sometimes',
             "product_details.*.material" => "nullable",
             "product_details.*.unit" => "nullable",
             "product_details.*.capacity" => "nullable",
