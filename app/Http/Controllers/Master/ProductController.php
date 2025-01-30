@@ -148,7 +148,7 @@ class ProductController extends Controller
             $this->product->update($id, $mapProduct);
             $select_product = $this->product->show($id);
             $products = $select_product->details->where('is_delete', 0);
-
+        
             foreach($data["product_details"] as $detail){
                 $detail["product_id"] = $id;
 
@@ -173,18 +173,20 @@ class ProductController extends Controller
                 } 
                 
                 if(isset($detail["product_detail_id"])){
-                    $products = collect($products)->map(function($item) use ($detail) {
+                    $idDetail = $detail["product_detail_id"];
+                    $products = collect($products)->filter(function($item) use ($detail) {
                         return $item->id != $detail["product_detail_id"];
                     });
-
-                    $this->productDetail->update($detail["product_detail_id"], $detail);
+                    
+                    unset($detail["product_detail_id"]);
+                    $this->productDetail->update($idDetail, $detail);
                 } else {
                     $this->productDetail->store($detail);
                 }
             }
-
+            
             foreach($products as $product_detail){
-                $product_detail->is_delete = 1;
+                $product_detail->is_delete = true;
                 $product_detail->save();
             } 
             

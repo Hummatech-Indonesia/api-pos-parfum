@@ -30,6 +30,7 @@ class ProductRequest extends FormRequest
             "unit_type" => "required|in:weight,volume,unit",
             "qr_code" => "nullable",
             "product_details" => "sometimes|array",
+            "product_details.*.product_detail_id" => "nullable",
             "product_details.*.product_id" => "nullable",
             "product_details.*.category_id" => "sometimes|unique:categories,name",
             "product_details.*.product_varian_id" => "sometimes|unique:product_varians,name",
