@@ -85,20 +85,38 @@ class ProductController extends Controller
                 /**
                  * Pengecekan apakah data varian yang dikirim sudah ada atau belum
                  */
-                $check_varian = $this->productVarian->show($detail["product_varian_id"]);
+                $check_varian = $this->productVarian->customQuery(["id" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
                 if(!$check_varian) {
-                    $this->productVarian->store(["name" => $detail["product_varian_id"]]);
-                    $store_varian = $this->productVarian->customQuery(["name" => $detail["product_varian_id"]])->first();
+                    /**
+                     * Check varian name has owned in this store
+                     */
+                    $checkVarianName = $this->productVarian->customQuery(["id" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
+                    if($checkVarianName){
+                        DB::rollBack();
+                        return BaseResponse::Error("Nama varian telah ada di store ini!", null);
+                    }
+
+                    $this->productVarian->store(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]]);
+                    $store_varian = $this->productVarian->customQuery(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
                     $detail["product_varian_id"] = $store_varian->id;
-                } 
+                }  
 
                 /**
                  * Pengecekan apakah data kategori sudah ada atau belum
                  */
-                $check_category = $this->category->show($detail["category_id"]);
+                $check_category = $this->category->customQuery(["id" => $detail["category_id"], "store_id" => $data["store_id"]])->first();
                 if(!$check_category) {
-                    $this->category->store(["name" => $detail["category_id"]]);
-                    $store_category = $this->category->customQuery(["name" => $detail["category_id"]])->first();
+                     /**
+                     * Check category name has owned in this store
+                     */
+                    $checkCategoryName = $this->category->customQuery(["name" => $detail["category_id"], "store_id" => $data["store_id"]])->first();
+                    if($checkCategoryName){
+                        DB::rollBack();
+                        return BaseResponse::Error("Nama kategori telah ada di store ini!", null);
+                    }
+
+                    $this->category->store(["name" => $detail["category_id"], "store_id" => $data["store_id"]]);
+                    $store_category = $this->category->customQuery(["name" => $detail["category_id"], "store_id" => $data["store_id"]])->first();
                     $detail["category_id"] = $store_category->id;
                 } 
 
@@ -155,20 +173,38 @@ class ProductController extends Controller
                 /**
                  * Pengecekan apakah data varian yang dikirim sudah ada atau belum
                  */
-                $check_varian = $this->productVarian->show($detail["product_varian_id"]);
+                $check_varian = $this->productVarian->customQuery(["id" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
                 if(!$check_varian) {
-                    $this->productVarian->store(["name" => $detail["product_varian_id"]]);
-                    $store_varian = $this->productVarian->customQuery(["name" => $detail["product_varian_id"]])->first();
+                    /**
+                     * Check varian name has owned in this store
+                     */
+                    $checkVarianName = $this->productVarian->customQuery(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
+                    if($checkVarianName){
+                        DB::rollBack();
+                        return BaseResponse::Error("Nama varian telah ada di store ini!", null);
+                    }
+
+                    $this->productVarian->store(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]]);
+                    $store_varian = $this->productVarian->customQuery(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
                     $detail["product_varian_id"] = $store_varian->id;
                 } 
 
                 /**
                  * Pengecekan apakah data kategori sudah ada atau belum
                  */
-                $check_category = $this->category->show($detail["category_id"]);
+                $check_category = $this->category->customQuery(["id" => $detail["category_id"], "store_id" => $data["store_id"]])->first();
                 if(!$check_category) {
-                    $this->category->store(["name" => $detail["category_id"]]);
-                    $store_category = $this->category->customQuery(["name" => $detail["category_id"]])->first();
+                     /**
+                     * Check category name has owned in this store
+                     */
+                    $checkCategoryName = $this->category->customQuery(["name" => $detail["category_id"], "store_id" => $data["store_id"]])->first();
+                    if($checkCategoryName){
+                        DB::rollBack();
+                        return BaseResponse::Error("Nama kategori telah ada di store ini!", null);
+                    }
+
+                    $this->category->store(["name" => $detail["category_id"], "store_id" => $data["store_id"]]);
+                    $store_category = $this->category->customQuery(["name" => $detail["category_id"], "store_id" => $data["store_id"]])->first();
                     $detail["category_id"] = $store_category->id;
                 } 
                 

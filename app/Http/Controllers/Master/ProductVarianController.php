@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class ProductVarianController extends Controller
 {
@@ -56,9 +57,14 @@ class ProductVarianController extends Controller
      */
     public function store(Request $request)
     {
-        
+        $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
         $validator = Validator::make($request->all(), [
-            "name" => "required|unique:product_varians,name",
+            'name' => [
+                'required',
+                Rule::unique('product_varians','name')->where(function ($query) use ($store_id) {
+                    return $query->where('store_id', $store_id);
+                }),
+            ],
         ],[
             'name.required' => 'Nama kategori harus diisi!',
             'name.unique' => 'Nama kategori telah digunakan!'
@@ -106,8 +112,14 @@ class ProductVarianController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
         $validator = Validator::make($request->all(), [
-            "name" => "required|unique:product_varians,name," . $id,
+            'name' => [
+                'required',
+                Rule::unique('product_varians','name')->where(function ($query) use ($store_id) {
+                    return $query->where('store_id', $store_id);
+                })->ignore($id),
+            ],
         ],[
             'name.required' => 'Nama kategori harus diisi!',
             'name.unique' => 'Nama kategori telah digunakan!'

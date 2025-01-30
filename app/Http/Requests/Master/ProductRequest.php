@@ -6,6 +6,7 @@ use App\Helpers\BaseResponse;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class ProductRequest extends FormRequest
 {
@@ -24,6 +25,7 @@ class ProductRequest extends FormRequest
      */
     public function rules(): array
     {
+        $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
         return [
             "name" => "required",
             "image" => "nullable|image|mimes:png,jpg,jpeg|max:2048",
@@ -32,8 +34,18 @@ class ProductRequest extends FormRequest
             "product_details" => "sometimes|array",
             "product_details.*.product_detail_id" => "nullable",
             "product_details.*.product_id" => "nullable",
-            "product_details.*.category_id" => "sometimes|unique:categories,name",
-            "product_details.*.product_varian_id" => "sometimes|unique:product_varians,name",
+            "product_details.*.category_id" => [
+                'sometimes',
+                Rule::unique('categories', 'name')->where(function ($query) use ($store_id) {
+                    return $query->where('store_id', $store_id);
+                }),
+            ],
+            "product_details.*.product_varian_id" => [
+                'sometimes',
+                Rule::unique('product_varians','name')->where(function ($query) use ($store_id) {
+                    return $query->where('store_id', $store_id);
+                }),
+            ],
             "product_details.*.material" => "nullable",
             "product_details.*.unit" => "nullable",
             "product_details.*.capacity" => "nullable",
