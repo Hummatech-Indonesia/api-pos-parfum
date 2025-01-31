@@ -161,6 +161,20 @@ class UserController extends Controller
         }
     }
 
+    public function listUserV2(Request $request)
+    {
+        try{
+            $payload = $request->all();
+            $payload["is_delete"] = 0;
+
+            $user = $this->user->customQueryV2($payload)->get();
+    
+            return BaseResponse::Ok("Behasil mengambil data user!", $user);
+        }catch(\Throwable $th){
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
     public function listRole(Request $request)
     {
         try{

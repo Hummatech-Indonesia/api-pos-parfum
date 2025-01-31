@@ -13,4 +13,6 @@ use App\Contracts\Interfaces\Eloquent\UpdateInterface;
 interface UserInterface extends GetInterface, StoreInterface, CustomQueryInterface, CustomPaginateInterface, ShowInterface, UpdateInterface, DeleteInterface
 {
     public function checkUserActive(mixed $id): mixed;
+
+    public function customQueryV2(array $data): mixed;
 }
