@@ -159,10 +159,10 @@ class ProductController extends Controller
         DB::beginTransaction();
         try {
             if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $data["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
-            $mapProduct = $this->productService->dataProduct($data);
-            
-            $this->product->update($id, $mapProduct);
             $select_product = $this->product->show($id);
+            
+            $mapProduct = $this->productService->dataProductUpdate($data, $select_product);
+            $this->product->update($id, $mapProduct);
             $products = $select_product->details->where('is_delete', 0);
         
             foreach($data["product_details"] as $detail){
