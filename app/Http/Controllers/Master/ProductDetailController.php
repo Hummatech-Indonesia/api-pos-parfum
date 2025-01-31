@@ -120,9 +120,8 @@ class ProductDetailController extends Controller
      */
     public function destroy(string $id)
     {
-        
         $check = $this->productDetail->checkActive($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data product !");
+        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data product detail!");
 
         DB::beginTransaction();
         try {

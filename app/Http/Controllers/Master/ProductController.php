@@ -222,7 +222,7 @@ class ProductController extends Controller
                 $product_detail->save();
             } 
             
-            $result_product = $this->product->checkActive($id);
+            $result_product = $this->product->checkActiveWithDetail($id);
             DB::commit();
             return BaseResponse::Ok('Berhasil update product', $result_product);
         }catch(\Throwable $th){

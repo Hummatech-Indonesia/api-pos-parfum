@@ -7,6 +7,7 @@ use App\Http\Controllers\Dashboard\CategoryController;
 use App\Http\Controllers\Master\DiscountVoucherController;
 use App\Http\Controllers\Master\OutletController;
 use App\Http\Controllers\Master\ProductController;
+use App\Http\Controllers\Master\ProductDetailController;
 use App\Http\Controllers\Master\ProductVarianController;
 use App\Http\Controllers\Master\WarehouseController;
 use App\Http\Controllers\Uma\UserController;
@@ -56,8 +57,8 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::get('products/no-paginate', [ProductController::class, 'listProduct'])->name('list-products-no-paginate');
         Route::resource("products", ProductController::class)->only(['store','destroy','update']);
         // API FOR DATA PRODUCT DETAIL
-        Route::get('product-details/no-paginate', [ProductController::class, 'listProduct'])->name('list-product-details-no-paginate');
-        Route::resource("product-details", ProductController::class)->only(['store','destroy','update']);
+        Route::get('product-details/no-paginate', [ProductDetailController::class, 'listProduct'])->name('list-product-details-no-paginate');
+        Route::resource("product-details", ProductDetailController::class)->only(['store','destroy','update']);
         // API FOR DATA CATEGORY
         Route::get('categories/no-paginate', [CategoryController::class, 'listCategory'])->name('list-categories-no-paginate');
         Route::resource("categories", CategoryController::class)->only(['store','destroy','update']);
@@ -78,7 +79,7 @@ Route::middleware('auth:sanctum')->group(function() {
     // API FOR DATA PRODUCT
     Route::resource("products", ProductController::class)->except(['store','destroy','update']);
     // API FOR DATA PRODUCT DETAIL
-    Route::resource("product-details", ProductController::class)->except(['store','destroy','update']);
+    Route::resource("product-details", ProductDetailController::class)->except(['store','destroy','update']);
     // API FOR DATA CATEGORY
     Route::resource("categories", CategoryController::class)->except(['store','destroy','update']);
     // API FOR DATA PRODUCT VARIANTS
