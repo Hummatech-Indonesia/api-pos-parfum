@@ -68,7 +68,7 @@ class ProductRepository extends BaseRepository implements ProductInterface
     public function checkActiveWithDetail(mixed $id): mixed
     {
         return $this->model->with(['store','details' => function ($query) {
-            $query->where('is_delete',0);
+            $query->with('varian', 'category')->where('is_delete',0);
         }])->whereRelation('details','is_delete', 0)->where('is_delete',0)->find($id);
     }
 

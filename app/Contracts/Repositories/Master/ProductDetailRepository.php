@@ -27,6 +27,7 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
+        ->with('varian', 'product', 'category')
         ->when(count($data) > 0, function ($query) use ($data){
             foreach ($data as $index => $value){
                 $query->where($index, $value);
@@ -37,7 +38,7 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-        ->with('store')
+        ->with('varian', 'product', 'category')
         ->when(count($data) > 0, function ($query) use ($data){
             if(isset($data["search"])){
                 $query->where(function ($query2) use ($data) {
@@ -56,12 +57,12 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
 
     public function show(mixed $id): mixed
     {
-        return $this->model->find($id);
+        return $this->model->with('varian', 'product', 'category')->find($id);
     }
 
     public function checkActive(mixed $id): mixed
     {
-        return $this->model->where('is_delete',0)->find($id);
+        return $this->model->with('varian', 'product', 'category')->where('is_delete',0)->find($id);
     }
 
     public function update(mixed $id, array $data): mixed

@@ -134,7 +134,7 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        $check_product = $this->product->show($id);
+        $check_product = $this->product->checkActiveWithDetail($id);
         if(!$check_product) return BaseResponse::Notfound("Tidak dapat menemukan data product !");
 
         return BaseResponse::Ok("Berhasil mengambil detail product !", $check_product);
