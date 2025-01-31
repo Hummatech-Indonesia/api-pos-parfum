@@ -109,7 +109,7 @@ class ProductController extends Controller
                      * Check category name has owned in this store
                      */
                     $checkCategoryName = $this->category->customQuery(["name" => $detail["category_id"], "store_id" => $data["store_id"]])->first();
-                    if($checkCategoryName){
+                    if(!$checkCategoryName){
                         $this->category->store(["name" => $detail["category_id"], "store_id" => $data["store_id"]]);
                         $store_category = $this->category->customQuery(["name" => $detail["category_id"], "store_id" => $data["store_id"]])->first();
                         $detail["category_id"] = $store_category->id;
@@ -195,7 +195,7 @@ class ProductController extends Controller
                      * Check category name has owned in this store
                      */
                     $checkCategoryName = $this->category->customQuery(["name" => $detail["category_id"], "store_id" => $data["store_id"]])->first();
-                    if($checkCategoryName){
+                    if(!$checkCategoryName){
                         $this->category->store(["name" => $detail["category_id"], "store_id" => $data["store_id"]]);
                         $store_category = $this->category->customQuery(["name" => $detail["category_id"], "store_id" => $data["store_id"]])->first();
                         $detail["category_id"] = $store_category->id;
