@@ -14,4 +14,5 @@ interface ProductInterface extends GetInterface, StoreInterface, CustomQueryInte
 {
     public function checkActive(mixed $id): mixed;
     public function checkActiveWithDetail(mixed $id): mixed;
+    public function checkActiveWithDetailV2(mixed $id): mixed;
 }

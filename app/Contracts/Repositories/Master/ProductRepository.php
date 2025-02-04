@@ -72,6 +72,13 @@ class ProductRepository extends BaseRepository implements ProductInterface
         }])->whereRelation('details','is_delete', 0)->where('is_delete',0)->find($id);
     }
 
+    public function checkActiveWithDetailV2(mixed $id): mixed
+    {
+        return $this->model->with(['store','details' => function ($query) {
+            $query->with('varian', 'category')->where('is_delete',0);
+        }])->where('is_delete',0)->find($id);
+    }
+
     public function update(mixed $id, array $data): mixed
     {
         return $this->show($id)->update($data);

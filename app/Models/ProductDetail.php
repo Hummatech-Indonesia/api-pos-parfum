@@ -38,6 +38,6 @@ class ProductDetail extends Model
      */
     public function varian(): BelongsTo
     {
-        return $this->belongsTo(ProductVarian::class);
+        return $this->belongsTo(ProductVarian::class, 'product_varian_id');
     }
 }
