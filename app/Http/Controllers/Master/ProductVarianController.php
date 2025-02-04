@@ -153,6 +153,7 @@ class ProductVarianController extends Controller
         
         $check = $this->productVarian->checkActive($id);
         if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data product varian!");
+        if($check->products_count) return BaseResponse::Notfound("Data masih terikat dalam product!");
 
         DB::beginTransaction();
         try {

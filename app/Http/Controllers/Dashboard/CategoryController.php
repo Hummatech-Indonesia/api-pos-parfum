@@ -143,6 +143,7 @@ class CategoryController extends Controller
         
         $check = $this->category->checkActive($id);
         if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data category!");
+        if($check->products_count) return BaseResponse::Notfound("Data masih terikat dalam product!");
 
         DB::beginTransaction();
         try {
