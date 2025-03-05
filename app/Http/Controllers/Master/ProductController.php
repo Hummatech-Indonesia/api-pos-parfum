@@ -255,9 +255,9 @@ class ProductController extends Controller
     public function listProduct(Request $request)
     {
         try{
-            $payload = [
-                "is_delete" => 1
-            ];
+            $payload = [];
+
+            if($request->has('is_delete')) $payload["is_delete"] = $request->is_delete;
 
             if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
             $data = $this->product->customQuery($payload)->get();
