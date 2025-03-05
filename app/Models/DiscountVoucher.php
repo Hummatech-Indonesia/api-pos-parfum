@@ -30,7 +30,7 @@ class DiscountVoucher extends Model
      */
     public function outlet(): BelongsTo
     {
-        return $this->belongsTo(Outlet::class);
+        return $this->belongsTo(Outlet::class)->where('is_delete',0);
     }
 
     /**
@@ -38,6 +38,6 @@ class DiscountVoucher extends Model
      */
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class)->where('is_delete',0);
     }
 }

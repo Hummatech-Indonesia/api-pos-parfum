@@ -23,7 +23,7 @@ class Article extends Model implements HasUser, HasCategory
      */
     public function category(): BelongsTo
     {
-        return $this->belongsTo(Category::class, 'article_category_id');
+        return $this->belongsTo(Category::class, 'article_category_id')->where('is_delete', 0);
     }
 
     /**
@@ -33,6 +33,6 @@ class Article extends Model implements HasUser, HasCategory
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->where('is_delete',0);
     }
 }

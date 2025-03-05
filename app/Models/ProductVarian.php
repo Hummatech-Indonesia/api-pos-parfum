@@ -23,7 +23,7 @@ class ProductVarian extends Model
      */
     public function productDetails(): HasMany
     {
-        return $this->hasMany(ProductDetail::class);
+        return $this->hasMany(ProductDetail::class)->where('is_delete',0);
     }
 
     public function store(): BelongsTo
@@ -33,6 +33,6 @@ class ProductVarian extends Model
 
     public function products(): HasMany
     {
-        return $this->hasMany(ProductDetail::class);
+        return $this->hasMany(ProductDetail::class)->where('is_delete',0);
     }
 }

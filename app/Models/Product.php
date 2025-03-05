@@ -31,7 +31,7 @@ class Product extends Model
      */
     public function details(): HasMany
     {
-        return $this->hasMany(ProductDetail::class);
+        return $this->hasMany(ProductDetail::class)->where('is_delete',0);
     }
 
     public function active_details(): HasMany
@@ -41,7 +41,7 @@ class Product extends Model
 
     public function discountVoucher(): HasMany
     {
-        return $this->hasMany(ProductDetail::class);
+        return $this->hasMany(ProductDetail::class)->where('is_delete',0);
     }
 
     public function discountVoucherActive(): HasMany

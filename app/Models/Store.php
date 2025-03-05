@@ -25,17 +25,17 @@ class Store extends Model
 
     public function users(): HasMany
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(User::class)->where('is_delete',0);
     }
 
     public function products(): HasMany
     {
-        return $this->hasMany(Product::class);
+        return $this->hasMany(Product::class)->where('is_delete',0);
     }
 
     public function discountVouchers(): HasMany
     {
-        return $this->hasMany(DiscountVoucher::class);
+        return $this->hasMany(DiscountVoucher::class)->where('is_delete',0);
     }
 
     public function discountVoucherActive(): HasMany

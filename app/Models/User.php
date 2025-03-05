@@ -89,7 +89,7 @@ class User extends Authenticatable implements HasArticles
      */
     public function outlet(): BelongsTo
     {
-        return $this->belongsTo(Outlet::class);
+        return $this->belongsTo(Outlet::class)->where('is_delete',0);
     }
 
     /**
@@ -97,6 +97,6 @@ class User extends Authenticatable implements HasArticles
      */
     public function warehouse(): BelongsTo
     {
-        return $this->belongsTo(Warehouse::class);
+        return $this->belongsTo(Warehouse::class)->where('is_delete',0);
     }
 }

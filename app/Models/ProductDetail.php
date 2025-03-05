@@ -22,7 +22,7 @@ class ProductDetail extends Model
      */
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class)->where('is_delete',0);
     }
 
     /**
@@ -30,7 +30,7 @@ class ProductDetail extends Model
      */
     public function category(): BelongsTo
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class)->where('is_delete',0);
     }
 
     /**
@@ -38,6 +38,6 @@ class ProductDetail extends Model
      */
     public function varian(): BelongsTo
     {
-        return $this->belongsTo(ProductVarian::class, 'product_varian_id');
+        return $this->belongsTo(ProductVarian::class, 'product_varian_id')->where('is_delete',0);
     }
 }
