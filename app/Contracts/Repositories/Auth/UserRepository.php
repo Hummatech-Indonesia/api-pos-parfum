@@ -196,11 +196,12 @@ class UserRepository extends BaseRepository implements UserInterface
                     ->orwhere('email', 'like', '%' . $search . '%');
                 });
             }
-            
+            // dd($data);
             foreach ($data as $index => $value){
                 if($value && $value != "") $query->where($index, $value);
             }
         })
+        ->where('is_delete', 0)
         ->when($role, function ($query) use ($role){
             $query->role($role);
         })
