@@ -63,7 +63,9 @@ class ProductVarianRepository extends BaseRepository implements ProductVarianInt
 
     public function checkActive(mixed $id): mixed
     {
-        return $this->model->with('store')->withCount('products')->where('is_delete',0)->find($id);
+        return $this->model->with('store')->withCount(['products' => function ($q) {
+            $q->where('is_delete',0);
+        }])->where('is_delete',0)->find($id);
     }
 
     public function update(mixed $id, array $data): mixed
