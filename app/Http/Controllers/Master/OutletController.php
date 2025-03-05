@@ -161,10 +161,8 @@ class OutletController extends Controller
     public function listOutlet(Request $request)
     {
         try{
-            $payload = [
-                "is_delete" => 0
-            ];
-            if($request->is_delete) $payload["is_delete"] = $request->is_delete;
+            $payload = [];
+            if($request->has('is_delete')) $payload["is_delete"] = $request->is_delete;
 
             if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
             $data = $this->outlet->customQuery($payload)->get();
