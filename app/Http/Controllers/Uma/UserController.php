@@ -30,7 +30,7 @@ class UserController extends Controller
         $per_page = $request->per_page ?? 10;
         $page = $request->page ?? 1;
         $request->merge([
-            "is_delete" => 0
+            
         ]);
         
         if(!$request->role && $request->role == "") {
