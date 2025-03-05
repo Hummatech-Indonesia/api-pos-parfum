@@ -39,8 +39,8 @@ class UserService
 
         $image = null;
         try{
-            if(isset($data->image)) {
-                $image = $this->upload("users", $data->image);
+            if(isset($data->logo)) {
+                $image = $this->upload("users", $data->logo);
             }
         }catch(\Throwable $th){ }
 
@@ -49,7 +49,7 @@ class UserService
             "user_id" => $data->user_id,
             "name" => $data->name_store,
             "address" => $data->address_store,
-            "image" => $image 
+            "logo" => $image 
         ];
     }
 

@@ -28,7 +28,6 @@ class OutletRepository extends BaseRepository implements OutletInterface
     {
         return $this->model->query()
         ->with('store','users')
-        ->where('is_delete', 0) // filter deleted data
         ->when(count($data) > 0, function ($query) use ($data){
             foreach ($data as $index => $value){
                 $query->where($index, $value);
