@@ -41,7 +41,7 @@ class Category extends Model implements HasArticles
 
     public function store(): BelongsTo
     {
-        return $this->belongsTo(Store::class)->where('is_delete',0);
+        return $this->belongsTo(Store::class);
     }
 
     public function products(): HasMany
