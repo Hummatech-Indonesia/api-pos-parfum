@@ -26,12 +26,14 @@ class ProductService{
                 }
             }catch(\Throwable $th){ }
 
+            $category = $data["product_details"][0]["category_id"] ?? null;
             return [
                 "store_id" => $data["store_id"],
                 "name" => $data["name"],
                 "image" => $image,
                 "unit_type" => $data["unit_type"],
-                "qr_code" => $data["qr_code"]
+                "qr_code" => $data["qr_code"],
+                "category_id" => $category
             ];
         }catch(\Throwable $th){
             Log::error($th->getMessage());
@@ -51,12 +53,15 @@ class ProductService{
                 }
             }catch(\Throwable $th){ }
 
+            $category = $data["product_details"][0]["category_id"] ?? null;
+
             return [
                 "store_id" => $data["store_id"],
                 "name" => $data["name"],
                 "image" => $image,
                 "unit_type" => $data["unit_type"],
-                "qr_code" => $data["qr_code"]
+                "qr_code" => $data["qr_code"],
+                "category_id" => $category
             ];
         }catch(\Throwable $th){
             Log::error($th->getMessage());

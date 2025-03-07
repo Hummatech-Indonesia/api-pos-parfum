@@ -37,22 +37,29 @@ class ProductRepository extends BaseRepository implements ProductInterface
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
-        return $this->model->query()
-        ->with('store')
-        ->when(count($data) > 0, function ($query) use ($data){
-            if(isset($data["search"])){
-                $query->where(function ($query2) use ($data) {
-                    $query2->where('name', 'like', '%' . $data["search"] . '%');
-                });
-                unset($data["search"]);
-            }
+        $query = $this->model->query()
+            ->with(['store', 'category', 'details'])
+            ->withSum('details', 'stock'); // Menjumlahkan stok dari detail_product
 
-            foreach ($data as $index => $value){
-                $query->where($index, $value);
-            }
-        })
-        ->paginate($pagination, ['*'], 'page', $page);
-        // ->appends(['search' => $request->search, 'year' => $request->year]);
+        // Filtering berdasarkan search
+        if (!empty($data["search"])) {
+            $query->where('name', 'like', '%' . $data["search"] . '%');
+            unset($data["search"]);
+        }
+
+        // OrderBy total stock jika param valid
+        if (!empty($data["orderby_total_stock"]) && in_array($data["orderby_total_stock"], ['asc', 'desc'])) {
+            $query->orderBy('details_sum_stock', $data["orderby_total_stock"]);
+            unset($data["orderby_total_stock"]);
+        }
+
+        // Filtering berdasarkan parameter lainnya
+        $filteredData = array_filter($data, fn($value) => !is_null($value) && $value !== '');
+        foreach ($filteredData as $index => $value) {
+            $query->where($index, $value);
+        }
+
+        return $query->paginate($pagination, ['*'], 'page', $page);
     }
 
     public function show(mixed $id): mixed

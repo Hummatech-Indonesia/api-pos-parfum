@@ -34,6 +34,11 @@ class Product extends Model
         return $this->hasMany(ProductDetail::class)->where('is_delete',0);
     }
 
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class)->where('is_delete',0);
+    }
+
     public function active_details(): HasMany
     {
         return $this->hasMany(ProductDetail::class)->where('is_delete',0);
