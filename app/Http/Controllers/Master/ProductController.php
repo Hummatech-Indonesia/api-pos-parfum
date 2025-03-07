@@ -47,6 +47,7 @@ class ProductController extends Controller
         // check query filter
         if($request->search) $payload["search"] = $request->search;
         if($request->is_delete) $payload["is_delete"] = $request->is_delete;
+        if($request->orderby_total_stock) $payload["orderby_total_stock"] = $request->orderby_total_stock;
         if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
 
         $data = $this->product->customPaginate($per_page, $page, $payload)->toArray();
