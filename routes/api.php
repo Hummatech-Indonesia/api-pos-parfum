@@ -9,6 +9,7 @@ use App\Http\Controllers\Master\OutletController;
 use App\Http\Controllers\Master\ProductController;
 use App\Http\Controllers\Master\ProductDetailController;
 use App\Http\Controllers\Master\ProductVarianController;
+use App\Http\Controllers\Master\StockRequestController;
 use App\Http\Controllers\Master\WarehouseController;
 use App\Http\Controllers\Uma\UserController;
 use Illuminate\Http\Request;
@@ -70,6 +71,11 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::get('discount-vouchers/no-paginate', [DiscountVoucherController::class, 'listDiscountVoucher'])->name('list-discount-vouchers-no-paginate');
         Route::resource("discount-vouchers", DiscountVoucherController::class)->only(['store','destroy','update']);
     });
+
+    // API FOR ROLE OUTLET & OWNER
+    Route::middleware('role:outlet|owner')->group(function () {
+        Route::resource("stock-request", StockRequestController::class)->only(['store', 'destroy', 'update']);
+    });
     
     // API FOR DATA USER
     Route::resource("users", UserController::class)->except(['store','destroy','update']);
@@ -87,4 +93,6 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::resource("variants", ProductVarianController::class)->except(['store','destroy','update']);
     // API FOR DATA DISCOUNT VOUCHER
     Route::resource("discount-vouchers", DiscountVoucherController::class)->except(['store','destroy','update']);
+    // API FOR DATA STOCK REQUEST
+    Route::resource("stock-request", StockRequestController::class)->except(['store', 'destroy', 'update']);
 });
