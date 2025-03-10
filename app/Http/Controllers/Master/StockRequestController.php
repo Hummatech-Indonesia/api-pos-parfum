@@ -60,17 +60,27 @@ class StockRequestController extends Controller
     {
         $data = $request->validated();
 
-        $check = $this->productDetail->customQuery(["product_id" => $data["product_id"], "id" => $data["product_detail_id"]])->exists();
-        if (!$check) return BaseResponse::Notfound("Tidak ada data product detail!");
-
         DB::beginTransaction();
         try {
+            // Check if product_detail exists
+            $check = $this->productDetail->show($data["product_detail_id"])->exists();
+            if (!$check) return BaseResponse::Notfound("Tidak ada data product detail!");
 
+            // Check if outlet_id is null and the user has an outlet_id
+            if (auth()->user()->outlet_id === null) {
+                return BaseResponse::Error("User tidak punya Outlet", null);
+            }
+
+            // Assign user_id and outlet_id from authenticated user
+            $data["user_id"] = auth()->user()->id;
+            $data["outlet_id"] = auth()->user()->outlet_id;
+
+            // Store the stock request
             $result_product = $this->stockRequest->store($data);
 
             DB::commit();
-            return BaseResponse::Ok('Berhasil membuat stock request ', $result_product);
-        }catch(\Throwable $th){
+            return BaseResponse::Ok('Berhasil membuat stock request', $result_product);
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }

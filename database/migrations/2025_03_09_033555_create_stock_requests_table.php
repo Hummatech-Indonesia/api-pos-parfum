@@ -12,7 +12,6 @@ return new class extends Migration {
             $table->uuid('id')->primary();
 
             // UUID foreign keys
-            $table->uuid('product_id');
             $table->uuid('product_detail_id');
             $table->uuid('user_id');
             $table->uuid('outlet_id');
