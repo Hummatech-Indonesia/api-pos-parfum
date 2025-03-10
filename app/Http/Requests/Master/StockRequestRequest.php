@@ -27,6 +27,7 @@ class StockRequestRequest extends FormRequest
     {
         return [
             'product_id' => 'required|exists:products,id',
+            'product_detail_id' => 'required|exists:product_details,id',
             'user_id' => 'required|exists:users,id',
             'outlet_id' => 'required|exists:outlets,id',
             'warehouse_id' => 'required|exists:warehouses,id',
@@ -38,6 +39,7 @@ class StockRequestRequest extends FormRequest
     {
         return [
             'product_id.required' => 'Product tidak boleh kosong!',
+            'product_detail_id.required' => 'Product detail tidak boleh kosong!',
             'user_id.required' => 'User tidak boleh kosong!',
             'outlet_id.required' => 'Outlet tidak boleh kosong!',
             'warehouse_id.required' => 'Warehouse tidak boleh kosong!',

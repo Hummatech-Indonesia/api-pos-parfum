@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Master;
 
+use App\Contracts\Interfaces\Master\ProductDetailInterface;
 use App\Contracts\Interfaces\Master\StockRequestInterface;
 use App\Helpers\BaseResponse;
 use App\Http\Requests\Master\StockRequestRequest;
@@ -13,11 +14,14 @@ use Illuminate\Support\Facades\DB;
 class StockRequestController extends Controller
 {
     private $stockRequest;
+    private $productDetail;
 
     public function __construct(
         StockRequestInterface $stockRequest,
+        ProductDetailInterface $productDetail
     ) {
         $this->stockRequest = $stockRequest;
+        $this->productDetail = $productDetail;
     }
 
     /**
@@ -55,6 +59,10 @@ class StockRequestController extends Controller
     public function store(StockRequestRequest $request)
     {
         $data = $request->validated();
+
+        $check = $this->productDetail->customQuery(["product_id" => $data["product_id"], "id" => $data["product_detail_id"]])->exists();
+        if (!$check) return BaseResponse::Notfound("Tidak ada data product detail!");
+
         DB::beginTransaction();
         try {
 
