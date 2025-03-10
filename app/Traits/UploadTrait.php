@@ -49,6 +49,6 @@ trait UploadTrait
             return $file->storeAs("public/$disk", $file->getClientOriginalName());
         }
 
-        return $file->store("public/$disk");
+        return $file->store($disk, 'public');
     }
 }
