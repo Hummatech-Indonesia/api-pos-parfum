@@ -82,6 +82,7 @@ class ProductController extends Controller
 
             foreach($data["product_details"] as $detail){
                 $detail["product_id"] = $result_product->id;
+                $detail["category_id"] = $data["category_id"];
                 
                 /**
                  * Pengecekan apakah data varian yang dikirim sudah ada atau belum
@@ -98,24 +99,6 @@ class ProductController extends Controller
                         $detail["product_varian_id"] = $store_varian->id;
                     } else {
                         $detail["product_varian_id"] = $checkVarianName?->id;
-                    }
-                } 
-
-                /**
-                 * Pengecekan apakah data kategori sudah ada atau belum
-                 */
-                $check_category = $this->category->customQuery(["id" => $detail["category_id"], "store_id" => $data["store_id"]])->first();
-                if(!$check_category) {
-                     /**
-                     * Check category name has owned in this store
-                     */
-                    $checkCategoryName = $this->category->customQuery(["name" => $detail["category_id"], "store_id" => $data["store_id"]])->first();
-                    if(!$checkCategoryName){
-                        $this->category->store(["name" => $detail["category_id"], "store_id" => $data["store_id"]]);
-                        $store_category = $this->category->customQuery(["name" => $detail["category_id"], "store_id" => $data["store_id"]])->first();
-                        $detail["category_id"] = $store_category->id;
-                    } else {
-                        $detail["category_id"] = $checkCategoryName->id;
                     }
                 } 
 
@@ -156,7 +139,6 @@ class ProductController extends Controller
     {
         
         $data = $request->validated();
-
         DB::beginTransaction();
         try {
             if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $data["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
@@ -168,6 +150,7 @@ class ProductController extends Controller
         
             foreach($data["product_details"] as $detail){
                 $detail["product_id"] = $id;
+                $detail["category_id"] = $data["category_id"];
 
                 /**
                  * Pengecekan apakah data varian yang dikirim sudah ada atau belum
@@ -184,24 +167,6 @@ class ProductController extends Controller
                         $detail["product_varian_id"] = $store_varian->id;
                     } else {
                         $detail["product_varian_id"] = $checkVarianName?->id;
-                    }
-                } 
-
-                /**
-                 * Pengecekan apakah data kategori sudah ada atau belum
-                 */
-                $check_category = $this->category->customQuery(["id" => $detail["category_id"], "store_id" => $data["store_id"]])->first();
-                if(!$check_category) {
-                     /**
-                     * Check category name has owned in this store
-                     */
-                    $checkCategoryName = $this->category->customQuery(["name" => $detail["category_id"], "store_id" => $data["store_id"]])->first();
-                    if(!$checkCategoryName){
-                        $this->category->store(["name" => $detail["category_id"], "store_id" => $data["store_id"]]);
-                        $store_category = $this->category->customQuery(["name" => $detail["category_id"], "store_id" => $data["store_id"]])->first();
-                        $detail["category_id"] = $store_category->id;
-                    } else {
-                        $detail["category_id"] = $checkCategoryName->id;
                     }
                 } 
                 
