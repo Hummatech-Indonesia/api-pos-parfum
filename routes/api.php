@@ -81,6 +81,7 @@ Route::middleware('auth:sanctum')->group(function() {
 
     // API FOR ROLE OUTLET & OWNER
     Route::middleware('role:outlet|owner')->group(function () {
+        Route::get('stock-request/no-paginate', [StockRequestController::class, 'listStockRequest'])->name('list-stock-request-no-paginate');
         Route::resource("stock-request", StockRequestController::class)->only(['store', 'destroy', 'update']);
     });
     

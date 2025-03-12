@@ -27,7 +27,7 @@ class StockRequestRepository extends BaseRepository implements StockRequestInter
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
-        ->with('store')
+        ->with(['user', 'detailProduct', 'outlet', 'warehouse'])
         ->when(count($data) > 0, function ($query) use ($data){
             foreach ($data as $index => $value){
                 $query->where($index, $value);
@@ -38,14 +38,7 @@ class StockRequestRepository extends BaseRepository implements StockRequestInter
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         $query = $this->model->query()
-            ->with(['store', 'category', 'details'])
-            ->withSum('details', 'stock'); // Menjumlahkan stok dari detail_product
-
-        // Filtering berdasarkan search
-        if (!empty($data["search"])) {
-            $query->where('name', 'like', '%' . $data["search"] . '%');
-            unset($data["search"]);
-        }
+            ->with(['user', 'detailProduct', 'outlet' , 'warehouse']);
 
         // Filtering berdasarkan parameter lainnya
         $filteredData = array_filter($data, fn($value) => !is_null($value) && $value !== '');

@@ -14,4 +14,21 @@ class StockRequest extends Model
     protected $primaryKey = "id";
 
     protected $guarded = [];
+
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
+
+    public function detailProduct(){
+        return $this->belongsTo(ProductDetail::class, 'product_detail_id');
+    }
+
+    public function outlet(){
+        return $this->belongsTo(Outlet::class);
+    }
+
+    public function warehouse(){
+        return $this->belongsTo(Warehouse::class);
+    }
+
 }

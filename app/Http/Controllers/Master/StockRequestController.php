@@ -35,14 +35,28 @@ class StockRequestController extends Controller
 
         // check query filter
         if ($request->search) $payload["search"] = $request->search;
-        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
         $data = $this->stockRequest->customPaginate($per_page, $page, $payload)->toArray();
 
         $result = $data["data"];
         unset($data["data"]);
 
-        return BaseResponse::Paginate('Berhasil mengambil list data product !', $result, $data);
+        return BaseResponse::Paginate('Berhasil mengambil list stock request !', $result, $data);
+    }
+
+    public function listStockRequest(Request $request)
+    {
+        try {
+            $payload = [];
+
+            if ($request->has('is_delete')) $payload["is_delete"] = $request->is_delete;
+
+            $data = $this->stockRequest->customQuery($payload)->get();
+
+            return BaseResponse::Ok("Berhasil mengambil data stock request", $data);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
     }
 
     /**
