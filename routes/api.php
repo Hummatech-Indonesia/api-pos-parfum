@@ -45,6 +45,7 @@ Route::middleware('auth:sanctum')->group(function() {
 
     // API FOR ROLE OUTLET & OWNER & GUDANG
     Route::middleware('role:outlet|owner|warehouse')->group(function () {
+        Route::get('stock-request/no-paginate', [StockRequestController::class, 'listStockRequest'])->name('list-stock-request-no-paginate');
         Route::get('product-details/stock', [ProductDetailController::class, 'stockProduct']);
         Route::post('warehouses/add/stock', [WarehouseController::class, 'warehouseStock']);
         Route::get('warehouses/history/stock', [WarehouseController::class, 'listWarehouseStock']);
@@ -81,7 +82,6 @@ Route::middleware('auth:sanctum')->group(function() {
 
     // API FOR ROLE OUTLET & OWNER
     Route::middleware('role:outlet|owner')->group(function () {
-        Route::get('stock-request/no-paginate', [StockRequestController::class, 'listStockRequest'])->name('list-stock-request-no-paginate');
         Route::resource("stock-request", StockRequestController::class)->only(['store', 'destroy', 'update']);
     });
     
