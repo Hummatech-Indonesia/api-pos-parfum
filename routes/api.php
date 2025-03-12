@@ -43,6 +43,13 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::get('me', [AuthController::class, 'getMe'])->name('get-me');
     Route::get('roles', [UserController::class, 'listRole'])->name('get-roles');
 
+    // API FOR ROLE OUTLET & OWNER & GUDANG
+    Route::middleware('role:outlet|owner|warehouse')->group(function () {
+        Route::get('product-details/stock', [ProductDetailController::class, 'stockProduct']);
+        Route::post('warehouses/add/stock', [WarehouseController::class, 'warehouseStock']);
+        Route::get('warehouses/history/stock', [WarehouseController::class, 'listWarehouseStock']);
+    });
+
     // API FOR ROLE OWNER
     Route::middleware('role:owner')->group(function (){
         // API FOR DATA USER

@@ -29,7 +29,8 @@ class WarehouseRequest extends FormRequest
             'name' => 'required',
             'address' => 'required',
             'telp' => 'sometimes|nullable|min:10',
-            'user_id' => 'sometimes|nullable|array'
+            'user_id' => 'sometimes|nullable|array',
+            'image' => 'nullable|image|max:2048'
         ];
     }
 
@@ -39,7 +40,9 @@ class WarehouseRequest extends FormRequest
             'name.required' => 'Nama outlet tidak boleh kosong!',
             'address.required' => 'Alamat outlet tidak boleh kosong',
             'telp.min' => 'Nomor telefon tidak valid!',
-            'user_id.array' => 'User yang terdaftar tidak valid!'
+            'user_id.array' => 'User yang terdaftar tidak valid!',
+            'image.image' => 'File valid hanya berupa image!',
+            'image.max' => 'Max file 2mb!'
         ];
     }
 

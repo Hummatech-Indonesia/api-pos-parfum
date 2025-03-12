@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\Master;
 
 use App\Contracts\Interfaces\Auth\UserInterface;
+use App\Contracts\Interfaces\Master\ProductDetailInterface;
+use App\Contracts\Interfaces\Master\ProductStockInterface;
 use App\Contracts\Interfaces\Master\WarehouseInterface;
+use App\Contracts\Interfaces\Master\WarehouseStockInterface;
 use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\WarehouseRequest;
+use App\Http\Requests\WarehouseStockRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -14,11 +18,20 @@ class WarehouseController extends Controller
 {
     private WarehouseInterface $warehouse;
     private UserInterface $user;
+    private WarehouseStockInterface $warehouseStock;
+    private ProductDetailInterface $productDetail;
+    private ProductStockInterface $productStock;
 
-    public function __construct(WarehouseInterface $warehouse, UserInterface $user)
+    public function __construct(WarehouseInterface $warehouse, UserInterface $user, 
+    WarehouseStockInterface $warehouseStock, ProductDetailInterface $productDetail,
+    ProductStockInterface $productStock
+    )
     {
         $this->warehouse = $warehouse; 
         $this->user = $user; 
+        $this->warehouseStock = $warehouseStock; 
+        $this->productDetail = $productDetail; 
+        $this->productStock = $productStock; 
     }
 
     /**
@@ -165,6 +178,52 @@ class WarehouseController extends Controller
             return BaseResponse::Ok("Berhasil mengambil data warehouse", $data);
         }catch(\Throwable $th) {
           return BaseResponse::Error($th->getMessage(), null);  
+        }
+    }
+
+    public function listWarehouseStock(Request $request)
+    {
+        $per_page = $request->per_page ?? 10;
+        $page = $request->page ?? 1;
+        $payload = [];
+
+        if($request->date) $payload["date"] = $request->date;
+
+        try {
+            return BaseResponse::Ok(
+                "Berhasil menampilkan riwayat stock", 
+                $this->warehouseStock->customPaginate($per_page, $page, $payload)
+            );
+        }catch(\Throwable $th){
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+    public function warehouseStock(WarehouseStockRequest $request)
+    {
+        $data = $request->validated();
+
+        DB::beginTransaction();
+        try {
+            $data["user_id"] = auth()->id;
+            $stock = $this->warehouseStock->store($data);
+            $product = $this->productStock->customQuery(["warehouse_id", $request->warehouse_id, "product_detail_id" => $request->product_detail_id])->first();
+            if($product) {
+                $product->stock += $request->stock;
+                $product->save();
+            } else {
+                $this->productStock->store([
+                    "warehouse_id" => $request->warehouse_id,
+                    "stock" => $request->stock,
+                    "product_detail_id" => $request->product_detail_id
+                ]);
+            }
+            // $this->productDetail->update($request->product_detail_id, ["stock" => $request->stock]);
+            DB::commit();
+            return BaseResponse::Ok("Berhasil menambahkan stock warehouse", $stock);
+        } catch(\Throwable $th) {
+            DB::rollBack();
+            return BaseResponse::Error($th->getMessage(), null);  
         }
     }
 }

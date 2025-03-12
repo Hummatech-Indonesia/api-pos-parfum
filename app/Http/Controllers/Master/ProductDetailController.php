@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Master;
 
 use App\Contracts\Interfaces\Master\ProductDetailInterface;
 use App\Contracts\Interfaces\Master\ProductInterface;
+use App\Contracts\Interfaces\Master\ProductStockInterface;
 use App\Enums\UploadDiskEnum;
 use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
@@ -18,12 +19,15 @@ class ProductDetailController extends Controller
     private ProductInterface $product;
     private ProductDetailInterface $productDetail;
     private ProductService $productService;
+    private ProductStockInterface $productStock;
 
-    public function __construct(ProductInterface $product, ProductDetailInterface $productDetail, ProductService $productService)
+    public function __construct(ProductInterface $product, ProductDetailInterface $productDetail, ProductService $productService,
+    ProductStockInterface $productStock)
     {
         $this->product = $product;
         $this->productDetail = $productDetail;
         $this->productService = $productService;
+        $this->productStock = $productStock;
     }
 
     /**
@@ -146,6 +150,22 @@ class ProductDetailController extends Controller
             return BaseResponse::Ok("Berhasil mengambil data product ", $data);
         }catch(\Throwable $th) {
           return BaseResponse::Error($th->getMessage(), null);  
+        }
+    }
+
+    public function stockProduct(Request $request) {
+        $payload = [];
+        try {
+            if($request->warehouse_id) $payload["warehouse_id"] = $request->warehouse_id;
+            if($request->product_detail_id) $payload["product_detail_id"] = $request->product_detail_id;
+            if($request->outlet_id) $payload["outlet_id"] = $request->outlet_id;
+            
+            if($request->page && $request->per_page) $data = $this->productStock->customPaginate($request->per_page, $request->page, $payload); 
+            else $data = $this->productStock->customQuery($payload);
+
+            return BaseResponse::Ok("Berhasil mengambil data product ", $data);
+        }catch(\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
         }
     }
 }
