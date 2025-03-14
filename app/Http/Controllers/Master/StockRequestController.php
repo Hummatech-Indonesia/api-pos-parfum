@@ -34,7 +34,8 @@ class StockRequestController extends Controller
         $payload = [];
 
         // check query filter
-        if ($request->search) $payload["search"] = $request->search;
+        // if ($request->search) $payload["search"] = $request->search;
+        if (auth()->user()->warehouse_id) $payload["warehouse_id"] = auth()->user()->warehouse_id; 
 
         $data = $this->stockRequest->customPaginate($per_page, $page, $payload)->toArray();
 
