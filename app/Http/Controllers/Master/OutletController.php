@@ -7,6 +7,7 @@ use App\Contracts\Interfaces\Master\OutletInterface;
 use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\OutletRequest;
+use App\Services\Master\OutletService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -14,11 +15,13 @@ class OutletController extends Controller
 {
     private OutletInterface $outlet;
     private UserInterface $user;
+    private $outletService;
 
-    public function __construct(OutletInterface $outlet, UserInterface $user)
+    public function __construct(OutletInterface $outlet, UserInterface $user, OutletService $outletService)
     {
         $this->outlet = $outlet; 
         $this->user = $user; 
+        $this->outletService = $outletService;
     }
 
     /**
@@ -70,8 +73,8 @@ class OutletController extends Controller
             $user = $data["user_id"];
             unset($data["user_id"]);
 
-            $data["store_id"] = auth()?->user()?->store?->id;
-            $result_outlet = $this->outlet->store($data);
+            $mapOutlet = $this->outletService->dataOutlet($data);
+            $result_outlet = $this->outlet->store($mapOutlet);
 
             if($user){
                 $result_user = $this->user->customQuery(["user_id" => $user])->get();
@@ -121,7 +124,8 @@ class OutletController extends Controller
             $user = $data["user_id"];
             unset($data["user_id"]);
 
-            $result_outlet = $this->outlet->update($id,$data);
+            $mapOutlet = $this->outletService->dataOutletUpdate($data, $check);
+            $result_outlet = $this->outlet->update($id, $mapOutlet);
 
             if($user){
                 $result_user = $this->user->customQuery(["user_id" => $user])->get();

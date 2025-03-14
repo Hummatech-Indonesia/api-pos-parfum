@@ -11,6 +11,7 @@ use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\WarehouseRequest;
 use App\Http\Requests\WarehouseStockRequest;
+use App\Services\Master\WarehouseService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -21,10 +22,11 @@ class WarehouseController extends Controller
     private WarehouseStockInterface $warehouseStock;
     private ProductDetailInterface $productDetail;
     private ProductStockInterface $productStock;
+    private WarehouseService $warehouseService;
 
     public function __construct(WarehouseInterface $warehouse, UserInterface $user, 
     WarehouseStockInterface $warehouseStock, ProductDetailInterface $productDetail,
-    ProductStockInterface $productStock
+    ProductStockInterface $productStock, WarehouseService $warehouseService
     )
     {
         $this->warehouse = $warehouse; 
@@ -32,6 +34,7 @@ class WarehouseController extends Controller
         $this->warehouseStock = $warehouseStock; 
         $this->productDetail = $productDetail; 
         $this->productStock = $productStock; 
+        $this->warehouseService = $warehouseService;
     }
 
     /**
@@ -79,8 +82,8 @@ class WarehouseController extends Controller
             $user = $data["user_id"];
             unset($data["user_id"]);
 
-            $data["store_id"] = auth()?->user()?->store?->id;
-            $result_warehouse = $this->warehouse->store($data);
+            $mapWarehouse = $this->warehouseService->dataWarehouse($data);
+            $result_warehouse = $this->warehouse->store($mapWarehouse);
 
             if($user){
                 $result_user = $this->user->customQuery(["user_id" => $user])->get();
@@ -130,7 +133,8 @@ class WarehouseController extends Controller
             $user = $data["user_id"];
             unset($data["user_id"]);
 
-            $result_outlet = $this->warehouse->update($id, $data);
+            $mapWarehouse = $this->warehouseService->dataWarehouseUpdate($data, $check);
+            $result_outlet = $this->warehouse->update($id, $mapWarehouse);
 
             if($user){
                 $result_user = $this->user->customQuery(["user_id" => $user])->get();
