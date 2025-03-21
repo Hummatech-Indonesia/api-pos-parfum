@@ -25,11 +25,15 @@ class AuthController extends Controller
     private CategoryInterface $category;
     private DiscountVoucherInterface $discount;
 
-    public function __construct(UserInterface $user, StoreInterface $stores, UserService $userService)
+    public function __construct(UserInterface $user, StoreInterface $stores, UserService $userService,
+    ProductInterface $product, CategoryInterface $category, DiscountVoucherInterface $discount)
     {
         $this->user = $user;
         $this->stores = $stores;
         $this->userService = $userService;
+        $this->product = $product;
+        $this->category = $category;
+        $this->discount = $discount;
     }
 
     public function login(LoginRequest $request)
