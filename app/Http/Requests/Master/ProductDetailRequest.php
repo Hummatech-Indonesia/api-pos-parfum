@@ -28,6 +28,7 @@ class ProductDetailRequest extends FormRequest
             "product_id" => "required",
             "category_id" => "nullable",
             "product_varian_id" => "nullable",
+            "variant_name" => "nullable",
             "material" => "nullable",
             "unit" => "nullable",
             "capacity" => "nullable",
