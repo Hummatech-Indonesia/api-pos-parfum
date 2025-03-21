@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Contracts\Interfaces\Auth\StoreInterface;
 use App\Contracts\Interfaces\Auth\UserInterface;
+use App\Contracts\Interfaces\CategoryInterface;
+use App\Contracts\Interfaces\Master\DiscountVoucherInterface;
+use App\Contracts\Interfaces\Master\ProductInterface;
 use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
@@ -18,6 +21,9 @@ class AuthController extends Controller
     private UserInterface $user;
     private StoreInterface $stores;
     private UserService $userService;
+    private ProductInterface $product;
+    private CategoryInterface $category;
+    private DiscountVoucherInterface $discount;
 
     public function __construct(UserInterface $user, StoreInterface $stores, UserService $userService)
     {
@@ -88,6 +94,9 @@ class AuthController extends Controller
             return BaseResponse::Notfound('Data diri tidak ditemukan, silahkan login ulang!');
         }
 
+        $user->product_count = $this->product->customQuery(["store_id" => $user?->store_id])->count();
+        $user->category_count = $this->category->customQuery(["store_id" => $user?->store_id])->count();
+        $user->discount_count = $this->discount->customQuery(["store_id" => $user?->store_id])->count();
         $user->role = auth()->user()->roles;
         $user->token = request()->bearerToken();
 
