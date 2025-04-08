@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Master;
 
 use App\Contracts\Interfaces\Master\ProductDetailInterface;
+use App\Contracts\Interfaces\Master\ProductStockInterface;
 use App\Contracts\Interfaces\Master\StockRequestInterface;
 use App\Contracts\Interfaces\Master\StockRequestDetailInterface;
 use App\Helpers\BaseResponse;
@@ -18,15 +19,18 @@ class StockRequestController extends Controller
     private $stockRequest;
     private $stockRequestDetail;
     private $productDetail;
+    private ProductStockInterface $productStock;
 
     public function __construct(
         StockRequestInterface $stockRequest,
         StockRequestDetailInterface $stockRequestDetail,
-        ProductDetailInterface $productDetail
+        ProductDetailInterface $productDetail,
+        ProductStockInterface $productStock
     ) {
         $this->stockRequest = $stockRequest;
         $this->stockRequestDetail = $stockRequestDetail;
         $this->productDetail = $productDetail;
+        $this->productStock = $productStock;
     }
 
     /**
@@ -144,6 +148,8 @@ class StockRequestController extends Controller
 
         $data = $request->validated();
 
+        if(!auth()->user()->warehouse_id) return BaseResponse::Error("Anda tidak terikat dengan gudang!", 400);
+
         DB::beginTransaction();
         try {
 
@@ -159,10 +165,20 @@ class StockRequestController extends Controller
                     'product_detail_id' => $detail['product_detail_id'],
                 ])->first();
 
-                if ($existingDetail) {
+                if ($existingDetail && $data["status"] == "accepted") {
                     $this->stockRequestDetail->update($existingDetail->id, [
                         'sended_stock' => $detail['sended_stock'],
                     ]);
+                    $productStock = $this->productStock->customQuery([
+                        "warehouse_id" => auth()->user()->warehouse_id,
+                        "product_detail_id" => $detail["product_detail_id"]
+                    ])
+                    ->first();
+                    
+                    if($productStock) {
+                        $productStock->stock -= $detail["sended_stock"];
+                        $productStock->save();
+                    }
                 }
             }
 
