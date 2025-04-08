@@ -44,15 +44,15 @@ trait UploadTrait
     public function upload(string $disk, UploadedFile $file, bool $originalName = false): string
     {
         // Ensure directory exists
-        if (!$this->exist("public/$disk")) {
-            Storage::makeDirectory("public/$disk");
+        if (!$this->exist("$disk")) {
+            Storage::makeDirectory("$disk");
         }
 
         // Save file with original name or generated name
         if ($originalName) {
-            return $file->storeAs("public/$disk", $file->getClientOriginalName());
+            return $file->storeAs("$disk", $file->getClientOriginalName());
         }
 
-        return $file->store($disk, 'public');
+        return $file->store($disk, $file);
     }
 }
