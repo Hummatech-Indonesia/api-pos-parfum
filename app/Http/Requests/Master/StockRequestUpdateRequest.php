@@ -8,7 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 
-class StockRequestRequest extends FormRequest
+class StockRequestUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,21 +26,24 @@ class StockRequestRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'warehouse_id' => 'required|exists:warehouses,id',
-            'product_detail' => 'sometimes|array',
-            "product_detail.*.product_detail_id" => "nullable",
-            "product_detail.*.requested_stock" => "nullable",
+            'status' => 'required|string',
+            'product_detail' => 'required|array',
+            'product_detail.*.product_detail_id' => 'required|uuid',
+            'product_detail.*.sended_stock' => 'required|integer|min:0',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'warehouse_id.required' => 'Warehouse tidak boleh kosong!',
-            'warehouse_id.exists' => 'Warehouse tidak ada!',
+            'status.required' => 'Status tidak boleh kosong!',
+            'status.string' => 'Status harus berupa string!',
             'product_detail.array' => 'Data produk tidak valid!',
-            // 'product_detail.*.product_detail_id.unique' => 'Produk tidak ada!',
+            // 'product_detail.*.product_detail_id.unique' => 'Produk tidak ada!',            
             // 'product_detail.*.requested_stock.required' => 'Stock tidak boleh kosong!',
+            'product_detail.*.sended_stock.required' => 'Stock tidak boleh kosong!',
+            'product_detail.*.sended_stock.integer' => 'Stock harus berupa integer!',
+            'product_detail.*.sended_stock.min' => 'Stock minimal adalah 0!',
         ];
     }
 

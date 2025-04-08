@@ -13,6 +13,7 @@ use App\Contracts\Interfaces\Master\ProductInterface;
 use App\Contracts\Interfaces\Master\ProductStockInterface;
 use App\Contracts\Interfaces\Master\ProductVarianInterface;
 use App\Contracts\Interfaces\Master\StockRequestInterface;
+use App\Contracts\Interfaces\Master\StockRequestDetailInterface;
 use App\Contracts\Interfaces\Master\WarehouseInterface;
 use App\Contracts\Interfaces\Master\WarehouseStockInterface;
 use App\Contracts\Repositories\ArticleRepository;
@@ -26,6 +27,7 @@ use App\Contracts\Repositories\Master\ProductRepository;
 use App\Contracts\Repositories\Master\ProductStockRepository;
 use App\Contracts\Repositories\Master\ProductVarianRepository;
 use App\Contracts\Repositories\Master\StockRequestRepository;
+use App\Contracts\Repositories\Master\StockRequestDetailRepository;
 use App\Contracts\Repositories\Master\WarehouseRepository;
 use App\Contracts\Repositories\Master\WarehouseStockRepository;
 use Illuminate\Support\ServiceProvider;
@@ -45,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
         ProductInterface::class => ProductRepository::class,
         DiscountVoucherInterface::class => DiscountVoucherRepository::class,
         StockRequestInterface::class => StockRequestRepository::class,
+        StockRequestDetailInterface::class => StockRequestDetailRepository::class,
         WarehouseStockInterface::class => WarehouseStockRepository::class,
         ProductStockInterface::class => ProductStockRepository::class
     ];

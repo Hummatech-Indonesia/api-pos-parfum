@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Master;
 
 use App\Contracts\Interfaces\Master\ProductDetailInterface;
 use App\Contracts\Interfaces\Master\StockRequestInterface;
+use App\Contracts\Interfaces\Master\StockRequestDetailInterface;
 use App\Helpers\BaseResponse;
 use App\Http\Requests\Master\StockRequestRequest;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Master\StockRequestUpdateRequest;
 use App\Models\StockRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,13 +16,16 @@ use Illuminate\Support\Facades\DB;
 class StockRequestController extends Controller
 {
     private $stockRequest;
+    private $stockRequestDetail;
     private $productDetail;
 
     public function __construct(
         StockRequestInterface $stockRequest,
+        StockRequestDetailInterface $stockRequestDetail,
         ProductDetailInterface $productDetail
     ) {
         $this->stockRequest = $stockRequest;
+        $this->stockRequestDetail = $stockRequestDetail;
         $this->productDetail = $productDetail;
     }
 
@@ -77,9 +82,13 @@ class StockRequestController extends Controller
 
         DB::beginTransaction();
         try {
-            // Check if product_detail exists
-            $check = $this->productDetail->show($data["product_detail_id"])->exists();
-            if (!$check) return BaseResponse::Notfound("Tidak ada data product detail!");
+
+            foreach($data["product_detail"] as $detail){
+
+                // Check if product_detail exists
+                $check = $this->productDetail->show($detail["product_detail_id"]);
+                if (!$check) return BaseResponse::Notfound("Tidak ada data product detail!");
+            }
 
             // Check if outlet_id is null and the user has an outlet_id
             if (auth()->user()->outlet_id === null) {
@@ -89,9 +98,19 @@ class StockRequestController extends Controller
             // Assign user_id and outlet_id from authenticated user
             $data["user_id"] = auth()->user()->id;
             $data["outlet_id"] = auth()->user()->outlet_id;
+            $data["product_detail_id"] = "";
+            unset($data["product_detail"]);
 
             // Store the stock request
             $result_product = $this->stockRequest->store($data);
+            
+            foreach ($request->product_detail as $detail) {
+                $this->stockRequestDetail->store([
+                    'stock_request_id' => $result_product->id,
+                    'product_detail_id' => $detail['product_detail_id'],
+                    'requested_stock' => $detail['requested_stock'],
+                ]);
+            }
 
             DB::commit();
             return BaseResponse::Ok('Berhasil membuat stock request', $result_product);
@@ -120,9 +139,39 @@ class StockRequestController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, StockRequest $stockRequest)
+    public function update(StockRequestUpdateRequest $request, string $id)
     {
-        //
+
+        $data = $request->validated();
+
+        DB::beginTransaction();
+        try {
+
+            // Update status
+            $this->stockRequest->update($id, [
+                'status' => $data['status'],
+            ]);
+
+            // Update each detail
+            foreach ($data['product_detail'] as $detail) {
+                $existingDetail = $this->stockRequestDetail->customQuery([
+                    'stock_request_id' => $id,
+                    'product_detail_id' => $detail['product_detail_id'],
+                ])->first();
+
+                if ($existingDetail) {
+                    $this->stockRequestDetail->update($existingDetail->id, [
+                        'sended_stock' => $detail['sended_stock'],
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return BaseResponse::Ok('Berhasil mengupdate stock request', null);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return BaseResponse::Error($th->getMessage(), null);
+        }
     }
 
     /**
