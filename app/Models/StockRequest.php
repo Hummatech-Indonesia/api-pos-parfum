@@ -23,6 +23,10 @@ class StockRequest extends Model
         return $this->belongsTo(ProductDetail::class, 'product_detail_id');
     }
 
+    public function store(){
+        return $this->belongsTo(Store::class);
+    }
+
     public function outlet(){
         return $this->belongsTo(Outlet::class);
     }

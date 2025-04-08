@@ -2,16 +2,16 @@
 
 namespace App\Contracts\Repositories\Master;
 
-use App\Contracts\Interfaces\Master\StockRequestInterface;
+use App\Contracts\Interfaces\Master\StockRequestDetailInterface;
 use App\Contracts\Repositories\BaseRepository;
-use App\Models\StockRequest;
+use App\Models\StockRequestDetail;
 
-class StockRequestRepository extends BaseRepository implements StockRequestInterface
+class StockRequestDetailRepository extends BaseRepository implements StockRequestDetailInterface
 {
 
-    public function __construct(StockRequest $stockRequest)
+    public function __construct(StockRequestDetail $stockRequestDetail)
     {
-        $this->model = $stockRequest;
+        $this->model = $stockRequestDetail;
     }
 
     public function get(): mixed
@@ -27,7 +27,6 @@ class StockRequestRepository extends BaseRepository implements StockRequestInter
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
-        ->with(['user', 'detailProduct', 'outlet', 'warehouse'])
         ->when(count($data) > 0, function ($query) use ($data){
             foreach ($data as $index => $value){
                 $query->where($index, $value);
@@ -37,8 +36,7 @@ class StockRequestRepository extends BaseRepository implements StockRequestInter
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
-        $query = $this->model->query()
-            ->with(['user', 'detailProduct.product', 'outlet' , 'warehouse']);
+        $query = $this->model->query();
 
         // Filtering berdasarkan parameter lainnya
         $filteredData = array_filter($data, fn($value) => !is_null($value) && $value !== '');
@@ -51,7 +49,7 @@ class StockRequestRepository extends BaseRepository implements StockRequestInter
 
     public function show(mixed $id): mixed
     {
-        return $this->model->with('store')->find($id);
+        return $this->model->find($id);
     }
 
     public function update(mixed $id, array $data): mixed
