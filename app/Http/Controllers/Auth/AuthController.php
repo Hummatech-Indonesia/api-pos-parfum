@@ -98,9 +98,9 @@ class AuthController extends Controller
             return BaseResponse::Notfound('Data diri tidak ditemukan, silahkan login ulang!');
         }
 
-        $user->product_count = $this->product->customQuery(["store_id" => $user?->store_id])->count();
-        $user->category_count = $this->category->customQuery(["store_id" => $user?->store_id])->count();
-        $user->discount_count = $this->discount->customQuery(["store_id" => $user?->store_id])->count();
+        $user->product_count = $this->product->customQuery(["store_id" => $user?->store_id, "is_delete" => 0])->count();
+        $user->category_count = $this->category->customQuery(["store_id" => $user?->store_id, "is_delete" => 0])->count();
+        $user->discount_count = $this->discount->customQuery(["store_id" => $user?->store_id, "is_delete" => 0])->count();
         $user->role = auth()->user()->roles;
         $user->token = request()->bearerToken();
 
