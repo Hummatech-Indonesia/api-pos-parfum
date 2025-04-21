@@ -27,6 +27,7 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
+        ->withCount('product')
         ->with('varian', 'product', 'category')
         ->when(count($data) > 0, function ($query) use ($data){
             foreach ($data as $index => $value){
@@ -38,6 +39,7 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
+        ->withCount('product')
         ->with('varian', 'product', 'category')
         ->when(count($data) > 0, function ($query) use ($data){
             if(isset($data["search"])){
