@@ -102,7 +102,7 @@ class StockRequestController extends Controller
             // Assign user_id and outlet_id from authenticated user
             $data["user_id"] = auth()->user()->id;
             $data["outlet_id"] = auth()->user()->outlet_id;
-            $data["product_detail_id"] = "";
+            $data["product_detail_id"] = null;
             unset($data["product_detail"]);
 
             // Store the stock request
