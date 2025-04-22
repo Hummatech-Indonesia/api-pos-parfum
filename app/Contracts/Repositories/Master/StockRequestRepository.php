@@ -38,7 +38,7 @@ class StockRequestRepository extends BaseRepository implements StockRequestInter
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         $query = $this->model->query()
-            ->with(['user', 'detailProduct.product', 'outlet' , 'warehouse']);
+            ->with(['user', 'detailRequestStock.detailProduct.product', 'outlet' , 'warehouse']);
 
         // Filtering berdasarkan parameter lainnya
         $filteredData = array_filter($data, fn($value) => !is_null($value) && $value !== '');

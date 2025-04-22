@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class StockRequestDetail extends Model
 {
@@ -16,4 +16,8 @@ class StockRequestDetail extends Model
 
     protected $guarded = [];
 
+    public function detailProduct(): BelongsTo
+    {
+        return $this->belongsTo(ProductDetail::class, 'product_detail_id');
+    }
 }
