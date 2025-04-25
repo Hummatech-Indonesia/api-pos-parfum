@@ -50,6 +50,7 @@ class DiscountVoucherRequest extends FormRequest
     public function prepareForValidation()
     {
         // if(!$this->store_id) $this->merge(["store_id" => auth()?->user()?->store?->id || auth()?->user()?->store_id]);
+        if(!$this->min) $this->merge(["min" => 0]);
     }
 
     public function failedValidation(Validator $validator)
