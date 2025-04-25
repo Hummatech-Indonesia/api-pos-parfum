@@ -13,7 +13,7 @@ return new class extends Migration
     {
         if(!Schema::hasColumn('discount_vouchers','used')){
             Schema::table('discount_vouchers', function (Blueprint $table) {
-                $table->intger('used')->nullable()->default(0);
+                $table->integer('used')->nullable()->default(0);
             });
         }
     }
