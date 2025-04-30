@@ -1,6 +1,6 @@
 <?php 
 
-namespace App\Services\Master;
+namespace App\Services\Transaction;
 
 use App\Models\Outlet;
 use App\Traits\UploadTrait;

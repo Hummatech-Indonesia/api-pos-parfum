@@ -11,7 +11,7 @@ use App\Contracts\Interfaces\Transaction\VoucherUsedInterface;
 use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TransactionRequest;
-use App\Services\Master\TransactionService;
+use App\Services\Transaction\TransactionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
