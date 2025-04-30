@@ -11,6 +11,7 @@ use App\Http\Controllers\Master\ProductDetailController;
 use App\Http\Controllers\Master\ProductVarianController;
 use App\Http\Controllers\Master\StockRequestController;
 use App\Http\Controllers\Master\WarehouseController;
+use App\Http\Controllers\Transaction\TransactionController;
 use App\Http\Controllers\Uma\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -103,4 +104,7 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::resource("discount-vouchers", DiscountVoucherController::class)->except(['store','destroy','update']);
     // API FOR DATA STOCK REQUEST
     Route::resource("stock-request", StockRequestController::class)->except(['store', 'destroy', 'update']);
+
+    // API FOR DATA TRANSACTION
+    Route::resource("transactions", TransactionController::class)->except(['destroy']);
 });

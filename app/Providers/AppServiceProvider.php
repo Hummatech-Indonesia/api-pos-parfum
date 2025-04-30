@@ -16,6 +16,9 @@ use App\Contracts\Interfaces\Master\StockRequestInterface;
 use App\Contracts\Interfaces\Master\StockRequestDetailInterface;
 use App\Contracts\Interfaces\Master\WarehouseInterface;
 use App\Contracts\Interfaces\Master\WarehouseStockInterface;
+use App\Contracts\Interfaces\Transaction\TransactionDetailInterface;
+use App\Contracts\Interfaces\Transaction\TransactionInterface;
+use App\Contracts\Interfaces\Transaction\VoucherUsedInterface;
 use App\Contracts\Repositories\ArticleRepository;
 use App\Contracts\Repositories\Auth\StoreRepository;
 use App\Contracts\Repositories\Auth\UserRepository;
@@ -30,6 +33,9 @@ use App\Contracts\Repositories\Master\StockRequestRepository;
 use App\Contracts\Repositories\Master\StockRequestDetailRepository;
 use App\Contracts\Repositories\Master\WarehouseRepository;
 use App\Contracts\Repositories\Master\WarehouseStockRepository;
+use App\Contracts\Repositories\Transaction\TransactionDetailRepository;
+use App\Contracts\Repositories\Transaction\TransactionRepository;
+use App\Contracts\Repositories\Transaction\VoucherUsedRepository;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -49,7 +55,10 @@ class AppServiceProvider extends ServiceProvider
         StockRequestInterface::class => StockRequestRepository::class,
         StockRequestDetailInterface::class => StockRequestDetailRepository::class,
         WarehouseStockInterface::class => WarehouseStockRepository::class,
-        ProductStockInterface::class => ProductStockRepository::class
+        ProductStockInterface::class => ProductStockRepository::class,
+        TransactionInterface::class => TransactionRepository::class,
+        TransactionDetailInterface::class => TransactionDetailRepository::class,
+        VoucherUsedInterface::class => VoucherUsedRepository::class,
     ];
 
     /**
