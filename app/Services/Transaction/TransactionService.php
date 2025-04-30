@@ -18,6 +18,7 @@ class TransactionService
             $total_price = $tax + $price;
 
             return [
+                'transaction_code' => date('Ymdhms'),
                 'store_id' => auth()->user()?->store_id ?? auth()->user()?->store?->id,
                 'transaction_status' => "Success",
                 'user_id' => isset($data["user_id"]) ? $data["user_id"] : null,
