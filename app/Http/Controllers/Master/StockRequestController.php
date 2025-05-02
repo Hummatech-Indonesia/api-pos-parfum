@@ -149,12 +149,15 @@ class StockRequestController extends Controller
         $data = $request->validated();
 
         if(!auth()->user()->warehouse_id) return BaseResponse::Error("Anda tidak terikat dengan gudang!", 400);
+        
+        $stockRequest = $this->stockRequest->show($id);
+        if(!$stockRequest) return BaseResponse::Notfound("Data permintaan stock tidak ditemukan");
 
         DB::beginTransaction();
         try {
 
             // Update status
-            $this->stockRequest->update($id, [
+            $stockRequest->update($id, [
                 'status' => $data['status'],
             ]);
 
@@ -169,6 +172,7 @@ class StockRequestController extends Controller
                     $this->stockRequestDetail->update($existingDetail->id, [
                         'sended_stock' => $detail['sended_stock'],
                     ]);
+
                     $productStock = $this->productStock->customQuery([
                         "warehouse_id" => auth()->user()->warehouse_id,
                         "product_detail_id" => $detail["product_detail_id"]
@@ -178,6 +182,20 @@ class StockRequestController extends Controller
                     if($productStock) {
                         $productStock->stock -= $detail["sended_stock"];
                         $productStock->save();
+                    }
+
+                    // add product to stock outlet
+                    $product = $this->productStock->customQuery(["outlet_id" => $stockRequest->outlet_id, "product_detail_id" => $request->product_detail_id])->first();
+                    
+                    if($product) {
+                        $product->stock += $request->stock;
+                        $product->save();
+                    } else {
+                        $this->productStock->store([
+                            "outlet_id" => $stockRequest->outlet_id,
+                            "stock" => $request->stock,
+                            "product_detail_id" => $request->product_detail_id
+                        ]);
                     }
                 }
             }
