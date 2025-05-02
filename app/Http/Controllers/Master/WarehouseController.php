@@ -217,7 +217,7 @@ class WarehouseController extends Controller
                 $product->save();
             } else {
                 $this->productStock->store([
-                    "warehouse_id" => $request->warehouse_id,
+                    "warehouse_id" => auth()->user()->warehouse_id,
                     "stock" => $request->stock,
                     "product_detail_id" => $request->product_detail_id
                 ]);
