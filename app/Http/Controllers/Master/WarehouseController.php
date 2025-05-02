@@ -209,7 +209,7 @@ class WarehouseController extends Controller
 
         DB::beginTransaction();
         try {
-            $data["user_id"] = auth()->id;
+            $data["user_id"] = auth()->user()->id;
             $stock = $this->warehouseStock->store($data);
             $product = $this->productStock->customQuery(["warehouse_id", $request->warehouse_id, "product_detail_id" => $request->product_detail_id])->first();
             if($product) {
