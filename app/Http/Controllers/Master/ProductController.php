@@ -87,20 +87,23 @@ class ProductController extends Controller
                 /**
                  * Pengecekan apakah data varian yang dikirim sudah ada atau belum
                  */
-                $check_varian = $this->productVarian->customQuery(["id" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
-                if(!$check_varian) {
-                    /**
-                     * Check varian name has owned in this store
-                     */
-                    $checkVarianName = $this->productVarian->customQuery(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
-                    if(!$checkVarianName){
-                        $this->productVarian->store(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]]);
-                        $store_varian = $this->productVarian->customQuery(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
-                        $detail["product_varian_id"] = $store_varian->id;
-                    } else {
-                        $detail["product_varian_id"] = $checkVarianName?->id;
-                    }
-                } 
+                if(isset($detail["product_varian_id"])) 
+                {
+                    $check_varian = $this->productVarian->customQuery(["id" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
+                    if(!$check_varian) {
+                        /**
+                         * Check varian name has owned in this store
+                         */
+                        $checkVarianName = $this->productVarian->customQuery(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
+                        if(!$checkVarianName){
+                            $this->productVarian->store(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]]);
+                            $store_varian = $this->productVarian->customQuery(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
+                            $detail["product_varian_id"] = $store_varian->id;
+                        } else {
+                            $detail["product_varian_id"] = $checkVarianName?->id;
+                        }
+                    } 
+                }
 
                 $this->productDetail->store($detail);
             }
@@ -155,20 +158,23 @@ class ProductController extends Controller
                 /**
                  * Pengecekan apakah data varian yang dikirim sudah ada atau belum
                  */
-                $check_varian = $this->productVarian->customQuery(["id" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
-                if(!$check_varian) {
-                    /**
-                     * Check varian name has owned in this store
-                     */
-                    $checkVarianName = $this->productVarian->customQuery(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
-                    if(!$checkVarianName){
-                        $this->productVarian->store(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]]);
-                        $store_varian = $this->productVarian->customQuery(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
-                        $detail["product_varian_id"] = $store_varian->id;
-                    } else {
-                        $detail["product_varian_id"] = $checkVarianName?->id;
-                    }
-                } 
+                if(isset($detail["product_varian_id"])) 
+                {
+                    $check_varian = $this->productVarian->customQuery(["id" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
+                    if(!$check_varian) {
+                        /**
+                         * Check varian name has owned in this store
+                         */
+                        $checkVarianName = $this->productVarian->customQuery(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
+                        if(!$checkVarianName){
+                            $this->productVarian->store(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]]);
+                            $store_varian = $this->productVarian->customQuery(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
+                            $detail["product_varian_id"] = $store_varian->id;
+                        } else {
+                            $detail["product_varian_id"] = $checkVarianName?->id;
+                        }
+                    } 
+                }
                 
                 if(isset($detail["product_detail_id"])){
                     $idDetail = $detail["product_detail_id"];
