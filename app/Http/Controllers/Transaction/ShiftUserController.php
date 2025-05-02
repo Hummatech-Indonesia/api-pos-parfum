@@ -59,6 +59,7 @@ class ShiftUserController extends Controller
         try {
             // check has data user or not 
             $data["user_id"] = auth()->user()->id;
+            $data["store_id"] = auth()->user()?->store?->id ?? auth()->user()?->store_id;
             $result = $this->shiftUser->store($data);
 
             DB::commit();

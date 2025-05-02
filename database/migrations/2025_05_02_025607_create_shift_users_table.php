@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('shift_users', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->foreignUuid('store_id')->constrained();
             $table->foreignUuid('outlet_id')->constrained();
             $table->foreignUuid('user_id')->constrained();
             $table->double('start_price')->default(0)->nullable();
