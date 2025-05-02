@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ProductDetail extends Model
 {
@@ -44,16 +45,16 @@ class ProductDetail extends Model
     /**
      * Get data stock in outlet
      */
-    public function productStockOutlet(): BelongsTo
+    public function productStockOutlet(): HasOne
     {
-        return $this->belongsTo(ProductStock::class)->where('outlet_id',auth()->user()->outlet_id);
+        return $this->hasOne(ProductStock::class)->where('outlet_id',auth()->user()->outlet_id);
     }
 
     /**
      * Get data stock in warehouse
      */
-    public function productStockWarehouse(): BelongsTo
+    public function productStockWarehouse(): HasOne
     {
-        return $this->belongsTo(ProductStock::class)->where('warehouse_id',auth()->user()->warehouse_id);
+        return $this->hasOne(ProductStock::class)->where('warehouse_id',auth()->user()->warehouse_id);
     }
 }
