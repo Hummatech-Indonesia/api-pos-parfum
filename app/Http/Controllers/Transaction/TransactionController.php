@@ -10,7 +10,7 @@ use App\Contracts\Interfaces\Transaction\TransactionInterface;
 use App\Contracts\Interfaces\Transaction\VoucherUsedInterface;
 use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\TransactionRequest;
+use App\Http\Requests\Transaction\TransactionRequest;
 use App\Services\Transaction\TransactionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -47,6 +47,8 @@ class TransactionController extends Controller
     {
         try{
             $payload = [];
+
+            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
 
             $transaction = $this->transaction->customPaginate($request->per_page, $request->page, $payload);
 

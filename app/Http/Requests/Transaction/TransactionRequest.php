@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Transaction;
 
 use App\Helpers\BaseResponse;
 use Illuminate\Contracts\Validation\Validator;
