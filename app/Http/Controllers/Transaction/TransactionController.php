@@ -98,7 +98,7 @@ class TransactionController extends Controller
 
             // handling product
             foreach($data["transaction_detail"] as $item) {
-dd($transaction);
+
                 $productStock = $this->productStock->customQuery(["product_detail_id" => $item['product_detail_id'], 'outlet_id' => auth()->user()?->outlet_id])->first();
                 
                 if(!$productStock) return BaseResponse::Error("Product tidak memiliki stock yang terdaftar di dalam outlet, silahkan check kembali dalam gudang!", null);
