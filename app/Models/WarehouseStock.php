@@ -15,6 +15,8 @@ class WarehouseStock extends Model
     protected $keyType = "string";
     protected $primaryKey = "id";
 
+    protected $guarded = [];
+
     public function productDetail(): BelongsTo
     {
         return $this->belongsTo(ProductDetail::class)->where('is_delete',0);
