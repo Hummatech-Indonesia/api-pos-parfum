@@ -98,13 +98,14 @@ class TransactionController extends Controller
 
             // handling product
             foreach($data["transaction_detail"] as $item) {
-                $productStock = $this->productStock->customQuery(["product_detail_id" => $item->product_detail_id, 'outlet_id' => auth()->user()?->outlet_id]);
-
+dd($transaction);
+                $productStock = $this->productStock->customQuery(["product_detail_id" => $item['product_detail_id'], 'outlet_id' => auth()->user()?->outlet_id])->first();
+                
                 if(!$productStock) return BaseResponse::Error("Product tidak memiliki stock yang terdaftar di dalam outlet, silahkan check kembali dalam gudang!", null);
                 
                 if($productStock->stock < $data["quantity"]) return BaseResponse::Error("Product tidak memiliki stock memadai!", null);
                 
-                $productDetail = $this->productDetail->show($item->product_detail_id);
+                $productDetail = $this->productDetail->show($item['product_detail_id']);
 
                 if(!$productDetail) return BaseResponse::Error("Product tidak terdaftar, silahkan check ke admin!", null);
 
@@ -113,16 +114,16 @@ class TransactionController extends Controller
 
                 $productStock->stock -= $used_quantity;
                 $productStock->save();
-
+                
                 $this->transactionDetail->store([
                     "transaction_id" => $transaction->id,
-                    "product_detail_id" => $item->product_detail_id,
-                    "quantity" => $item->quantity,
-                    "price" => $item->price,
-                    "unit" => $item->unit,
+                    "product_detail_id" => $item['product_detail_id'],
+                    "quantity" => $item['quantity'],
+                    "price" => $item['price'],
+                    "unit" => $item['unit'],
                 ]);
             }
-
+            dd($transaction);
             DB::commit();
             return BaseResponse::Ok("Berhasil melakukan transaksi", null);
         }catch(\Throwable $th){

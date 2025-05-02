@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->string('transaction_code')->nullable();
             $table->foreignUuid('store_id')->constrained();
             $table->foreignUuid('user_id')->nullable()->constrained();
-            $table->string('name_user')->nullable();
+            $table->string('user_name')->nullable();
             $table->double('amount_price')->default(0)->nullable();
             $table->double('amount_tax')->default(0)->nullable();
             $table->integer('tax')->default(0)->nullable();
