@@ -53,5 +53,6 @@ class ShiftUserRequest extends FormRequest
     public function prepareForValidation()
     {
         if(!$this->outlet_id) $this->merge(["outlet_id" => auth()->user()?->outlet_id]);
+        if(!$this->date) $this->merge(["date" => now()]);
     }
 }
