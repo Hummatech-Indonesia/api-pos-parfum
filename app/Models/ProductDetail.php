@@ -40,4 +40,20 @@ class ProductDetail extends Model
     {
         return $this->belongsTo(ProductVarian::class, 'product_varian_id')->where('is_delete',0);
     }
+
+    /**
+     * Get data stock in outlet
+     */
+    public function productStockOutlet(): BelongsTo
+    {
+        return $this->belongsTo(ProductStock::class)->where('outlet_id',auth()->user()->outlet_id);
+    }
+
+    /**
+     * Get data stock in warehouse
+     */
+    public function productStockWarehouse(): BelongsTo
+    {
+        return $this->belongsTo(ProductStock::class)->where('warehouse_id',auth()->user()->warehouse_id);
+    }
 }
