@@ -211,7 +211,7 @@ class WarehouseController extends Controller
         try {
             $data["user_id"] = auth()->user()->id;
             $stock = $this->warehouseStock->store($data);
-            $product = $this->productStock->customQuery(["warehouse_id", $request->warehouse_id, "product_detail_id" => $request->product_detail_id])->first();
+            $product = $this->productStock->customQuery(["warehouse_id" => auth()->user()->warehouse_id, "product_detail_id" => $request->product_detail_id])->first();
             if($product) {
                 $product->stock += $request->stock;
                 $product->save();
