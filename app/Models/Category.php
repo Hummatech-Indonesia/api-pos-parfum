@@ -46,6 +46,6 @@ class Category extends Model implements HasArticles
 
     public function products(): HasMany
     {
-        return $this->hasMany(ProductDetail::class)->where('is_delete',0);
+        return $this->hasMany(Product::class)->where('is_delete',0);
     }
 }
