@@ -94,7 +94,7 @@ class TransactionController extends Controller
                 $this->voucherUsed->store([
                     "store_id" => auth()->user()?->store_id ?? auth()->user()?->store?->id,
                     "discount_voucher_id" => $value,
-                    "description" => "Discount ". $discount->name . " telah digunakan dalam transaksi ". date("d-m-Y")
+                    "description" => "Discount ". $discount->name . " telah digunakan dalam transaksi pada ". date("d-m-Y")
                 ]);
             }
 
@@ -105,17 +105,18 @@ class TransactionController extends Controller
                 
                 if(!$productStock) return BaseResponse::Error("Product tidak memiliki stock yang terdaftar di dalam outlet, silahkan check kembali dalam gudang!", null);
                 
-                if($productStock->stock < $data["quantity"]) return BaseResponse::Error("Product tidak memiliki stock memadai!", null);
+                if($productStock->stock < $item["quantity"]) return BaseResponse::Error("Product tidak memiliki stock memadai!", null);
                 
                 $productDetail = $this->productDetail->show($item['product_detail_id']);
 
                 if(!$productDetail) return BaseResponse::Error("Product tidak terdaftar, silahkan check ke admin!", null);
-
-                $used_quantity = $data["quantity"];
-                if($item->unit == "gram") $used_quantity = $data["quantity"] * $productDetail->density;
+                
+                $used_quantity = $item["quantity"];
+                if(strtolower($item["unit"]) == "gram") $used_quantity = $item["quantity"] * $productDetail->density;
 
                 $productStock->stock -= $used_quantity;
                 $productStock->save();
+
                 
                 $this->transactionDetail->store([
                     "transaction_id" => $transaction->id,
@@ -125,7 +126,6 @@ class TransactionController extends Controller
                     "unit" => $item['unit'],
                 ]);
             }
-            dd($transaction);
             DB::commit();
             return BaseResponse::Ok("Berhasil melakukan transaksi", null);
         }catch(\Throwable $th){
