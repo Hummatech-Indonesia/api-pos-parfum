@@ -11,6 +11,7 @@ use App\Contracts\Interfaces\Transaction\VoucherUsedInterface;
 use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Transaction\TransactionRequest;
+use App\Http\Requests\Transaction\TransactionSyncRequest;
 use App\Services\Transaction\TransactionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -180,6 +181,76 @@ class TransactionController extends Controller
 
             return BaseResponse::Ok("Berhasil mengambil data transaction", $transaction);
         } catch(\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage with sync mobile.
+     */
+    public function syncStoreData(TransactionSyncRequest $request)
+    {
+        $data = $request->validated();
+        
+        DB::beginTransaction();
+        try {
+
+            foreach($data['transaction'] as $trans) {
+                $transaction = $this->transaction->store($this->transactionService->store($trans));
+    
+                // use discount
+                foreach($trans["discounts"] as $item => $value) {
+                    $discount = $this->discountVoucher->show($value);
+    
+                    if(!$discount) return BaseResponse::Error("Discount voucher yang dipilih sudah tidak valid, silahkan pilih yang lain!", null);
+                    
+                    if($discount->used > $discount->max_used) return BaseResponse::Error("Discount voucher sudah habis, silahkan pilih yang lain!", null);
+                    
+                    if($discount->expired > now()) return BaseResponse::Error("Discount voucher telah habis masa berlakunya, silahkan pilih yang lain!", null);
+    
+                    $discount->used += 1;
+                    $discount->save();
+    
+                    $this->voucherUsed->store([
+                        "store_id" => auth()->user()?->store_id ?? auth()->user()?->store?->id,
+                        "discount_voucher_id" => $value,
+                        "description" => "Discount ". $discount->name . " telah digunakan dalam transaksi pada ". date("d-m-Y")
+                    ]);
+                }
+    
+                // handling product
+                foreach($trans["transaction_detail"] as $item) {
+    
+                    $productStock = $this->productStock->customQuery(["product_detail_id" => $item['product_detail_id'], 'outlet_id' => auth()->user()?->outlet_id])->first();
+                    
+                    if(!$productStock) return BaseResponse::Error("Product tidak memiliki stock yang terdaftar di dalam outlet, silahkan check kembali dalam gudang!", null);
+                    
+                    if($productStock->stock < $item["quantity"]) return BaseResponse::Error("Product tidak memiliki stock memadai!", null);
+                    
+                    $productDetail = $this->productDetail->show($item['product_detail_id']);
+    
+                    if(!$productDetail) return BaseResponse::Error("Product tidak terdaftar, silahkan check ke admin!", null);
+                    
+                    $used_quantity = $item["quantity"];
+                    if(strtolower($item["unit"]) == "gram") $used_quantity = $item["quantity"] * $productDetail->density;
+    
+                    $productStock->stock -= $used_quantity;
+                    $productStock->save();
+    
+                    
+                    $this->transactionDetail->store([
+                        "transaction_id" => $transaction->id,
+                        "product_detail_id" => $item['product_detail_id'],
+                        "quantity" => $item['quantity'],
+                        "price" => $item['price'],
+                        "unit" => $item['unit'],
+                    ]);
+                }
+            }
+            DB::commit();
+            return BaseResponse::Ok("Berhasil melakukan sinkronisasi transaksi", null);
+        }catch(\Throwable $th){
+            DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
