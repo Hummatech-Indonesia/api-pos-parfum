@@ -107,7 +107,9 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::resource("stock-request", StockRequestController::class)->except(['store', 'destroy', 'update']);
 
     // API FOR DATA TRANSACTION
+    Route::api("transactions/no-paginate", [TransactionController::class, 'getData']);
     Route::resource("transactions", TransactionController::class)->except(['destroy']);
     // API FOR DATA SHIFT
+    Route::api("shifts/no-paginate", [ShiftUserController::class, 'getData']);
     Route::resource("shifts", ShiftUserController::class)->except(['destroy']);
 });

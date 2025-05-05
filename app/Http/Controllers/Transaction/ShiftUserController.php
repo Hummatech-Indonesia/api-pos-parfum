@@ -32,12 +32,16 @@ class ShiftUserController extends Controller
         // check query filter
         if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
 
-        $data = $this->shiftUser->customPaginate($per_page, $page, $payload)->toArray();
-
-        $result = $data["data"];
-        unset($data["data"]);
-
-        return BaseResponse::Paginate('Berhasil mengambil list data warehouse!', $result, $data);
+        try {
+            $data = $this->shiftUser->customPaginate($per_page, $page, $payload)->toArray();
+    
+            $result = $data["data"];
+            unset($data["data"]);
+    
+            return BaseResponse::Paginate('Berhasil mengambil list data shift!', $result, $data);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
     }
 
     /**
@@ -118,5 +122,26 @@ class ShiftUserController extends Controller
     public function destroy(string $id)
     {
 
+    }
+
+     /**
+     * Display a listing of the resource.
+     */
+    public function getData(Request $request)
+    {
+        $payload = [
+
+        ];
+
+        // check query filter
+        if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+
+        try {
+            $data = $this->shiftUser->customQuery($payload)->get();
+    
+            return BaseResponse::Ok("Berhasil mengambil data shift", $data);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
     }
 }

@@ -50,9 +50,12 @@ class TransactionController extends Controller
 
             if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
 
-            $transaction = $this->transaction->customPaginate($request->per_page, $request->page, $payload);
+            $transaction = $this->transaction->customPaginate($request->per_page, $request->page, $payload)->toArray();
 
-            return BaseResponse::Ok("Berhasil mengambil data transaction", $transaction);
+            $result = $transaction["data"];
+            unset($transaction["data"]);
+    
+            return BaseResponse::Paginate('Berhasil mengambil list data shift!', $result, $transaction);
         } catch(\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -164,5 +167,20 @@ class TransactionController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function getData(Request $request)
+    {
+        try{
+            $payload = [];
+
+            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+
+            $transaction = $this->transaction->customQuery($payload)->get();
+
+            return BaseResponse::Ok("Berhasil mengambil data transaction", $transaction);
+        } catch(\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
     }
 }
