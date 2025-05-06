@@ -37,15 +37,15 @@ class WarehouseStockRepository extends BaseRepository implements WarehouseStockI
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-        ->with('productDetail')
+        ->with('productDetail.product')
         ->when(count($data) > 0, function ($query) use ($data){
-            if(isset($data["search"])){
-                $query->where(function ($query2) use ($data) {
-                    $query2->where('name', 'like', '%' . $data["search"] . '%')
-                    ->orwhere('address', 'like', '%' . $data["search"] . '%');
-                });
-                unset($data["search"]);
-            }
+            // if(isset($data["search"])){
+            //     $query->where(function ($query2) use ($data) {
+            //         $query2->where('name', 'like', '%' . $data["search"] . '%')
+            //         ->orwhere('address', 'like', '%' . $data["search"] . '%');
+            //     });
+            //     unset($data["search"]);
+            // }
 
             foreach ($data as $index => $value){
                 $query->where($index, $value);
