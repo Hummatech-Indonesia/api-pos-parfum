@@ -6,6 +6,7 @@ use App\Contracts\Interfaces\Transaction\ShiftUserInterface;
 use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Transaction\ShiftUserRequest;
+use App\Http\Requests\Transaction\ShiftUserSyncRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -141,6 +142,29 @@ class ShiftUserController extends Controller
     
             return BaseResponse::Ok("Berhasil mengambil data shift", $data);
         } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+      /**
+     * Store a newly created resource in storage.
+     */
+    public function syncStoreData(ShiftUserSyncRequest $request)
+    {
+        $data = $request->validated();
+
+        DB::beginTransaction();
+        try {
+            // check has data user or not
+            foreach($data["shift"] as $item) {
+                $item["store_id"] = auth()->user()?->store?->id ?? auth()->user()?->store_id;
+                $this->shiftUser->store($item);
+            } 
+
+            DB::commit();
+            return BaseResponse::Ok('Berhasil sinkronisasi data shift', null);
+        }catch(\Throwable $th){
+            DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
     }

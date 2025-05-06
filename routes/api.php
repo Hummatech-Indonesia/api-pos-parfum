@@ -111,6 +111,7 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::post("transactions/sync", [TransactionController::class, 'syncStoreData']);
     Route::resource("transactions", TransactionController::class)->except(['destroy']);
     // API FOR DATA SHIFT
+    Route::post("shifts/sync", [ShiftUserController::class, 'syncStoreData']);
     Route::get("shifts/no-paginate", [ShiftUserController::class, 'getData']);
     Route::resource("shifts", ShiftUserController::class)->except(['destroy']);
 });
