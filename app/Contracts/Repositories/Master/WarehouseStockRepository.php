@@ -37,6 +37,7 @@ class WarehouseStockRepository extends BaseRepository implements WarehouseStockI
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
+        ->with('productDetail')
         ->when(count($data) > 0, function ($query) use ($data){
             if(isset($data["search"])){
                 $query->where(function ($query2) use ($data) {
