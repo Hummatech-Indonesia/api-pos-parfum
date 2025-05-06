@@ -194,9 +194,15 @@ class WarehouseController extends Controller
         if($request->date) $payload["date"] = $request->date;
 
         try {
-            return BaseResponse::Ok(
+            $result = $this->warehouseStock->customPaginate($per_page, $page, $payload)->toArray();
+
+            $data = $result["data"];
+            unset($result["data"]);
+
+            return BaseResponse::Paginate(
                 "Berhasil menampilkan riwayat stock", 
-                $this->warehouseStock->customPaginate($per_page, $page, $payload)
+                $data,
+                $result
             );
         }catch(\Throwable $th){
             return BaseResponse::Error($th->getMessage(), null);
