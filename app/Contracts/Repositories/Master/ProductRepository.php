@@ -38,7 +38,12 @@ class ProductRepository extends BaseRepository implements ProductInterface
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         $query = $this->model->query()
-            ->with(['store', 'category', 'details'])
+            ->with([
+                'store', 'category', 
+                'details' => function ($q) {
+                    $q->withSum('productStockOutlet','stock')->withSum('productStockWarehouse','stock');
+                }
+            ])
             ->withSum('details', 'stock'); // Menjumlahkan stok dari detail_product
 
         // Filtering berdasarkan search
