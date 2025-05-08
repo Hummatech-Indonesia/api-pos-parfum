@@ -194,7 +194,7 @@ class StockRequestController extends Controller
                         $this->productStock->store([
                             "outlet_id" => $stockRequest->outlet_id,
                             "stock" => $detail['sended_stock'],
-                            "product_detail_id" => $request->product_detail_id
+                            "product_detail_id" => $detail['product_detail_id']
                         ]);
                     }
                 }
