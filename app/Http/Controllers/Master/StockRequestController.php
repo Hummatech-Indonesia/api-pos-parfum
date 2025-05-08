@@ -157,7 +157,7 @@ class StockRequestController extends Controller
         try {
 
             // Update status
-            $stockRequest->update($id, [
+            $stockRequest->update([
                 'status' => $data['status'],
             ]);
 
