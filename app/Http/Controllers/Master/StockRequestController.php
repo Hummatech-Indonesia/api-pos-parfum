@@ -168,7 +168,7 @@ class StockRequestController extends Controller
                     'product_detail_id' => $detail['product_detail_id'],
                 ])->first();
 
-                if ($existingDetail && $data["status"] == "accepted") {
+                if ($existingDetail && $data["status"] == "approved") {
                     $this->stockRequestDetail->update($existingDetail->id, [
                         'sended_stock' => $detail['sended_stock'],
                     ]);
