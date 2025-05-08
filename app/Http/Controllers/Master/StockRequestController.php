@@ -185,7 +185,7 @@ class StockRequestController extends Controller
                     }
 
                     // add product to stock outlet
-                    $product = $this->productStock->customQuery(["outlet_id" => $stockRequest->outlet_id, "product_detail_id" => $request->product_detail_id])->first();
+                    $product = $this->productStock->customQuery(["outlet_id" => $stockRequest->outlet_id, "product_detail_id" => $detail['product_detail_id']])->first();
                     
                     if($product) {
                         $product->stock += $request->stock;
