@@ -7,6 +7,7 @@ use App\Contracts\Interfaces\Auth\UserInterface;
 use App\Contracts\Interfaces\CategoryInterface;
 use App\Contracts\Interfaces\Master\DiscountVoucherInterface;
 use App\Contracts\Interfaces\Master\ProductInterface;
+use App\Contracts\Interfaces\Master\WarehouseInterface;
 use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
@@ -24,9 +25,10 @@ class AuthController extends Controller
     private ProductInterface $product;
     private CategoryInterface $category;
     private DiscountVoucherInterface $discount;
+    private WarehouseInterface $warehouse;
 
     public function __construct(UserInterface $user, StoreInterface $stores, UserService $userService,
-    ProductInterface $product, CategoryInterface $category, DiscountVoucherInterface $discount)
+    ProductInterface $product, CategoryInterface $category, DiscountVoucherInterface $discount, WarehouseInterface $warehouse)
     {
         $this->user = $user;
         $this->stores = $stores;
@@ -34,6 +36,7 @@ class AuthController extends Controller
         $this->product = $product;
         $this->category = $category;
         $this->discount = $discount;
+        $this->warehouse = $warehouse;
     }
 
     public function login(LoginRequest $request)
@@ -69,9 +72,16 @@ class AuthController extends Controller
             $data["user_id"] = $result_user->id;
             if($request->hasFile('logo')) $data["logo"] = $request->file('logo');
             $store = $this->userService->addStore($data);
-            $this->stores->store($store);
+            $newStore = $this->stores->store($store);
+            $warehouse = $this->warehouse->store([
+                'store_id' => $newStore->id,
+                'name' => $newStore->name,
+                'address' => $newStore->address,
+            ]);
 
-            $result_user->syncRoles(['owner']);
+            $this->user->update($result_user->id, ['warehouse_id'=>$warehouse->id, 'store_id'=>$newStore->id]);
+
+            $result_user->syncRoles(['owner', 'warehouse']);
 
             DB::commit();
             return BaseResponse::Ok('Berhasil membuat akun', null);
