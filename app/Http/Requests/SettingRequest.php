@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\BaseResponse;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class SettingRequest extends FormRequest
 {
@@ -29,5 +31,10 @@ class SettingRequest extends FormRequest
             'value_text' => 'required|string',
             'group' => 'nullable|string|max:255',
         ];
+    }
+
+    public function failedValidation(Validator $validator): JsonResponse
+    {
+        throw new HttpResponseException(BaseResponse::Error("Kesalahan dalam validasi", $validator->errors()));
     }
 }
