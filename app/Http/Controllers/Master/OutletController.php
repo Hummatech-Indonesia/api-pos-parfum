@@ -9,17 +9,17 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Services\Master\OutletService;
 use App\Http\Requests\Master\OutletRequest;
-use App\Contracts\Interfaces\Auth\UserInterface;
-use App\Contracts\Interfaces\Master\OutletInterface;
+use App\Contracts\Repositories\Auth\UserRepository;
+use App\Contracts\Repositories\Master\OutletRepository;
 
 class OutletController extends Controller
 {
-    private OutletInterface $outlet;
-    private UserInterface $user;
+    private OutletRepository $outlet;
+    private UserRepository $user;
     private $outletService;
     private UserService $userService;
 
-    public function __construct(OutletInterface $outlet, UserInterface $user, OutletService $outletService, UserService $userService)
+    public function __construct(OutletRepository $outlet, UserRepository $user, OutletService $outletService, UserService $userService)
     {
         $this->outlet = $outlet; 
         $this->user = $user; 

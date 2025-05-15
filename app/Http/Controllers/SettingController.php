@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Contracts\Interfaces\SettingInterface;
-use App\Helpers\BaseResponse;
-use App\Http\Requests\SettingRequest;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use App\Helpers\BaseResponse;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\SettingRequest;
+use App\Contracts\Repositories\SettingRepository;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class SettingController extends Controller
 {
-    private $settingInterface;
-    public function __construct(SettingInterface $settingInterface)
+    private $settingRepository;
+    public function __construct(SettingRepository $settingRepository)
     {
-        $this->settingInterface = $settingInterface;
+        $this->settingRepository = $settingRepository;
     }
     /**
      * Display a listing of the resource.
@@ -22,7 +22,7 @@ class SettingController extends Controller
     public function index()
     {
         try {
-            $data = $this->settingInterface->get();
+            $data = $this->settingRepository->get();
             return BaseResponse::Ok("Berhasil mengambil semua setting", $data);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), data: null);
@@ -42,7 +42,7 @@ class SettingController extends Controller
 
         try {
 
-            $settingData = $this->settingInterface->store($data);
+            $settingData = $this->settingRepository->store($data);
 
             DB::commit();
 
@@ -66,7 +66,7 @@ class SettingController extends Controller
      */
     public function update(SettingRequest $request, string $id)
     {
-        $setting = $this->settingInterface->show($id);
+        $setting = $this->settingRepository->show($id);
         if (!$setting) return BaseResponse::Notfound("id tidak ditemukan");
 
         $settingData = $request->validated();
@@ -77,7 +77,7 @@ class SettingController extends Controller
         DB::beginTransaction();
         try {
 
-            $updatedSetting = $this->settingInterface->update($id, $settingData);
+            $updatedSetting = $this->settingRepository->update($id, $settingData);
 
             DB::commit();
             return BaseResponse::Ok('Berhasil memperbarui setting', $updatedSetting);
@@ -95,7 +95,7 @@ class SettingController extends Controller
         DB::beginTransaction();
 
         try {
-            $setting = $this->settingInterface->show($id);
+            $setting = $this->settingRepository->show($id);
 
             $setting->delete();
 

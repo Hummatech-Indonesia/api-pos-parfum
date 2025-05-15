@@ -67,6 +67,7 @@ class AppServiceProvider extends ServiceProvider
         VoucherUsedInterface::class => VoucherUsedRepository::class,
         ShiftUserInterface::class => ShiftUserRepository::class,
         RoleInterface::class => RoleRepository::class,
+        SettingInterface::class => SettingRepository::class,
     ];
 
     /**
