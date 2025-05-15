@@ -2,26 +2,29 @@
 
 namespace App\Http\Controllers\Master;
 
+use Illuminate\Http\Request;
+use App\Helpers\BaseResponse;
+use App\Services\Auth\UserService;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Services\Master\OutletService;
+use App\Http\Requests\Master\OutletRequest;
 use App\Contracts\Interfaces\Auth\UserInterface;
 use App\Contracts\Interfaces\Master\OutletInterface;
-use App\Helpers\BaseResponse;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Master\OutletRequest;
-use App\Services\Master\OutletService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class OutletController extends Controller
 {
     private OutletInterface $outlet;
     private UserInterface $user;
     private $outletService;
+    private UserService $userService;
 
-    public function __construct(OutletInterface $outlet, UserInterface $user, OutletService $outletService)
+    public function __construct(OutletInterface $outlet, UserInterface $user, OutletService $outletService, UserService $userService)
     {
         $this->outlet = $outlet; 
         $this->user = $user; 
         $this->outletService = $outletService;
+        $this->userService = $userService;
     }
 
     /**
@@ -73,12 +76,30 @@ class OutletController extends Controller
             $user = $data["user_id"];
             unset($data["user_id"]);
 
+            $userCreate = $data["users"];
+            unset($data["users"]);
+            $userLogin = auth()->user();
+
             $mapOutlet = $this->outletService->dataOutlet($data);
             $result_outlet = $this->outlet->store($mapOutlet);
 
             if($user){
                 $result_user = $this->user->customQuery(["user_id" => $user])->get();
                 foreach($result_user as $dataUser) $dataUser->update(["outlet_id" => $result_outlet->id]);
+            }
+
+            if($userCreate && is_array($userCreate) && !empty($userCreate) && count($userCreate) > 0) {
+                foreach($userCreate as $userData) {
+                    $mapping = $this->userService->mappingDataUser($userData);
+                    $mapping["outlet_id"] = $result_outlet->id;
+                    if($userLogin && $userLogin->warehouse_id) {
+                        $mapping['warehouse_id'] = $userLogin->warehouse_id;
+                    }
+                    if($userLogin && $userLogin->store_id) {
+                        $mapping['store_id'] = $userLogin->store_id;
+                    }
+                    $this->user->store($mapping);
+                }
             }
     
             DB::commit();
