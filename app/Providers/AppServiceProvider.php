@@ -16,6 +16,7 @@ use App\Contracts\Interfaces\Master\StockRequestInterface;
 use App\Contracts\Interfaces\Master\StockRequestDetailInterface;
 use App\Contracts\Interfaces\Master\WarehouseInterface;
 use App\Contracts\Interfaces\Master\WarehouseStockInterface;
+use App\Contracts\Interfaces\SettingInterface;
 use App\Contracts\Interfaces\Transaction\ShiftUserInterface;
 use App\Contracts\Interfaces\Transaction\TransactionDetailInterface;
 use App\Contracts\Interfaces\Transaction\TransactionInterface;
@@ -34,6 +35,7 @@ use App\Contracts\Repositories\Master\StockRequestRepository;
 use App\Contracts\Repositories\Master\StockRequestDetailRepository;
 use App\Contracts\Repositories\Master\WarehouseRepository;
 use App\Contracts\Repositories\Master\WarehouseStockRepository;
+use App\Contracts\Repositories\SettingRepository;
 use App\Contracts\Repositories\Transaction\ShiftUserRepository;
 use App\Contracts\Repositories\Transaction\TransactionDetailRepository;
 use App\Contracts\Repositories\Transaction\TransactionRepository;
@@ -62,6 +64,7 @@ class AppServiceProvider extends ServiceProvider
         TransactionDetailInterface::class => TransactionDetailRepository::class,
         VoucherUsedInterface::class => VoucherUsedRepository::class,
         ShiftUserInterface::class => ShiftUserRepository::class,
+        SettingInterface::class => SettingRepository::class,
     ];
 
     /**
