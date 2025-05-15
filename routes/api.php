@@ -4,6 +4,7 @@ use App\Helpers\BaseResponse;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\BelajarController;
 use App\Http\Controllers\Dashboard\CategoryController;
+use App\Http\Controllers\Master\RoleController;
 use App\Http\Controllers\Master\DiscountVoucherController;
 use App\Http\Controllers\Master\OutletController;
 use App\Http\Controllers\Master\ProductController;
@@ -82,6 +83,11 @@ Route::middleware('auth:sanctum')->group(function () {
         // API FOR DATA DISCOUNT VOUCHER
         Route::get('discount-vouchers/no-paginate', [DiscountVoucherController::class, 'listDiscountVoucher'])->name('list-discount-vouchers-no-paginate');
         Route::resource("discount-vouchers", DiscountVoucherController::class)->only(['store', 'destroy', 'update']);
+    });
+
+    Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+        Route::apiResource('roles', RoleController::class);
+        Route::post('roles/{id}/restore', [RoleController::class, 'restore']);
     });
 
     // API FOR ROLE OUTLET & OWNER
