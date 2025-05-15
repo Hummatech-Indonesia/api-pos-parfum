@@ -40,7 +40,7 @@ class UserService
         $image = null;
         try{
             if(isset($data->logo)) {
-                $image = $this->upload("users", $data->logo);
+                $image = $this->upload("stores", $data->logo);
             }
         }catch(\Throwable $th){ }
 

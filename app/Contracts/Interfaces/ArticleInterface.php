@@ -7,6 +7,7 @@ use App\Contracts\Interfaces\Eloquent\GetInterface;
 use App\Contracts\Interfaces\Eloquent\StoreInterface;
 use App\Contracts\Interfaces\Eloquent\UpdateInterface;
 
-interface ArticleInterface extends GetInterface, StoreInterface, UpdateInterface, DeleteInterface
+interface ArticleInterface extends GetInterface, StoreInterface, UpdateInterface, DeleteInterface 
 {
+    
 }
