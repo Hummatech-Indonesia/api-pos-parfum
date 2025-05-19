@@ -7273,3 +7273,517 @@ Stack trace:
 [stacktrace]
 #0 {main}
 "} 
+[2025-05-22 06:34:15] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\AppServiceProvider.php:6)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\composer\\ClassLoader.php(427): Composer\\Autoload\\{closure}('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(855): Composer\\Autoload\\ClassLoader->loadClass('App\\\\Providers\\\\A...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(789): Illuminate\\Foundation\\Application->resolveProvider('App\\\\Providers\\\\A...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\ProviderRepository.php(75): Illuminate\\Foundation\\Application->register('App\\\\Providers\\\\A...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(769): Illuminate\\Foundation\\ProviderRepository->load(Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\RegisterProviders.php(17): Illuminate\\Foundation\\Application->registerConfiguredProviders()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\RegisterProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#9 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 
+[2025-05-22 06:34:15] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\AppServiceProvider.php:6)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\composer\\ClassLoader.php(427): Composer\\Autoload\\{closure}('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(855): Composer\\Autoload\\ClassLoader->loadClass('App\\\\Providers\\\\A...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(789): Illuminate\\Foundation\\Application->resolveProvider('App\\\\Providers\\\\A...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\ProviderRepository.php(75): Illuminate\\Foundation\\Application->register('App\\\\Providers\\\\A...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(769): Illuminate\\Foundation\\ProviderRepository->load(Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\RegisterProviders.php(17): Illuminate\\Foundation\\Application->registerConfiguredProviders()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\RegisterProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#9 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 
+[2025-05-22 06:34:15] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\AppServiceProvider.php:6)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\composer\\ClassLoader.php(427): Composer\\Autoload\\{closure}('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(855): Composer\\Autoload\\ClassLoader->loadClass('App\\\\Providers\\\\A...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(789): Illuminate\\Foundation\\Application->resolveProvider('App\\\\Providers\\\\A...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\ProviderRepository.php(75): Illuminate\\Foundation\\Application->register('App\\\\Providers\\\\A...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(769): Illuminate\\Foundation\\ProviderRepository->load(Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\RegisterProviders.php(17): Illuminate\\Foundation\\Application->registerConfiguredProviders()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\RegisterProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#9 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 
+[2025-05-22 06:34:15] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\AppServiceProvider.php:6)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\composer\\ClassLoader.php(427): Composer\\Autoload\\{closure}('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(855): Composer\\Autoload\\ClassLoader->loadClass('App\\\\Providers\\\\A...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(789): Illuminate\\Foundation\\Application->resolveProvider('App\\\\Providers\\\\A...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\ProviderRepository.php(75): Illuminate\\Foundation\\Application->register('App\\\\Providers\\\\A...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(769): Illuminate\\Foundation\\ProviderRepository->load(Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\RegisterProviders.php(17): Illuminate\\Foundation\\Application->registerConfiguredProviders()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\RegisterProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#9 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 
+[2025-05-22 06:34:15] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\AppServiceProvider.php:6)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\composer\\ClassLoader.php(427): Composer\\Autoload\\{closure}('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(855): Composer\\Autoload\\ClassLoader->loadClass('App\\\\Providers\\\\A...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(789): Illuminate\\Foundation\\Application->resolveProvider('App\\\\Providers\\\\A...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\ProviderRepository.php(75): Illuminate\\Foundation\\Application->register('App\\\\Providers\\\\A...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(769): Illuminate\\Foundation\\ProviderRepository->load(Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\RegisterProviders.php(17): Illuminate\\Foundation\\Application->registerConfiguredProviders()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\RegisterProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#9 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 
+[2025-05-22 06:34:15] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\AppServiceProvider.php:6)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\composer\\ClassLoader.php(427): Composer\\Autoload\\{closure}('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(855): Composer\\Autoload\\ClassLoader->loadClass('App\\\\Providers\\\\A...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(789): Illuminate\\Foundation\\Application->resolveProvider('App\\\\Providers\\\\A...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\ProviderRepository.php(75): Illuminate\\Foundation\\Application->register('App\\\\Providers\\\\A...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(769): Illuminate\\Foundation\\ProviderRepository->load(Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\RegisterProviders.php(17): Illuminate\\Foundation\\Application->registerConfiguredProviders()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\RegisterProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#9 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 
+[2025-05-22 06:34:15] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\AppServiceProvider.php:6)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\composer\\ClassLoader.php(427): Composer\\Autoload\\{closure}('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(855): Composer\\Autoload\\ClassLoader->loadClass('App\\\\Providers\\\\A...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(789): Illuminate\\Foundation\\Application->resolveProvider('App\\\\Providers\\\\A...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\ProviderRepository.php(75): Illuminate\\Foundation\\Application->register('App\\\\Providers\\\\A...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(769): Illuminate\\Foundation\\ProviderRepository->load(Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\RegisterProviders.php(17): Illuminate\\Foundation\\Application->registerConfiguredProviders()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\RegisterProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#9 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 
+[2025-05-22 06:34:15] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\AppServiceProvider.php:6)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\composer\\ClassLoader.php(427): Composer\\Autoload\\{closure}('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(855): Composer\\Autoload\\ClassLoader->loadClass('App\\\\Providers\\\\A...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(789): Illuminate\\Foundation\\Application->resolveProvider('App\\\\Providers\\\\A...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\ProviderRepository.php(75): Illuminate\\Foundation\\Application->register('App\\\\Providers\\\\A...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(769): Illuminate\\Foundation\\ProviderRepository->load(Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\RegisterProviders.php(17): Illuminate\\Foundation\\Application->registerConfiguredProviders()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\RegisterProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#9 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 
+[2025-05-22 06:34:15] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\AppServiceProvider.php:6)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\composer\\ClassLoader.php(427): Composer\\Autoload\\{closure}('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(855): Composer\\Autoload\\ClassLoader->loadClass('App\\\\Providers\\\\A...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(789): Illuminate\\Foundation\\Application->resolveProvider('App\\\\Providers\\\\A...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\ProviderRepository.php(75): Illuminate\\Foundation\\Application->register('App\\\\Providers\\\\A...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(769): Illuminate\\Foundation\\ProviderRepository->load(Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\RegisterProviders.php(17): Illuminate\\Foundation\\Application->registerConfiguredProviders()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\RegisterProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#9 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 
+[2025-05-22 06:34:15] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\AppServiceProvider.php:6)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\composer\\ClassLoader.php(427): Composer\\Autoload\\{closure}('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(855): Composer\\Autoload\\ClassLoader->loadClass('App\\\\Providers\\\\A...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(789): Illuminate\\Foundation\\Application->resolveProvider('App\\\\Providers\\\\A...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\ProviderRepository.php(75): Illuminate\\Foundation\\Application->register('App\\\\Providers\\\\A...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(769): Illuminate\\Foundation\\ProviderRepository->load(Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\RegisterProviders.php(17): Illuminate\\Foundation\\Application->registerConfiguredProviders()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\RegisterProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#9 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 
+[2025-05-22 06:34:15] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\AppServiceProvider.php:6)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\composer\\ClassLoader.php(427): Composer\\Autoload\\{closure}('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(855): Composer\\Autoload\\ClassLoader->loadClass('App\\\\Providers\\\\A...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(789): Illuminate\\Foundation\\Application->resolveProvider('App\\\\Providers\\\\A...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\ProviderRepository.php(75): Illuminate\\Foundation\\Application->register('App\\\\Providers\\\\A...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(769): Illuminate\\Foundation\\ProviderRepository->load(Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\RegisterProviders.php(17): Illuminate\\Foundation\\Application->registerConfiguredProviders()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\RegisterProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#9 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 
+[2025-05-22 06:34:24] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\AppServiceProvider.php:6)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\composer\\ClassLoader.php(427): Composer\\Autoload\\{closure}('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(855): Composer\\Autoload\\ClassLoader->loadClass('App\\\\Providers\\\\A...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(789): Illuminate\\Foundation\\Application->resolveProvider('App\\\\Providers\\\\A...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\ProviderRepository.php(75): Illuminate\\Foundation\\Application->register('App\\\\Providers\\\\A...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(769): Illuminate\\Foundation\\ProviderRepository->load(Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\RegisterProviders.php(17): Illuminate\\Foundation\\Application->registerConfiguredProviders()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\RegisterProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#9 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 
+[2025-05-22 06:34:24] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\AppServiceProvider.php:6)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\composer\\ClassLoader.php(427): Composer\\Autoload\\{closure}('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(855): Composer\\Autoload\\ClassLoader->loadClass('App\\\\Providers\\\\A...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(789): Illuminate\\Foundation\\Application->resolveProvider('App\\\\Providers\\\\A...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\ProviderRepository.php(75): Illuminate\\Foundation\\Application->register('App\\\\Providers\\\\A...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(769): Illuminate\\Foundation\\ProviderRepository->load(Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\RegisterProviders.php(17): Illuminate\\Foundation\\Application->registerConfiguredProviders()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\RegisterProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#9 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 
+[2025-05-22 06:34:28] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\AppServiceProvider.php:6)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\composer\\ClassLoader.php(427): Composer\\Autoload\\{closure}('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(855): Composer\\Autoload\\ClassLoader->loadClass('App\\\\Providers\\\\A...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(789): Illuminate\\Foundation\\Application->resolveProvider('App\\\\Providers\\\\A...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\ProviderRepository.php(75): Illuminate\\Foundation\\Application->register('App\\\\Providers\\\\A...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(769): Illuminate\\Foundation\\ProviderRepository->load(Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\RegisterProviders.php(17): Illuminate\\Foundation\\Application->registerConfiguredProviders()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\RegisterProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#9 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 
+[2025-05-22 06:34:28] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\AppServiceProvider.php:6)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\composer\\ClassLoader.php(427): Composer\\Autoload\\{closure}('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(855): Composer\\Autoload\\ClassLoader->loadClass('App\\\\Providers\\\\A...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(789): Illuminate\\Foundation\\Application->resolveProvider('App\\\\Providers\\\\A...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\ProviderRepository.php(75): Illuminate\\Foundation\\Application->register('App\\\\Providers\\\\A...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(769): Illuminate\\Foundation\\ProviderRepository->load(Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\RegisterProviders.php(17): Illuminate\\Foundation\\Application->registerConfiguredProviders()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\RegisterProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#9 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 
+[2025-05-22 06:35:28] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\AppServiceProvider.php:6)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\composer\\ClassLoader.php(427): Composer\\Autoload\\{closure}('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(855): Composer\\Autoload\\ClassLoader->loadClass('App\\\\Providers\\\\A...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(789): Illuminate\\Foundation\\Application->resolveProvider('App\\\\Providers\\\\A...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\ProviderRepository.php(75): Illuminate\\Foundation\\Application->register('App\\\\Providers\\\\A...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(769): Illuminate\\Foundation\\ProviderRepository->load(Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\RegisterProviders.php(17): Illuminate\\Foundation\\Application->registerConfiguredProviders()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\RegisterProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#9 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 
+[2025-05-22 06:35:28] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\AppServiceProvider.php:6)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\composer\\ClassLoader.php(427): Composer\\Autoload\\{closure}('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(855): Composer\\Autoload\\ClassLoader->loadClass('App\\\\Providers\\\\A...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(789): Illuminate\\Foundation\\Application->resolveProvider('App\\\\Providers\\\\A...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\ProviderRepository.php(75): Illuminate\\Foundation\\Application->register('App\\\\Providers\\\\A...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(769): Illuminate\\Foundation\\ProviderRepository->load(Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\RegisterProviders.php(17): Illuminate\\Foundation\\Application->registerConfiguredProviders()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\RegisterProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#9 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 
+[2025-05-22 06:35:46] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\AppServiceProvider.php:6)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\composer\\ClassLoader.php(427): Composer\\Autoload\\{closure}('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(855): Composer\\Autoload\\ClassLoader->loadClass('App\\\\Providers\\\\A...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(789): Illuminate\\Foundation\\Application->resolveProvider('App\\\\Providers\\\\A...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\ProviderRepository.php(75): Illuminate\\Foundation\\Application->register('App\\\\Providers\\\\A...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(769): Illuminate\\Foundation\\ProviderRepository->load(Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\RegisterProviders.php(17): Illuminate\\Foundation\\Application->registerConfiguredProviders()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\RegisterProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#9 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 
+[2025-05-22 06:35:46] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\AppServiceProvider.php:6)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\composer\\ClassLoader.php(427): Composer\\Autoload\\{closure}('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(855): Composer\\Autoload\\ClassLoader->loadClass('App\\\\Providers\\\\A...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(789): Illuminate\\Foundation\\Application->resolveProvider('App\\\\Providers\\\\A...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\ProviderRepository.php(75): Illuminate\\Foundation\\Application->register('App\\\\Providers\\\\A...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(769): Illuminate\\Foundation\\ProviderRepository->load(Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\RegisterProviders.php(17): Illuminate\\Foundation\\Application->registerConfiguredProviders()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\RegisterProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#9 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 
+[2025-05-22 06:36:28] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\routes\\api.php:4)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(511): Illuminate\\Routing\\RouteFileRegistrar->register('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(465): Illuminate\\Routing\\Router->loadRoutes('C:\\\\laravel\\\\Gith...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\RouteRegistrar.php(194): Illuminate\\Routing\\Router->group(Array, 'C:\\\\laravel\\\\Gith...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\RouteServiceProvider.php(34): Illuminate\\Routing\\RouteRegistrar->group('C:\\\\laravel\\\\Gith...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): App\\Providers\\RouteServiceProvider->App\\Providers\\{closure}()
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Object(Closure), Object(Closure))
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Object(Closure), Array, NULL)
+#9 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider.php(120): Illuminate\\Container\\Container->call(Object(Closure))
+#10 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider.php(45): Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider->loadRoutes()
+#11 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider->Illuminate\\Foundation\\Support\\Providers\\{closure}()
+#12 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#13 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#14 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Object(Closure), Object(Closure))
+#15 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Object(Closure), Array, NULL)
+#16 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\ServiceProvider.php(119): Illuminate\\Container\\Container->call(Object(Closure))
+#17 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1037): Illuminate\\Support\\ServiceProvider->callBootedCallbacks()
+#18 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1015): Illuminate\\Foundation\\Application->bootProvider(Object(App\\Providers\\RouteServiceProvider))
+#19 [internal function]: Illuminate\\Foundation\\Application->Illuminate\\Foundation\\{closure}(Object(App\\Providers\\RouteServiceProvider), 25)
+#20 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1014): array_walk(Array, Object(Closure))
+#21 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\BootProviders.php(17): Illuminate\\Foundation\\Application->boot()
+#22 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\BootProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#23 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#24 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#25 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#26 {main}
+"} 
+[2025-05-22 06:36:28] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\routes\\api.php:4)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(511): Illuminate\\Routing\\RouteFileRegistrar->register('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(465): Illuminate\\Routing\\Router->loadRoutes('C:\\\\laravel\\\\Gith...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\RouteRegistrar.php(194): Illuminate\\Routing\\Router->group(Array, 'C:\\\\laravel\\\\Gith...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\RouteServiceProvider.php(34): Illuminate\\Routing\\RouteRegistrar->group('C:\\\\laravel\\\\Gith...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): App\\Providers\\RouteServiceProvider->App\\Providers\\{closure}()
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Object(Closure), Object(Closure))
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Object(Closure), Array, NULL)
+#9 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider.php(120): Illuminate\\Container\\Container->call(Object(Closure))
+#10 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider.php(45): Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider->loadRoutes()
+#11 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider->Illuminate\\Foundation\\Support\\Providers\\{closure}()
+#12 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#13 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#14 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Object(Closure), Object(Closure))
+#15 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Object(Closure), Array, NULL)
+#16 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\ServiceProvider.php(119): Illuminate\\Container\\Container->call(Object(Closure))
+#17 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1037): Illuminate\\Support\\ServiceProvider->callBootedCallbacks()
+#18 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1015): Illuminate\\Foundation\\Application->bootProvider(Object(App\\Providers\\RouteServiceProvider))
+#19 [internal function]: Illuminate\\Foundation\\Application->Illuminate\\Foundation\\{closure}(Object(App\\Providers\\RouteServiceProvider), 25)
+#20 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1014): array_walk(Array, Object(Closure))
+#21 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\BootProviders.php(17): Illuminate\\Foundation\\Application->boot()
+#22 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\BootProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#23 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#24 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#25 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#26 {main}
+"} 
+[2025-05-22 06:36:29] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\routes\\api.php:4)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(511): Illuminate\\Routing\\RouteFileRegistrar->register('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(465): Illuminate\\Routing\\Router->loadRoutes('C:\\\\laravel\\\\Gith...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\RouteRegistrar.php(194): Illuminate\\Routing\\Router->group(Array, 'C:\\\\laravel\\\\Gith...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\RouteServiceProvider.php(34): Illuminate\\Routing\\RouteRegistrar->group('C:\\\\laravel\\\\Gith...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): App\\Providers\\RouteServiceProvider->App\\Providers\\{closure}()
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Object(Closure), Object(Closure))
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Object(Closure), Array, NULL)
+#9 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider.php(120): Illuminate\\Container\\Container->call(Object(Closure))
+#10 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider.php(45): Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider->loadRoutes()
+#11 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider->Illuminate\\Foundation\\Support\\Providers\\{closure}()
+#12 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#13 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#14 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Object(Closure), Object(Closure))
+#15 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Object(Closure), Array, NULL)
+#16 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\ServiceProvider.php(119): Illuminate\\Container\\Container->call(Object(Closure))
+#17 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1037): Illuminate\\Support\\ServiceProvider->callBootedCallbacks()
+#18 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1015): Illuminate\\Foundation\\Application->bootProvider(Object(App\\Providers\\RouteServiceProvider))
+#19 [internal function]: Illuminate\\Foundation\\Application->Illuminate\\Foundation\\{closure}(Object(App\\Providers\\RouteServiceProvider), 25)
+#20 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1014): array_walk(Array, Object(Closure))
+#21 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\BootProviders.php(17): Illuminate\\Foundation\\Application->boot()
+#22 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\BootProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#23 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#24 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#25 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#26 {main}
+"} 
+[2025-05-22 06:36:29] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\routes\\api.php:4)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(511): Illuminate\\Routing\\RouteFileRegistrar->register('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(465): Illuminate\\Routing\\Router->loadRoutes('C:\\\\laravel\\\\Gith...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\RouteRegistrar.php(194): Illuminate\\Routing\\Router->group(Array, 'C:\\\\laravel\\\\Gith...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\RouteServiceProvider.php(34): Illuminate\\Routing\\RouteRegistrar->group('C:\\\\laravel\\\\Gith...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): App\\Providers\\RouteServiceProvider->App\\Providers\\{closure}()
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Object(Closure), Object(Closure))
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Object(Closure), Array, NULL)
+#9 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider.php(120): Illuminate\\Container\\Container->call(Object(Closure))
+#10 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider.php(45): Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider->loadRoutes()
+#11 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider->Illuminate\\Foundation\\Support\\Providers\\{closure}()
+#12 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#13 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#14 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Object(Closure), Object(Closure))
+#15 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Object(Closure), Array, NULL)
+#16 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\ServiceProvider.php(119): Illuminate\\Container\\Container->call(Object(Closure))
+#17 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1037): Illuminate\\Support\\ServiceProvider->callBootedCallbacks()
+#18 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1015): Illuminate\\Foundation\\Application->bootProvider(Object(App\\Providers\\RouteServiceProvider))
+#19 [internal function]: Illuminate\\Foundation\\Application->Illuminate\\Foundation\\{closure}(Object(App\\Providers\\RouteServiceProvider), 25)
+#20 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1014): array_walk(Array, Object(Closure))
+#21 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\BootProviders.php(17): Illuminate\\Foundation\\Application->boot()
+#22 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\BootProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#23 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#24 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#25 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#26 {main}
+"} 
+[2025-05-22 06:36:51] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\routes\\api.php:4)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(511): Illuminate\\Routing\\RouteFileRegistrar->register('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(465): Illuminate\\Routing\\Router->loadRoutes('C:\\\\laravel\\\\Gith...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\RouteRegistrar.php(194): Illuminate\\Routing\\Router->group(Array, 'C:\\\\laravel\\\\Gith...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\RouteServiceProvider.php(34): Illuminate\\Routing\\RouteRegistrar->group('C:\\\\laravel\\\\Gith...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): App\\Providers\\RouteServiceProvider->App\\Providers\\{closure}()
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Object(Closure), Object(Closure))
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Object(Closure), Array, NULL)
+#9 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider.php(120): Illuminate\\Container\\Container->call(Object(Closure))
+#10 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider.php(45): Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider->loadRoutes()
+#11 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider->Illuminate\\Foundation\\Support\\Providers\\{closure}()
+#12 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#13 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#14 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Object(Closure), Object(Closure))
+#15 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Object(Closure), Array, NULL)
+#16 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\ServiceProvider.php(119): Illuminate\\Container\\Container->call(Object(Closure))
+#17 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1037): Illuminate\\Support\\ServiceProvider->callBootedCallbacks()
+#18 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1015): Illuminate\\Foundation\\Application->bootProvider(Object(App\\Providers\\RouteServiceProvider))
+#19 [internal function]: Illuminate\\Foundation\\Application->Illuminate\\Foundation\\{closure}(Object(App\\Providers\\RouteServiceProvider), 25)
+#20 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1014): array_walk(Array, Object(Closure))
+#21 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\BootProviders.php(17): Illuminate\\Foundation\\Application->boot()
+#22 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\BootProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#23 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#24 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#25 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#26 {main}
+"} 
+[2025-05-22 06:36:51] local.ERROR: syntax error, unexpected token "<<", expecting end of file {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting end of file at C:\\laravel\\Github\\api-pos-parfum\\routes\\api.php:4)
+[stacktrace]
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(511): Illuminate\\Routing\\RouteFileRegistrar->register('C:\\\\laravel\\\\Gith...')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(465): Illuminate\\Routing\\Router->loadRoutes('C:\\\\laravel\\\\Gith...')
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\RouteRegistrar.php(194): Illuminate\\Routing\\Router->group(Array, 'C:\\\\laravel\\\\Gith...')
+#3 C:\\laravel\\Github\\api-pos-parfum\\app\\Providers\\RouteServiceProvider.php(34): Illuminate\\Routing\\RouteRegistrar->group('C:\\\\laravel\\\\Gith...')
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): App\\Providers\\RouteServiceProvider->App\\Providers\\{closure}()
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#7 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Object(Closure), Object(Closure))
+#8 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Object(Closure), Array, NULL)
+#9 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider.php(120): Illuminate\\Container\\Container->call(Object(Closure))
+#10 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider.php(45): Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider->loadRoutes()
+#11 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider->Illuminate\\Foundation\\Support\\Providers\\{closure}()
+#12 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#13 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#14 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Object(Closure), Object(Closure))
+#15 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Object(Closure), Array, NULL)
+#16 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\ServiceProvider.php(119): Illuminate\\Container\\Container->call(Object(Closure))
+#17 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1037): Illuminate\\Support\\ServiceProvider->callBootedCallbacks()
+#18 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1015): Illuminate\\Foundation\\Application->bootProvider(Object(App\\Providers\\RouteServiceProvider))
+#19 [internal function]: Illuminate\\Foundation\\Application->Illuminate\\Foundation\\{closure}(Object(App\\Providers\\RouteServiceProvider), 25)
+#20 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1014): array_walk(Array, Object(Closure))
+#21 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\BootProviders.php(17): Illuminate\\Foundation\\Application->boot()
+#22 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\BootProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#23 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#24 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#25 Command line code(1): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#26 {main}
+"} 
+[2025-05-22 06:36:57] local.ERROR: Cannot use App\Http\Controllers\BelajarController as BelajarController because the name is already in use {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot use App\\Http\\Controllers\\BelajarController as BelajarController because the name is already in use at C:\\laravel\\Github\\api-pos-parfum\\routes\\api.php:11)
+[stacktrace]
+#0 {main}
+"} 
+[2025-05-22 06:36:57] local.ERROR: Cannot use App\Http\Controllers\BelajarController as BelajarController because the name is already in use {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot use App\\Http\\Controllers\\BelajarController as BelajarController because the name is already in use at C:\\laravel\\Github\\api-pos-parfum\\routes\\api.php:11)
+[stacktrace]
+#0 {main}
+"} 
+[2025-05-22 06:37:05] local.ERROR: Cannot use App\Http\Controllers\Uma\UserController as UserController because the name is already in use {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot use App\\Http\\Controllers\\Uma\\UserController as UserController because the name is already in use at C:\\laravel\\Github\\api-pos-parfum\\routes\\api.php:21)
+[stacktrace]
+#0 {main}
+"} 
+[2025-05-22 06:37:05] local.ERROR: Cannot use App\Http\Controllers\Uma\UserController as UserController because the name is already in use {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot use App\\Http\\Controllers\\Uma\\UserController as UserController because the name is already in use at C:\\laravel\\Github\\api-pos-parfum\\routes\\api.php:21)
+[stacktrace]
+#0 {main}
+"} 
+[2025-05-22 06:37:26] local.ERROR: Uncaught InvalidArgumentException: Please provide a valid cache path. in C:\laravel\Github\api-pos-parfum\vendor\laravel\framework\src\Illuminate\View\Compilers\Compiler.php:67
+Stack trace:
+#0 C:\laravel\Github\api-pos-parfum\vendor\laravel\framework\src\Illuminate\View\ViewServiceProvider.php(97): Illuminate\View\Compilers\Compiler->__construct(Object(Illuminate\Filesystem\Filesystem), false, '', true, 'php')
+#1 C:\laravel\Github\api-pos-parfum\vendor\laravel\framework\src\Illuminate\Container\Container.php(908): Illuminate\View\ViewServiceProvider->Illuminate\View\{closure}(Object(Illuminate\Foundation\Application), Array)
+#2 C:\laravel\Github\api-pos-parfum\vendor\laravel\framework\src\Illuminate\Container\Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#3 C:\laravel\Github\api-pos-parfum\vendor\laravel\framework\src\Illuminate\Foundation\Application.php(961): Illuminate\Container\Container->resolve('blade.compiler', Array, true)
+#4 C:\laravel\Github\api-pos-parfum\vendor\laravel\framework\src\Illuminate\Container\Container.php(731): Illuminate\Foundation\Application->resolve('blade.compiler', Array)
+#5 C:\laravel\Github\api-pos-parfum\vendor\laravel\framework\src\Illuminate\Foundation\Application.php(946): Illuminate\Container\Container->make('blade.compiler', Array)
+#6 C:\laravel\Github\api-pos-parfum\vendor\laravel\framework\src\Illuminate\Foundation\helpers.php(120): Illuminate\Foundation\Application->make('blade.compiler', Array)
+#7 Command line code(1): app('Illuminate\\View...')
+#8 {main}
+  thrown {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Uncaught InvalidArgumentException: Please provide a valid cache path. in C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\View\\Compilers\\Compiler.php:67
+Stack trace:
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\View\\ViewServiceProvider.php(97): Illuminate\\View\\Compilers\\Compiler->__construct(Object(Illuminate\\Filesystem\\Filesystem), false, '', true, 'php')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(908): Illuminate\\View\\ViewServiceProvider->Illuminate\\View\\{closure}(Object(Illuminate\\Foundation\\Application), Array)
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(795): Illuminate\\Container\\Container->build(Object(Closure))
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(961): Illuminate\\Container\\Container->resolve('blade.compiler', Array, true)
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(731): Illuminate\\Foundation\\Application->resolve('blade.compiler', Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(946): Illuminate\\Container\\Container->make('blade.compiler', Array)
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\helpers.php(120): Illuminate\\Foundation\\Application->make('blade.compiler', Array)
+#7 Command line code(1): app('Illuminate\\\\View...')
+#8 {main}
+  thrown at C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\View\\Compilers\\Compiler.php:67)
+[stacktrace]
+#0 {main}
+"} 
+[2025-05-22 06:37:26] local.ERROR: Uncaught InvalidArgumentException: Please provide a valid cache path. in C:\laravel\Github\api-pos-parfum\vendor\laravel\framework\src\Illuminate\View\Compilers\Compiler.php:67
+Stack trace:
+#0 C:\laravel\Github\api-pos-parfum\vendor\laravel\framework\src\Illuminate\View\ViewServiceProvider.php(97): Illuminate\View\Compilers\Compiler->__construct(Object(Illuminate\Filesystem\Filesystem), false, '', true, 'php')
+#1 C:\laravel\Github\api-pos-parfum\vendor\laravel\framework\src\Illuminate\Container\Container.php(908): Illuminate\View\ViewServiceProvider->Illuminate\View\{closure}(Object(Illuminate\Foundation\Application), Array)
+#2 C:\laravel\Github\api-pos-parfum\vendor\laravel\framework\src\Illuminate\Container\Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#3 C:\laravel\Github\api-pos-parfum\vendor\laravel\framework\src\Illuminate\Foundation\Application.php(961): Illuminate\Container\Container->resolve('blade.compiler', Array, true)
+#4 C:\laravel\Github\api-pos-parfum\vendor\laravel\framework\src\Illuminate\Container\Container.php(731): Illuminate\Foundation\Application->resolve('blade.compiler', Array)
+#5 C:\laravel\Github\api-pos-parfum\vendor\laravel\framework\src\Illuminate\Foundation\Application.php(946): Illuminate\Container\Container->make('blade.compiler', Array)
+#6 C:\laravel\Github\api-pos-parfum\vendor\laravel\framework\src\Illuminate\Foundation\helpers.php(120): Illuminate\Foundation\Application->make('blade.compiler', Array)
+#7 Command line code(1): app('Illuminate\\View...')
+#8 {main}
+  thrown {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Uncaught InvalidArgumentException: Please provide a valid cache path. in C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\View\\Compilers\\Compiler.php:67
+Stack trace:
+#0 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\View\\ViewServiceProvider.php(97): Illuminate\\View\\Compilers\\Compiler->__construct(Object(Illuminate\\Filesystem\\Filesystem), false, '', true, 'php')
+#1 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(908): Illuminate\\View\\ViewServiceProvider->Illuminate\\View\\{closure}(Object(Illuminate\\Foundation\\Application), Array)
+#2 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(795): Illuminate\\Container\\Container->build(Object(Closure))
+#3 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(961): Illuminate\\Container\\Container->resolve('blade.compiler', Array, true)
+#4 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(731): Illuminate\\Foundation\\Application->resolve('blade.compiler', Array)
+#5 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(946): Illuminate\\Container\\Container->make('blade.compiler', Array)
+#6 C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\helpers.php(120): Illuminate\\Foundation\\Application->make('blade.compiler', Array)
+#7 Command line code(1): app('Illuminate\\\\View...')
+#8 {main}
+  thrown at C:\\laravel\\Github\\api-pos-parfum\\vendor\\laravel\\framework\\src\\Illuminate\\View\\Compilers\\Compiler.php:67)
+[stacktrace]
+#0 {main}
+"} 
