@@ -19,10 +19,16 @@ class SettingController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $per_page = $request->per_page ?? 10;
+        $page = $request->page ?? 1;
+        $payload = [];
+
+        // check query filter
+        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
         try {
-            $data = $this->settingRepository->get();
+            $data =  $this->settingRepository->customPaginate($per_page, $page, $payload)->toArray();
             return BaseResponse::Ok("Berhasil mengambil semua setting", $data);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), data: null);
@@ -73,7 +79,6 @@ class SettingController extends Controller
 
         if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $settingData['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
-
         DB::beginTransaction();
         try {
 
@@ -103,6 +108,20 @@ class SettingController extends Controller
             return BaseResponse::Ok('Berhasil menghapus setting', null);
         } catch (\Throwable $th) {
             DB::rollBack();
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+    public function listWSetting(Request $request)
+    {
+        try {
+            $payload = [];
+
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+            $data = $this->settingRepository->customQuery($payload)->get();
+
+            return BaseResponse::Ok("Berhasil mengambil data setting", $data);
+        } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
     }

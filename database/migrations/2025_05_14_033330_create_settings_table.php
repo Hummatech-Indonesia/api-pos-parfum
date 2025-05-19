@@ -19,7 +19,7 @@ return new class extends Migration
             $table->boolean('value_active');
             $table->text('value_text');
             $table->string('group')->nullable();
-            $table->foreignUuid('store_id')->constrained('stores');
+            $table->foreignUuid('store_id')->constrained();
             $table->softDeletes();
             $table->timestamps();
         });
