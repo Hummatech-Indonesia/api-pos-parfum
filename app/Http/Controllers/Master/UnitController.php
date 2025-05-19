@@ -137,8 +137,7 @@ class UnitController extends Controller
     public function list(Request $request)
     {
         try {
-            $payload = [];
-            $data = $this->unit->customQuery($payload)->get();
+            $data = $this->unit->all();
 
             return BaseResponse::Ok("Berhasil mengambil data unit", $data);
         } catch (\Throwable $th) {

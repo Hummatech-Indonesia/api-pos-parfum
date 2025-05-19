@@ -1,25 +1,24 @@
 <?php
 
+use Illuminate\Http\Request;
 use App\Helpers\BaseResponse;
-use App\Http\Controllers\AuditController;
-use App\Http\Controllers\AuditDetailController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BelajarController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\Uma\UserController;
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Dashboard\CategoryController;
-use App\Http\Controllers\Master\DiscountVoucherController;
+use App\Http\Controllers\Master\RoleController;
+use App\Http\Controllers\Master\UnitController;
 use App\Http\Controllers\Master\OutletController;
 use App\Http\Controllers\Master\ProductController;
+use App\Http\Controllers\Master\WarehouseController;
+use App\Http\Controllers\Dashboard\CategoryController;
+use App\Http\Controllers\Master\StockRequestController;
 use App\Http\Controllers\Master\ProductDetailController;
 use App\Http\Controllers\Master\ProductVarianController;
-use App\Http\Controllers\Master\StockRequestController;
-use App\Http\Controllers\Master\WarehouseController;
 use App\Http\Controllers\Transaction\ShiftUserController;
+use App\Http\Controllers\Master\DiscountVoucherController;
 use App\Http\Controllers\Transaction\TransactionController;
-use App\Http\Controllers\Uma\UserController;
-use Illuminate\Http\Request;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -132,4 +131,8 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::post("shifts/sync", [ShiftUserController::class, 'syncStoreData']);
     Route::get("shifts/no-paginate", [ShiftUserController::class, 'getData']);
     Route::resource("shifts", ShiftUserController::class)->except(['destroy']);
+    // API FOR UNIT
+    Route::get("unit/all", [UnitController::class, 'list']);
+    Route::get("unit/alltrashed", [UnitController::class, 'trashed']);
+    Route::resource("unit", UnitController::class)->except(['create', 'edit']);
 });
