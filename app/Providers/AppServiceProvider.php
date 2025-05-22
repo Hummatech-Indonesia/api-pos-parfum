@@ -8,6 +8,7 @@ use App\Contracts\Interfaces\Auth\UserInterface;
 use App\Contracts\Interfaces\CategoryInterface;
 use App\Contracts\Interfaces\Master\DiscountVoucherInterface;
 use App\Contracts\Interfaces\Master\OutletInterface;
+use App\Contracts\Interfaces\Master\ProductBundlingInterface;
 use App\Contracts\Interfaces\Master\ProductDetailInterface;
 use App\Contracts\Interfaces\Master\ProductInterface;
 use App\Contracts\Interfaces\Master\ProductStockInterface;
@@ -20,12 +21,15 @@ use App\Contracts\Interfaces\Transaction\ShiftUserInterface;
 use App\Contracts\Interfaces\Transaction\TransactionDetailInterface;
 use App\Contracts\Interfaces\Transaction\TransactionInterface;
 use App\Contracts\Interfaces\Transaction\VoucherUsedInterface;
+use App\Contracts\Interfaces\Master\ProductBundlingDetailInterface;
 use App\Contracts\Repositories\ArticleRepository;
 use App\Contracts\Repositories\Auth\StoreRepository;
 use App\Contracts\Repositories\Auth\UserRepository;
 use App\Contracts\Repositories\CategoryRepository;
 use App\Contracts\Repositories\Master\DiscountVoucherRepository;
 use App\Contracts\Repositories\Master\OutletRepository;
+use App\Contracts\Repositories\Master\ProductBundlingDetailRepository;
+use App\Contracts\Repositories\Master\ProductBundlingRepository;
 use App\Contracts\Repositories\Master\ProductDetailRepository;
 use App\Contracts\Repositories\Master\ProductRepository;
 use App\Contracts\Repositories\Master\ProductStockRepository;
@@ -62,6 +66,11 @@ class AppServiceProvider extends ServiceProvider
         TransactionDetailInterface::class => TransactionDetailRepository::class,
         VoucherUsedInterface::class => VoucherUsedRepository::class,
         ShiftUserInterface::class => ShiftUserRepository::class,
+        // RoleInterface::class => RoleRepository::class,
+        // SettingInterface::class => SettingRepository::class,
+        ProductBundlingInterface::class => ProductBundlingRepository::class,
+        ProductBundlingDetailInterface::class => ProductBundlingDetailRepository::class,
+
     ];
 
     /**

@@ -6,11 +6,13 @@ use App\Http\Controllers\BelajarController;
 use App\Http\Controllers\Dashboard\CategoryController;
 use App\Http\Controllers\Master\DiscountVoucherController;
 use App\Http\Controllers\Master\OutletController;
+use App\Http\Controllers\Master\ProductBundlingDetailController;
 use App\Http\Controllers\Master\ProductController;
 use App\Http\Controllers\Master\ProductDetailController;
 use App\Http\Controllers\Master\ProductVarianController;
 use App\Http\Controllers\Master\StockRequestController;
 use App\Http\Controllers\Master\WarehouseController;
+use App\Http\Controllers\Master\ProductBundlingController;
 use App\Http\Controllers\Transaction\ShiftUserController;
 use App\Http\Controllers\Transaction\TransactionController;
 use App\Http\Controllers\Uma\UserController;
@@ -52,6 +54,14 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::get('product-details/stock', [ProductDetailController::class, 'stockProduct']);
         Route::post('warehouses/add/stock', [WarehouseController::class, 'warehouseStock']);
         Route::get('warehouses/history/stock', [WarehouseController::class, 'listWarehouseStock']);
+    });
+
+    // API FOR ROLE OWNER & WAREHOUSE
+    Route::middleware('role:owner|warehouse')->group(function () {
+        Route::Resource('/product-bundling', ProductBundlingController::class);
+        Route::post('/product-bundling/{id}/restore', [ProductBundlingController::class, 'restore']);
+        Route::apiResource('/product-bundling-detail', ProductBundlingDetailController::class);
+        Route::post('/product-bundling-detail/{id}/restore', [ProductBundlingDetailController::class, 'restore']);
     });
 
     // API FOR ROLE OWNER
