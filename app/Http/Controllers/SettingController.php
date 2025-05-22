@@ -29,7 +29,11 @@ class SettingController extends Controller
         if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
         try {
             $data =  $this->settingRepository->customPaginate($per_page, $page, $payload)->toArray();
-            return BaseResponse::Ok("Berhasil mengambil semua setting", $data);
+
+            $result = $data["data"];
+            unset($data["data"]);
+
+            return BaseResponse::Paginate("Berhasil mengambil semua setting", $result, $data);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), data: null);
         }
