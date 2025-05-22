@@ -11,6 +11,7 @@ use App\Http\Controllers\Master\RoleController;
 use App\Http\Controllers\Master\UnitController;
 use App\Http\Controllers\Master\OutletController;
 use App\Http\Controllers\Master\ProductBundlingDetailController;
+use App\Http\Controllers\Master\ProductBundlingController;
 use App\Http\Controllers\Master\ProductController;
 use App\Http\Controllers\Master\WarehouseController;
 use App\Http\Controllers\Dashboard\CategoryController;
