@@ -2,15 +2,15 @@
 
 namespace App\Contracts\Repositories;
 
-use App\Contracts\Interfaces\SettingInterface;
-use App\Models\Setting;
+use App\Contracts\Interfaces\AuditInterface;
+use App\Models\Audit;
 use Illuminate\Database\QueryException;
 
-class SettingRepository extends BaseRepository implements SettingInterface
+class AuditRepository extends BaseRepository implements AuditInterface
 {
-    public function __construct(Setting $setting)
+    public function __construct(Audit $audit)
     {
-        $this->model = $setting;
+        $this->model = $audit;
     }
 
     public function get(): mixed
@@ -41,7 +41,7 @@ class SettingRepository extends BaseRepository implements SettingInterface
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-            ->with('store')
+            ->with('store', 'details')
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (isset($data["search"])) {
                     $query->where(function ($query2) use ($data) {
@@ -50,9 +50,23 @@ class SettingRepository extends BaseRepository implements SettingInterface
                     unset($data["search"]);
                 }
 
-                foreach ($data as $index => $value) {
-                    $query->where($index, $value);
+                if (!empty($data['name'])) {
+                    $query->where('name', 'like', '%' . $data['name'] . '%');
                 }
+
+                // Filter berdasarkan status
+                if (!empty($data['status'])) {
+                    $query->where('status', $data['status']);
+                }
+
+                // Filter berdasarkan rentang tanggal
+                if (!empty($data['date'])) {
+                    $query->where('date', $data['date']);
+                }
+
+                // foreach ($data as $index => $value) {
+                //     $query->where($index, $value);
+                // }
             })
             ->paginate($pagination, ['*'], 'page', $page);
         // ->appends(['search' => $request->search, 'year' => $request->year]);
@@ -68,7 +82,7 @@ class SettingRepository extends BaseRepository implements SettingInterface
             });
     }
 
-    public function allDataTrashed(): mixed // Untuk mencari data yang dihapus
+        public function allDataTrashed(): mixed // Untuk mencari data yang dihapus
     {
         return $this->model->withTrashed()->get();
     }
