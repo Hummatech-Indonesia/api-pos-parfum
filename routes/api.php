@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use App\Helpers\BaseResponse;
+use App\Http\Controllers\AuditController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BelajarController;
 use App\Http\Controllers\SettingController;
