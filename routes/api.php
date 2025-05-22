@@ -5,6 +5,7 @@ use App\Helpers\BaseResponse;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BelajarController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\AuditController;
 use App\Http\Controllers\Uma\UserController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Master\RoleController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\Master\ProductVarianController;
 use App\Http\Controllers\Transaction\ShiftUserController;
 use App\Http\Controllers\Master\DiscountVoucherController;
 use App\Http\Controllers\Transaction\TransactionController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -105,6 +107,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:outlet|owner')->group(function () {
         Route::resource("stock-request", StockRequestController::class)->only(['store', 'destroy']);
     });
+
+    Route::middleware('role:auditor|admin|owner')->group(function () {
+        Route::resource("audit", AuditController::class)->only(['store', 'index', 'destroy']);
+    });
+
+    Route::middleware('role:outlet|admin|owner')->group(function() {
+        Route::resource("audit", AuditController::class)->only(['update','destroy','index']);
+    });
+
 
     // API FOR ROLE ADMIN, WAREHOUSE & OWNER
     Route::middleware('role:admin|owner|warehouse')->group(function () {
