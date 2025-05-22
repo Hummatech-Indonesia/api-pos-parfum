@@ -1,6 +1,15 @@
 <?php
 
 use App\Helpers\BaseResponse;
+<<<<<<< Updated upstream
+=======
+use App\Http\Controllers\AuditController;
+use App\Http\Controllers\AuditDetailController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BelajarController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\Uma\UserController;
+>>>>>>> Stashed changes
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\BelajarController;
 use App\Http\Controllers\Dashboard\CategoryController;
@@ -16,6 +25,7 @@ use App\Http\Controllers\Transaction\TransactionController;
 use App\Http\Controllers\Uma\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -87,7 +97,24 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::middleware('role:outlet|owner')->group(function () {
         Route::resource("stock-request", StockRequestController::class)->only(['store', 'destroy']);
     });
+<<<<<<< Updated upstream
     
+=======
+
+    Route::middleware('role:auditor|admin|owner')->group(function () {
+        Route::resource("audit", AuditController::class)->only(['store', 'index', 'destroy']);
+    });
+
+    Route::middleware('role:outlet|admin|owner')->group(function () {
+        Route::resource("audit", AuditController::class)->only(['update', 'destroy', 'index']);
+    });
+
+    // API FOR ROLE ADMIN, WAREHOUSE & OWNER
+    Route::middleware('role:admin|owner|warehouse')->group(function () {
+        Route::resource("setting", SettingController::class)->only(['store', 'destroy', 'update']);
+    });
+
+>>>>>>> Stashed changes
     // API FOR DATA USER
     Route::resource("users", UserController::class)->except(['store','destroy','update']);
     // API FOR DATA OUTLET
