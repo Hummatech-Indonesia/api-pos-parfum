@@ -68,7 +68,7 @@ class AppServiceProvider extends ServiceProvider
         TransactionDetailInterface::class => TransactionDetailRepository::class,
         VoucherUsedInterface::class => VoucherUsedRepository::class,
         ShiftUserInterface::class => ShiftUserRepository::class,
-        RoleInterface::class => RoleRepository::class,
+        // RoleInterface::class => RoleRepository::class,
         SettingInterface::class => SettingRepository::class,
         UnitInterface::class => UnitRepository::class,
     ];
