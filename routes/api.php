@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use App\Helpers\BaseResponse;
+use App\Http\Controllers\AuditController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BelajarController;
 use App\Http\Controllers\SettingController;
@@ -94,6 +95,14 @@ Route::middleware('auth:sanctum')->group(function () {
     // API FOR ROLE OUTLET & OWNER
     Route::middleware('role:outlet|owner')->group(function () {
         Route::resource("stock-request", StockRequestController::class)->only(['store', 'destroy']);
+    });
+
+    Route::middleware('role:auditor|admin|owner')->group(function () {
+        Route::resource("audit", AuditController::class)->only(['store', 'index', 'destroy']);
+    });
+
+    Route::middleware('role:outlet|admin|owner')->group(function () {
+        Route::resource("audit", AuditController::class)->only(['update', 'destroy', 'index']);
     });
 
     // API FOR ROLE ADMIN, WAREHOUSE & OWNER

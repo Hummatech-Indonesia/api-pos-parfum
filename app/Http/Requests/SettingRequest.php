@@ -5,6 +5,8 @@ namespace App\Http\Requests;
 use App\Helpers\BaseResponse;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\JsonResponse;
 
 class SettingRequest extends FormRequest
 {
@@ -33,7 +35,19 @@ class SettingRequest extends FormRequest
         ];
     }
 
-    public function failedValidation(Validator $validator): JsonResponse
+    public function messages()
+    {
+        return [
+            'name.max' => 'Nama tidak boleh lebih dari 255 karakter.',    
+            'code.max' => 'Kode tidak boleh lebih dari 255 karakter.',
+            'value_active.required' => 'Status aktif wajib diisi.',
+            'value_active.boolean' => 'Status aktif harus berupa true atau false.',
+            'value_text.required' => 'Nilai teks wajib diisi.',
+            'group.max' => 'Grup tidak boleh lebih dari 255 karakter.',
+        ];
+    }
+
+    protected function failedValidation(Validator $validator): JsonResponse
     {
         throw new HttpResponseException(BaseResponse::Error("Kesalahan dalam validasi", $validator->errors()));
     }
