@@ -131,7 +131,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get("shifts/no-paginate", [ShiftUserController::class, 'getData']);
     Route::resource("shifts", ShiftUserController::class)->except(['destroy']);
     // API FOR UNIT
-    Route::get("unit/all", [UnitController::class, 'list']);
+    Route::get("unit/no-paginate", [UnitController::class, 'list']);
     Route::get("unit/alltrashed", [UnitController::class, 'trashed']);
     Route::resource("unit", UnitController::class)->except(['create', 'edit']);
 });
