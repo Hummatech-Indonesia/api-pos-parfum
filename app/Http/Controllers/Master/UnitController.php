@@ -31,16 +31,16 @@ class UnitController extends Controller
         $payload = [];
 
         // check query filter
-        if ($request->search) $payload["search"] = $request->search;
+        if($request->search) $payload["search"] = $request->search;
 
-        try {
+        try{
             $data = $this->unit->customPaginate($per_page, $page, $payload)->toArray();
-
+            
             $result = $data["data"];
             unset($data["data"]);
-
+    
             return BaseResponse::Paginate('Berhasil mengambil list data unit!', $result, $data);
-        } catch (\Throwable $th) {
+        }catch(\Throwable $th){
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
@@ -48,7 +48,10 @@ class UnitController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create() {}
+    public function create()
+    {
+        
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -61,10 +64,10 @@ class UnitController extends Controller
         try {
             $mapping = $this->unitService->dataUnit($data);
             $result_unit = $this->unit->store($mapping);
-
+            
             DB::commit();
             return BaseResponse::Ok('Berhasil membuat unit', $result_unit);
-        } catch (\Throwable $th) {
+        }catch(\Throwable $th){
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -76,7 +79,7 @@ class UnitController extends Controller
     public function show(string $id)
     {
         $check_unit = $this->unit->show($id);
-        if (!$check_unit) return BaseResponse::Notfound("Tidak dapat menemukan data unit!");
+        if(!$check_unit) return BaseResponse::Notfound("Tidak dapat menemukan data unit!");
 
         return BaseResponse::Ok("Berhasil mengambil detail unit!", $check_unit);
     }
@@ -97,17 +100,17 @@ class UnitController extends Controller
         $data = $request->validated();
 
         // kenapa pakai show karena memakai fitur bawaan softdelete dari laravel jadi data yang sudah didelete tidak akan tampil do show function
-        $check = $this->unit->show($id);
-        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data unit!");
+        $check = $this->unit->show($id); 
+        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data unit!");
 
         DB::beginTransaction();
         try {
             $mapping = $this->unitService->dataUnit($data);
             $result_unit = $this->unit->update($id, $mapping);
-
+            
             DB::commit();
             return BaseResponse::Ok('Berhasil update data unit', $result_unit);
-        } catch (\Throwable $th) {
+        }catch(\Throwable $th){
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -117,18 +120,18 @@ class UnitController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
-    {
+    {        
         // kenapa pakai show karena memakai fitur bawaan softdelete dari laravel jadi data yang sudah didelete tidak akan tampil do show function
-        $check = $this->unit->show($id);
-        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data unit!");
+        $check = $this->unit->show($id); 
+        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data unit!");
 
         DB::beginTransaction();
         try {
             $result_unit = $this->unit->delete($id);
-
+            
             DB::commit();
             return BaseResponse::Ok('Berhasil delete data unit', $result_unit);
-        } catch (\Throwable $th) {
+        }catch(\Throwable $th){
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -136,23 +139,24 @@ class UnitController extends Controller
 
     public function list(Request $request)
     {
-        try {
-            $data = $this->unit->all();
+        try{
+            $payload = [];
+            $data = $this->unit->customQuery($payload)->get();
 
             return BaseResponse::Ok("Berhasil mengambil data unit", $data);
-        } catch (\Throwable $th) {
-            return BaseResponse::Error($th->getMessage(), null);
+        }catch(\Throwable $th) {
+          return BaseResponse::Error($th->getMessage(), null);  
         }
     }
 
     public function trashed(Request $request)
     {
-        try {
+        try{
             $data = $this->unit->allDataTrashed();
 
             return BaseResponse::Ok("Berhasil mengambil data unit", $data);
-        } catch (\Throwable $th) {
-            return BaseResponse::Error($th->getMessage(), null);
+        }catch(\Throwable $th) {
+          return BaseResponse::Error($th->getMessage(), null);  
         }
     }
 }
