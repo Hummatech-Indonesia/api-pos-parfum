@@ -166,4 +166,13 @@ class AuditController extends Controller
         }
     }
 
+    public function restore(string $id)
+    {
+        try {
+            $audit = $this->auditRepository->restore($id);
+            return BaseResponse::Ok("Audit berhasil dikembalikan", $audit);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error("Gagal mengembalikan audit: " . $th->getMessage(), null);
+        }
+    }
 }

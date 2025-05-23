@@ -72,4 +72,11 @@ class SettingRepository extends BaseRepository implements SettingInterface
     {
         return $this->model->withTrashed()->get();
     }
+
+    public function restore(string $id)
+    {
+        $audit = $this->model->withTrashed()->findOrFail($id);
+        $audit->restore();
+        return $audit;
+    }
 }
