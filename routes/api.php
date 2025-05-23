@@ -18,6 +18,7 @@ use App\Http\Controllers\Master\ProductDetailController;
 use App\Http\Controllers\Master\ProductVarianController;
 use App\Http\Controllers\Transaction\ShiftUserController;
 use App\Http\Controllers\Master\DiscountVoucherController;
+use App\Http\Controllers\ProductBlendController;
 use App\Http\Controllers\Transaction\TransactionController;
 
 /*
@@ -134,4 +135,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get("unit/all", [UnitController::class, 'list']);
     Route::get("unit/alltrashed", [UnitController::class, 'trashed']);
     Route::resource("unit", UnitController::class)->except(['create', 'edit']);
+    // API FOR PRODUCT BLEND
+    Route::apiResource("product-blend", ProductBlendController::class);
+    Route::post("product-blend/{productBlend}", [ProductBlendController::class, 'blend']);
 });

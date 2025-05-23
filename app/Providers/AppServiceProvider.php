@@ -39,11 +39,15 @@ use App\Contracts\Repositories\Master\ProductVarianRepository;
 use App\Contracts\Repositories\Master\WarehouseStockRepository;
 use App\Contracts\Repositories\Transaction\ShiftUserRepository;
 use App\Contracts\Interfaces\Master\StockRequestDetailInterface;
+use App\Contracts\Interfaces\ProductBlendDetailInterface;
+use App\Contracts\Interfaces\ProductBlendInterface;
 use App\Contracts\Repositories\Master\DiscountVoucherRepository;
 use App\Contracts\Repositories\Transaction\TransactionRepository;
 use App\Contracts\Repositories\Transaction\VoucherUsedRepository;
 use App\Contracts\Repositories\Master\StockRequestDetailRepository;
 use App\Contracts\Interfaces\Transaction\TransactionDetailInterface;
+use App\Contracts\Repositories\ProductBlendDetailRepository;
+use App\Contracts\Repositories\ProductBlendRepository;
 use App\Contracts\Repositories\Transaction\TransactionDetailRepository;
 
 class AppServiceProvider extends ServiceProvider
@@ -71,6 +75,8 @@ class AppServiceProvider extends ServiceProvider
         RoleInterface::class => RoleRepository::class,
         SettingInterface::class => SettingRepository::class,
         UnitInterface::class => UnitRepository::class,
+        ProductBlendInterface::class => ProductBlendRepository::class,
+        ProductBlendDetailInterface::class => ProductBlendDetailRepository::class,
     ];
 
     /**
