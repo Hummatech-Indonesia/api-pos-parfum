@@ -41,6 +41,8 @@ use App\Contracts\Repositories\Master\ProductVarianRepository;
 use App\Contracts\Repositories\Master\WarehouseStockRepository;
 use App\Contracts\Repositories\Transaction\ShiftUserRepository;
 use App\Contracts\Interfaces\Master\StockRequestDetailInterface;
+use App\Contracts\Interfaces\ProductBlendDetailInterface;
+use App\Contracts\Interfaces\ProductBlendInterface;
 use App\Contracts\Repositories\Master\DiscountVoucherRepository;
 use App\Contracts\Repositories\Transaction\TransactionRepository;
 use App\Contracts\Repositories\Transaction\VoucherUsedRepository;
@@ -48,6 +50,8 @@ use App\Contracts\Repositories\Master\StockRequestDetailRepository;
 use App\Contracts\Interfaces\Transaction\TransactionDetailInterface;
 use App\Contracts\Repositories\Master\ProductBundlingDetailRepository;
 use App\Contracts\Repositories\Master\ProductBundlingRepository;
+use App\Contracts\Repositories\ProductBlendDetailRepository;
+use App\Contracts\Repositories\ProductBlendRepository;
 use App\Contracts\Repositories\Transaction\TransactionDetailRepository;
 use App\Models\ProductBundling;
 use App\Models\ProductBundlingDetail;
@@ -80,6 +84,8 @@ class AppServiceProvider extends ServiceProvider
         UnitInterface::class => UnitRepository::class,
         ProductBundlingInterface::class => ProductBundlingRepository::class,
         ProductBundlingDetailInterface::class => ProductBundlingDetailRepository::class,
+        ProductBlendInterface::class => ProductBlendRepository::class,
+        ProductBlendDetailInterface::class => ProductBlendDetailRepository::class,
     ];
 
     /**

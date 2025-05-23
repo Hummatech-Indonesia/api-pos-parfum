@@ -80,4 +80,8 @@ class UnitRepository extends BaseRepository implements UnitInterface
         return $this->model->all();
     }
 
+    public function cekUnit(mixed $name, mixed $code)
+    {
+        return $this->model->where('name', $name)->orWhere('code', $code)->first();
+    }
 }
