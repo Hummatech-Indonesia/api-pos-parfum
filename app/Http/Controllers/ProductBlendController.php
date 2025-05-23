@@ -103,7 +103,7 @@ class ProductBlendController extends Controller
             foreach ($blendDetails as $detail) {
                 $productDetail = $detail->productDetail;
                 if ($productDetail->stock < $detail->used_stock) {
-                    return BaseResponse::Error("Stok bahan '{$productBlend->product->name}' tidak cukup untuk melakukan pencampuran.", null);
+                    return BaseResponse::Error("Stok bahan '{$detail->productDetail->product->name}' tidak cukup untuk melakukan pencampuran.", null);
                 } else {
                     $productDetail->stock -= $detail->used_stock;
                     $productDetail->save();
