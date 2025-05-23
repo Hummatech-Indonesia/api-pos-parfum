@@ -34,7 +34,7 @@ class UnitRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'N   ama unit tidak boleh kosong!',
+            'name.required' => 'Nama unit tidak boleh kosong!',
             'name.string' => 'Nama harus berupa string',
             'code.required' => 'Kode unit tidak boleh kosong',
             'code.string' => 'Kode harus berupa string',

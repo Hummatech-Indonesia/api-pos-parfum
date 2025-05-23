@@ -143,7 +143,7 @@ class AuditController extends Controller
         }
     }
 
-        public function list(Request $request)
+    public function list(Request $request)
     {
         try {
             $payload = [];
@@ -155,15 +155,18 @@ class AuditController extends Controller
         }
     }
 
-            public function trashed(Request $request)
+    public function trashed(Request $request)
     {
         try {
-            $data = $this->auditRepository->allDataTrashed();
+            $payload = [];
+
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+
+            $data = $this->auditRepository->allDataTrashed($payload);
 
             return BaseResponse::Ok("Berhasil mengambil data audit", $data);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
-
 }

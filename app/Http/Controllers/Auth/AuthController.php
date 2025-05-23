@@ -7,6 +7,7 @@ use App\Contracts\Interfaces\Auth\UserInterface;
 use App\Contracts\Interfaces\CategoryInterface;
 use App\Contracts\Interfaces\Master\DiscountVoucherInterface;
 use App\Contracts\Interfaces\Master\ProductInterface;
+use App\Contracts\Interfaces\Master\WarehouseInterface;
 use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
@@ -24,16 +25,24 @@ class AuthController extends Controller
     private ProductInterface $product;
     private CategoryInterface $category;
     private DiscountVoucherInterface $discount;
+    private WarehouseInterface $warehouse;
 
-    public function __construct(UserInterface $user, StoreInterface $stores, UserService $userService,
-    ProductInterface $product, CategoryInterface $category, DiscountVoucherInterface $discount)
-    {
+    public function __construct(
+        UserInterface $user,
+        StoreInterface $stores,
+        UserService $userService,
+        ProductInterface $product,
+        CategoryInterface $category,
+        DiscountVoucherInterface $discount,
+        WarehouseInterface $warehouse
+    ) {
         $this->user = $user;
         $this->stores = $stores;
         $this->userService = $userService;
         $this->product = $product;
         $this->category = $category;
         $this->discount = $discount;
+        $this->warehouse = $warehouse;
     }
 
     public function login(LoginRequest $request)
@@ -44,7 +53,7 @@ class AuthController extends Controller
             $token = auth()->user()->createToken('authToken')->plainTextToken;
             $user = $this->user->checkUserActive(auth()->user()->id);
 
-            if(!$user) return BaseResponse::Notfound("Tidak dapat menukan user!");
+            if (!$user) return BaseResponse::Notfound("Tidak dapat menukan user!");
 
             $user->role = auth()->user()->roles;
             $user->token = $token;
@@ -60,22 +69,29 @@ class AuthController extends Controller
         $data = $request->validated();
 
         DB::beginTransaction();
-        
+
         try {
 
             $user = $this->userService->mappingDataUser($data);
             $result_user = $this->user->store($user);
-            
-            $data["user_id"] = $result_user->id;
-            if($request->hasFile('logo')) $data["logo"] = $request->file('logo');
-            $store = $this->userService->addStore($data);
-            $this->stores->store($store);
 
-            $result_user->syncRoles(['owner']);
+            $data["user_id"] = $result_user->id;
+            if ($request->hasFile('logo')) $data["logo"] = $request->file('logo');
+            $store = $this->userService->addStore($data);
+            $newStore = $this->stores->store($store);
+            $warehouse = $this->warehouse->store([
+                'store_id' => $newStore->id,
+                'name' => $newStore->name,
+                'address' => $newStore->address,
+            ]);
+
+            $this->user->update($result_user->id, ['warehouse_id' => $warehouse->id, 'store_id' => $newStore->id]);
+
+            $result_user->syncRoles(['owner', 'warehouse']);
 
             DB::commit();
             return BaseResponse::Ok('Berhasil membuat akun', null);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -88,13 +104,14 @@ class AuthController extends Controller
         return BaseResponse::Ok("Berhasil logout", null);
     }
 
-    public function getMe(){
-        if(!auth()->user()){
+    public function getMe()
+    {
+        if (!auth()->user()) {
             return BaseResponse::Error('Token tidak valid!', null);
         }
 
         $user = $this->user->checkUserActive(auth()->user()->id);
-        if(!$user){
+        if (!$user) {
             return BaseResponse::Notfound('Data diri tidak ditemukan, silahkan login ulang!');
         }
 

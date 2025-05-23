@@ -82,8 +82,14 @@ class AuditRepository extends BaseRepository implements AuditInterface
             });
     }
 
-        public function allDataTrashed(): mixed // Untuk mencari data yang dihapus
+    public function allDataTrashed(array $filter = []): mixed // Untuk mencari data yang dihapus
     {
-        return $this->model->withTrashed()->get();
+        return $this->model->onlyTrashed()
+            ->when(!empty($filter), function ($query) use ($filter) {
+                foreach ($filter as $key => $value) {
+                    $query->where($key, $value);
+                }
+            })
+            ->get();
     }
 }

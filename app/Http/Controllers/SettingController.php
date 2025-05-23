@@ -132,10 +132,14 @@ class SettingController extends Controller
         }
     }
 
-        public function trashed(Request $request)
+    public function trashed(Request $request)
     {
         try {
-            $data = $this->settingRepository->allDataTrashed();
+            $payload = [];
+
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+
+            $data = $this->settingRepository->allDataTrashed($payload);
 
             return BaseResponse::Ok("Berhasil mengambil data setting", $data);
         } catch (\Throwable $th) {

@@ -103,11 +103,17 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('role:outlet|admin|owner')->group(function () {
         Route::resource("audit", AuditController::class)->only(['update', 'destroy', 'index']);
+        Route::get("audit/no-paginate", [AuditController::class, 'list']);
+        Route::get("audit/alltrashed", [AuditController::class, 'trashed']);
     });
 
     // API FOR ROLE ADMIN, WAREHOUSE & OWNER
     Route::middleware('role:admin|owner|warehouse')->group(function () {
         Route::resource("setting", SettingController::class)->only(['store', 'destroy', 'update', 'index']);
+        Route::get("setting/no-paginate", [SettingController::class, 'listWSetting']);
+        Route::get("setting/alltrashed", [SettingController::class, 'trashed']);
+        Route::get("audit/no-paginate", [AuditController::class, 'list']);
+        Route::get("audit/alltrashed", [AuditController::class, 'trashed']);
     });
 
     // API FOR DATA USER

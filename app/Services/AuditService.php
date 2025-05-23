@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Audit;
 use App\Models\AuditDetail;
 use App\Models\Outlet;
+use App\Models\ProductDetail;
 use App\Models\ProductStock;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -96,6 +97,11 @@ class AuditService
                                 'stock' => $detail->audit_stock,
                             ]);
                         }
+                        $totalStock = ProductStock::where('product_detail_id', $detail->product_detail_id)
+                            ->sum('stock');
+
+                        ProductDetail::where('id', $detail->product_detail_id)
+                            ->update(['stock' => $totalStock]);
 
                         $detail->save();
                     }
@@ -113,39 +119,56 @@ class AuditService
         }
     }
 
-    
+
     public function storeAudit(array $data)
     {
-        return DB::transaction(function () use ($data) {
-            $audit = Audit::create([
-                'name' => $data['name'],
-                'description' => $data['description'],
-                'outlet_id' => $data['outlet_id'],
-                'store_id' => $data['store_id'],
-                'date' => $data['date'],
-                'user_id' => auth()->id(), // kalau ingin menyimpan user
-                'status' => 'pending', // default
-            ]);
-
-            foreach ($data['products'] as $product) {
-                $productStock = ProductStock::where('product_detail_id', $product['product_detail_id'])
-                    ->where('outlet_id', $data['outlet_id'])
-                    ->first();
-
-                $oldStock = $productStock?->stock ?? 0;
-
-                AuditDetail::create([
-                    'audit_id' => $audit->id,
-                    'product_detail_id' => $product['product_detail_id'],
-                    'old_stock' => $oldStock,
-                    'audit_stock' => $product['audit_stock'],
-                    'unit' => $product['unit'],
-                    'unit_id' => $product['unit_id'],
+        try {
+            return DB::transaction(function () use ($data) {
+                $audit = Audit::create([
+                    'name' => $data['name'],
+                    'description' => $data['description'],
+                    'outlet_id' => $data['outlet_id'],
+                    'store_id' => $data['store_id'],
+                    'date' => $data['date'],
+                    'user_id' => auth()->id(),
+                    'status' => 'pending',
                 ]);
-            }
 
-            return $audit->load('details');
-        });
+                foreach ($data['products'] as $index => $product) {
+
+                    $productDetail = ProductDetail::with('product')->find($product['product_detail_id']);
+
+                    if (!$productDetail) {
+                        throw new \Exception("Inputan produk ke-" . ($index + 1) . " tidak ditemukan.");
+                    }
+
+                    if ($productDetail->product->store_id !== $data['store_id']) {
+                        throw new \Exception("Inputan produk ke-" . ($index + 1) . " tidak sesuai dengan toko.");
+                    }
+
+
+                    $productStock = ProductStock::where('product_detail_id', $product['product_detail_id'])
+                        ->where('outlet_id', $data['outlet_id'])
+                        ->first();
+
+                    $oldStock = $productStock?->stock ?? 0;
+
+                    AuditDetail::create([
+                        'audit_id' => $audit->id,
+                        'product_detail_id' => $product['product_detail_id'],
+                        'old_stock' => $oldStock,
+                        'audit_stock' => $product['audit_stock'],
+                        'unit' => $product['unit'],
+                        'unit_id' => $product['unit_id'],
+                    ]);
+                }
+
+                return $audit->load('details');
+            });
+        } catch (\Exception $e) {
+            Log::error('Error in storeAudit: ' . $e->getMessage());
+            throw $e; // biar errornya muncul dan tidak silent fail
+        }
     }
 
 

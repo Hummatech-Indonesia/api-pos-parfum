@@ -225,7 +225,8 @@ class WarehouseController extends Controller
                 $this->productStock->store([
                     "warehouse_id" => auth()->user()->warehouse_id,
                     "stock" => $request->stock,
-                    "product_detail_id" => $request->product_detail_id
+                    "product_detail_id" => $request->product_detail_id,
+                    "outlet_id" => $request->outlet_id
                 ]);
             }
             // $this->productDetail->update($request->product_detail_id, ["stock" => $request->stock]);

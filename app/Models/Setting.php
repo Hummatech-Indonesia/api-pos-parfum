@@ -18,4 +18,9 @@ class Setting extends Model
     protected $table = 'settings';
     protected $primaryKey = 'id';
 
+    public function store()
+{
+    return $this->belongsTo(Store::class);
+}
+
 }
