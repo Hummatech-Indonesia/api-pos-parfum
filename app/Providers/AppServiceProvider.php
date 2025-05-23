@@ -46,6 +46,7 @@ use App\Contracts\Repositories\Transaction\TransactionRepository;
 use App\Contracts\Repositories\Transaction\VoucherUsedRepository;
 use App\Contracts\Repositories\Master\StockRequestDetailRepository;
 use App\Contracts\Interfaces\Transaction\TransactionDetailInterface;
+use App\Contracts\Repositories\Master\ProductBundlingDetailRepository;
 use App\Contracts\Repositories\Master\ProductBundlingRepository;
 use App\Contracts\Repositories\Transaction\TransactionDetailRepository;
 use App\Models\ProductBundling;
@@ -78,7 +79,7 @@ class AppServiceProvider extends ServiceProvider
         SettingInterface::class => SettingRepository::class,
         UnitInterface::class => UnitRepository::class,
         ProductBundlingInterface::class => ProductBundlingRepository::class,
-        ProductBundlingDetailInterface::class => ProductBundlingDetail::class,
+        ProductBundlingDetailInterface::class => ProductBundlingDetailRepository::class,
     ];
 
     /**

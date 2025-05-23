@@ -46,15 +46,18 @@ class ProductBundlingController extends Controller
     public function index(Request $request): JsonResponse
     {
         if ($request->has('paginate') && $request->paginate == 1) {
-        $perPage = $request->input('per_page', 10);
-        $result = $this->repository->paginate($perPage);
+            $perPage = $request->input('per_page', 10);
+            $result = $this->repository->paginate($perPage);
+
+            return response()->json($result); // penting: jangan bungkus di 'data'
         } else {
             $result = $this->repository->get();
-        }
 
-        return response()->json([
-            'message' => 'Daftar product bundling berhasil diambil',
-            'data' => $result
-        ]);
+            return response()->json([
+                'message' => 'Daftar product bundling berhasil diambil',
+                'data' => $result
+            ]);
+        }
     }
+
 }

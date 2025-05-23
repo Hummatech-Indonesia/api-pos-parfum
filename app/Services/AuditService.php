@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Audit;
 use App\Models\AuditDetail;
 use App\Models\Outlet;
+use App\Models\Product;
+use App\Models\ProductDetail;
 use App\Models\ProductStock;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -97,6 +99,11 @@ class AuditService
                             ]);
                         }
 
+                        $totalStock = ProductStock::where('product_detail_id', $detail->product_detail_id)
+                        ->sum('stock');
+
+                        ProductDetail::where('id', $detail->product_detail_id)
+                        ->update(['stock'=> $totalStock]);
                         $detail->save();
                     }
                     Log::info('Update stock selesai');
