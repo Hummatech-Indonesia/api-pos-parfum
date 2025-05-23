@@ -99,10 +99,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('role:auditor|admin|owner')->group(function () {
         Route::resource("audit", AuditController::class)->only(['store', 'index', 'destroy']);
+        Route::post('audit/{id}/restore', [AuditController::class, 'restore']);
+
     });
 
     Route::middleware('role:outlet|admin|owner')->group(function () {
         Route::resource("audit", AuditController::class)->only(['update', 'destroy', 'index']);
+        Route::post('audit/{id}/restore', [AuditController::class, 'restore']);
         Route::get("audit/no-paginate", [AuditController::class, 'list']);
         Route::get("audit/alltrashed", [AuditController::class, 'trashed']);
     });
@@ -110,6 +113,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // API FOR ROLE ADMIN, WAREHOUSE & OWNER
     Route::middleware('role:admin|owner|warehouse')->group(function () {
         Route::resource("setting", SettingController::class)->only(['store', 'destroy', 'update', 'index']);
+        Route::post('audit/{id}/restore', [AuditController::class, 'restore']);
+        Route::post('setting/{id}/restore', [SettingController::class, 'restore']);
         Route::get("setting/no-paginate", [SettingController::class, 'listWSetting']);
         Route::get("setting/alltrashed", [SettingController::class, 'trashed']);
         Route::get("audit/no-paginate", [AuditController::class, 'list']);

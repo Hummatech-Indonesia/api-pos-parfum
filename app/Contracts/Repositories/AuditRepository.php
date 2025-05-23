@@ -92,4 +92,17 @@ class AuditRepository extends BaseRepository implements AuditInterface
             })
             ->get();
     }
+
+    public function restore(string $id): Audit
+    {
+        $audit = $this->model->withTrashed()->findOrFail($id);
+        $audit->restore();
+
+        // Restore juga semua AuditDetail yang terhapus
+        $audit->details()->withTrashed()->get()->each(function ($detail) {
+            $detail->restore();
+        });
+
+        return $audit;
+    }
 }

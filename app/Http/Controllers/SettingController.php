@@ -146,4 +146,14 @@ class SettingController extends Controller
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
+
+    public function restore(string $id)
+{
+    try {
+        $setting = $this->settingRepository->restore($id);
+        return BaseResponse::Ok("setting berhasil dikembalikan", $setting);
+    } catch (\Throwable $th) {
+        return BaseResponse::Error("Gagal mengembalikan setting: " . $th->getMessage(), null);
+    }
+}
 }
