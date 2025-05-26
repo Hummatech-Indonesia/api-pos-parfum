@@ -68,17 +68,17 @@ class ProductBlendController extends Controller
 
             $this->productBlendService->storeBlendDetail($data);
             $product = $this->productBlendService->storeProduct($request);
-            $product_id = $this->product->store($product)->id;
+            // $product_id = $this->product->store($product)->id;
 
-            $this->productBlend->update($data['product_blend_id'], ['product_id' => $product_id]);
-
+            
             $data = $this->productBlendService->storeVarian($data);
-
+            
             foreach ($data['product_blend'] as $productBlend) {
+                $this->productBlend->update($data['product_blend_id'], ['product_id' => $product_id]); //ambil product detail
                 $this->productDetail->store([
-                    'product_id' => $product_id,
+                    // 'product_id' => $product_id,
                     'category_id' => $productBlend['category_id'],
-                    'product_varian_id' => $data['product_varian_id'],
+                    // 'product_varian_id' => $data['product_varian_id'],
                     'price' => $productBlend['price'],
                 ]);
             }
@@ -92,6 +92,9 @@ class ProductBlendController extends Controller
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
+
+    //JADI SATU FLOW 
+    //DIKASI FILTER
 
     public function blend(ProductBlend $productBlend)
     {
@@ -130,7 +133,7 @@ class ProductBlendController extends Controller
      */
     public function show(string $id)
     {
-        //
+        //DIKASI DETAIL
     }
 
     /**
