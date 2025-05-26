@@ -17,8 +17,7 @@ return new class extends Migration
             $table->foreignUuid('product_detail_id')->constrained();
             $table->double('old_stock')->default(0);
             $table->double('audit_stock')->default(0);
-            $table->foreignUuid('unit_id')->nullable();
-            $table->string('unit')->nullable();
+            $table->foreignUuid('unit_id')->constrained();
             $table->softDeletes();
             $table->timestamps();
         });

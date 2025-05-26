@@ -97,28 +97,26 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource("stock-request", StockRequestController::class)->only(['store', 'destroy']);
     });
 
-    Route::middleware('role:auditor|admin|owner')->group(function () {
-        Route::resource("audit", AuditController::class)->only(['store', 'index', 'destroy']);
-        Route::post('audit/{id}/restore', [AuditController::class, 'restore']);
-
-    });
-
     Route::middleware('role:outlet|admin|owner')->group(function () {
-        Route::resource("audit", AuditController::class)->only(['update', 'destroy', 'index']);
         Route::post('audit/{id}/restore', [AuditController::class, 'restore']);
         Route::get("audit/no-paginate", [AuditController::class, 'list']);
         Route::get("audit/alltrashed", [AuditController::class, 'trashed']);
+        Route::resource("audit", AuditController::class)->only(['update', 'destroy', 'index', 'show']);
+    });
+
+    Route::middleware('role:auditor|admin|owner')->group(function () {
+        Route::post('audit/{id}/restore', [AuditController::class, 'restore']);
+        Route::resource("audit", AuditController::class)->only(['store', 'index', 'destroy', 'show']);
     });
 
     // API FOR ROLE ADMIN, WAREHOUSE & OWNER
     Route::middleware('role:admin|owner|warehouse')->group(function () {
-        Route::resource("setting", SettingController::class)->only(['store', 'destroy', 'update', 'index']);
-        Route::post('audit/{id}/restore', [AuditController::class, 'restore']);
         Route::post('setting/{id}/restore', [SettingController::class, 'restore']);
         Route::get("setting/no-paginate", [SettingController::class, 'listWSetting']);
         Route::get("setting/alltrashed", [SettingController::class, 'trashed']);
         Route::get("audit/no-paginate", [AuditController::class, 'list']);
         Route::get("audit/alltrashed", [AuditController::class, 'trashed']);
+        Route::resource("setting", SettingController::class);
     });
 
     // API FOR DATA USER

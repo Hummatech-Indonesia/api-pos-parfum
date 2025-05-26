@@ -76,7 +76,17 @@ class AuditController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $audit = $this->auditRepository->show($id);
+
+            if (!$audit) {
+                return BaseResponse::Notfound("audit dengan ID $id tidak ditemukan");
+            }
+
+            return BaseResponse::Ok("Berhasil mengambil detail setting", $audit);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error("Terjadi kesalahan: " . $th->getMessage(), null);
+        }
     }
 
     /**
@@ -84,8 +94,8 @@ class AuditController extends Controller
      */
     public function update(AuditRequest $request, string $id)
     {
-        $setting = $this->auditRepository->show($id,);
-        if (!$setting) return BaseResponse::Notfound("id tidak ditemukan");
+        $audit = $this->auditRepository->show($id,);
+        if (!$audit) return BaseResponse::Notfound("audit tidak ditemukan");
 
         $settingData = $request->validated();
 
@@ -97,7 +107,7 @@ class AuditController extends Controller
         DB::beginTransaction();
         try {
 
-            $update = $this->service->updateAudit($setting, $settingData);
+            $update = $this->service->updateAudit($audit, $settingData);
 
             DB::commit();
             return BaseResponse::Ok('Berhasil memperbarui Audit', $update);
@@ -109,6 +119,7 @@ class AuditController extends Controller
 
     public function getData(Request $request)
     {
+
         $payload = [];
 
         // check query filter
@@ -128,12 +139,13 @@ class AuditController extends Controller
      */
     public function destroy(string $id)
     {
+        $audit = $this->auditRepository->show($id,);
+        if (!$audit) return BaseResponse::Notfound("audit tidak ditemukan");
         DB::beginTransaction();
 
         try {
-            $setting = $this->auditRepository->show($id);
 
-            $this->service->deleteAudit($setting);
+            $this->service->deleteAudit($audit);
 
             DB::commit();
             return BaseResponse::Ok('Berhasil menghapus audit', null);

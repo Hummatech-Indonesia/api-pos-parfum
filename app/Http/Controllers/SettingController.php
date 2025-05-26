@@ -23,7 +23,9 @@ class SettingController extends Controller
     {
         $per_page = $request->per_page ?? 10;
         $page = $request->page ?? 1;
-        $payload = [];
+        $payload = $request->only(['search', 'name']);
+
+        $data['user_id'] = auth()?->user()?->id;
 
         // check query filter
         if ($request->search) $payload["search"] = $request->search;
@@ -70,7 +72,17 @@ class SettingController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $setting = $this->settingRepository->show($id);
+
+            if (!$setting) {
+                return BaseResponse::Notfound("Setting dengan ID $id tidak ditemukan");
+            }
+
+            return BaseResponse::Ok("Berhasil mengambil detail setting", $setting);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error("Terjadi kesalahan: " . $th->getMessage(), null);
+        }
     }
 
     /**
@@ -79,7 +91,7 @@ class SettingController extends Controller
     public function update(SettingRequest $request, string $id)
     {
         $setting = $this->settingRepository->show($id);
-        if (!$setting) return BaseResponse::Notfound("id tidak ditemukan");
+        if (!$setting) return BaseResponse::Notfound("setting tidak ditemukan");
 
         $settingData = $request->validated();
 
@@ -103,10 +115,11 @@ class SettingController extends Controller
      */
     public function destroy(string $id)
     {
+        $setting = $this->settingRepository->show($id);
+        if (!$setting) return BaseResponse::Notfound("setting tidak ditemukan");
         DB::beginTransaction();
 
         try {
-            $setting = $this->settingRepository->show($id);
 
             $setting->delete();
 
@@ -141,19 +154,20 @@ class SettingController extends Controller
 
             $data = $this->settingRepository->allDataTrashed($payload);
 
-            return BaseResponse::Ok("Berhasil mengambil data setting", $data);
+
+            return BaseResponse::Ok("Berhasil mengambil data sampah setting", $data);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
 
     public function restore(string $id)
-{
-    try {
-        $setting = $this->settingRepository->restore($id);
-        return BaseResponse::Ok("setting berhasil dikembalikan", $setting);
-    } catch (\Throwable $th) {
-        return BaseResponse::Error("Gagal mengembalikan setting: " . $th->getMessage(), null);
+    {
+        try {
+            $setting = $this->settingRepository->restore($id);
+            return BaseResponse::Ok("setting berhasil dikembalikan", $setting);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error("Gagal mengembalikan setting: " . $th->getMessage(), null);
+        }
     }
-}
 }

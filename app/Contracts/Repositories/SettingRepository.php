@@ -38,10 +38,9 @@ class SettingRepository extends BaseRepository implements SettingInterface
         return $this->show($id)->delete();
     }
 
-    public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
+    public function customPaginate(int $pagination = 8, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-            ->with('store')
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (isset($data["search"])) {
                     $query->where(function ($query2) use ($data) {
@@ -50,9 +49,10 @@ class SettingRepository extends BaseRepository implements SettingInterface
                     unset($data["search"]);
                 }
 
-                foreach ($data as $index => $value) {
-                    $query->where($index, $value);
+                if (!empty($data['name'])) {
+                    $query->where('name', 'like', '%' . $data['name'] . '%');
                 }
+
             })
             ->paginate($pagination, ['*'], 'page', $page);
         // ->appends(['search' => $request->search, 'year' => $request->year]);

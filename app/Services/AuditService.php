@@ -18,21 +18,16 @@ class AuditService
         try {
             Log::info('Mulai updateAudit', ['audit_id' => $audit->id, 'data' => $data]);
 
-            if (isset($data['status']) && $data['status'] !== $audit->status) {
-                if ($audit->status !== 'pending') {
-                    throw ValidationException::withMessages([
-                        'status' => ['Audit hanya bisa diubah jika masih pending.'],
-                    ]);
-                }
+            if ($audit->status !== 'pending') {
+                throw ValidationException::withMessages([
+                    'status' => ['Data tidak dapat diubah karena Anda sudah memberikan tanggapan.'],
+                ]);
             }
+
 
             return DB::transaction(function () use ($audit, $data) {
                 Log::info('Update audit utama dimulai');
                 $audit->update([
-                    'name' => $data['name'],
-                    'description' => $data['description'] ?? null,
-                    'date' => $data['date'],
-                    'outlet_id' => $data['outlet_id'],
                     'status' => $data['status'] ?? $audit->status,
                     'reason' => $data['reason'] ?? null,
                 ]);
@@ -52,7 +47,6 @@ class AuditService
 
                         if ($detail) {
                             $detail->audit_stock = $product['audit_stock'];
-                            $detail->unit = $product['unit'];
                             $detail->unit_id = $product['unit_id'];
                             $detail->save();
                         } else {
@@ -61,7 +55,6 @@ class AuditService
                                 'product_detail_id' => $product['product_detail_id'],
                                 'old_stock' => $oldStock,
                                 'audit_stock' => $product['audit_stock'],
-                                'unit' => $product['unit'],
                                 'unit_id' => $product['unit_id'],
 
                             ]);
@@ -115,7 +108,7 @@ class AuditService
             throw $ve;
         } catch (\Exception $e) {
             Log::error('Error update audit: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            throw new \RuntimeException('Terjadi kesalahan saat memperbarui audit.');
+            throw new \RuntimeException('Terjadi kesalahan saat memperbarui audit.' . $e->getMessage());
         }
     }
 
@@ -131,7 +124,7 @@ class AuditService
                     'store_id' => $data['store_id'],
                     'date' => $data['date'],
                     'user_id' => auth()->id(),
-                    'status' => 'pending',
+                    'status' => 'pending',  
                 ]);
 
                 foreach ($data['products'] as $index => $product) {
@@ -158,7 +151,6 @@ class AuditService
                         'product_detail_id' => $product['product_detail_id'],
                         'old_stock' => $oldStock,
                         'audit_stock' => $product['audit_stock'],
-                        'unit' => $product['unit'],
                         'unit_id' => $product['unit_id'],
                     ]);
                 }
@@ -176,7 +168,7 @@ class AuditService
     {
         if ($audit->status !== 'pending') {
             throw ValidationException::withMessages([
-                'status' => ['Audit hanya dapat dihapus jika status masih pending.'],
+                'status' => ['Data tidak dapat dihapus karena Anda sudah memberikan tanggapan.'],
             ]);
         }
 

@@ -25,19 +25,33 @@ class AuditRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => 'required|string',
-            'description' => 'nullable|string',
-            'outlet_id' => 'required|uuid',
-            'date' => 'required|date',
-            'status' => 'sometimes|string|in:pending,approved,rejected', 
-            'reason' => 'required_if:status,rejected|string|nullable',
-            'products' => 'required|array|min:1',
-            'products.*.product_detail_id' => 'required|uuid',
-            'products.*.audit_stock' => 'required|integer|min:0',
-            'products.*.unit' => 'required|string',
-            'products.*.unit_id' => 'required|uuid',
-        ];
+        if ($this->isMethod('POST')) {
+            return [
+                'name' => 'required|string',
+                'description' => 'nullable|string',
+                'outlet_id' => 'required|uuid',
+                'date' => 'required|date',
+                'status' => 'sometimes|string|in:pending,approved,rejected',
+                'reason' => 'required_if:status,rejected|string|nullable',
+                'products' => 'required|array|min:1',
+                'products.*.product_detail_id' => 'required|uuid',
+                'products.*.audit_stock' => 'required|integer|min:0',
+                'products.*.unit_id' => 'required|uuid',
+            ];
+        }
+
+        if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
+            return [
+                'status' => 'sometimes|string|in:pending,approved,rejected',
+                'reason' => 'required_if:status,rejected|string|nullable',
+                'products' => 'required|array|min:1',
+                'products.*.product_detail_id' => 'required|uuid',
+                'products.*.audit_stock' => 'required|integer|min:0',
+                'products.*.unit_id' => 'required|uuid',
+            ];
+        }
+
+        return [];
     }
 
     public function messages()
