@@ -73,11 +73,15 @@ class OutletController extends Controller
         DB::beginTransaction();
         try {
             // check has data user or not 
-            $user = $data["user_id"];
+            $user = $data["user_id"]; // menambahkan/mengganti outlet_id yang dimiliki user yang di iputkan
             unset($data["user_id"]);
 
-            $userCreate = $data["users"];
-            unset($data["users"]);
+            // cek apakah ada menginputkan user baru
+            $userCreate = [];
+            if(isset($data["users"])){
+                $userCreate = $data["users"];
+                unset($data["users"]);
+            }
             $userLogin = auth()->user();
 
             $mapOutlet = $this->outletService->dataOutlet($data);
@@ -88,7 +92,9 @@ class OutletController extends Controller
                 foreach($result_user as $dataUser) $dataUser->update(["outlet_id" => $result_outlet->id]);
             }
 
+            // cek apakah ada user create dan apakah user create tersebut adalah array
             if($userCreate && is_array($userCreate) && !empty($userCreate) && count($userCreate) > 0) {
+                // jika ada maka tambahkan user tersebut ke database
                 foreach($userCreate as $userData) {
                     $mapping = $this->userService->mappingDataUser($userData);
                     $mapping["outlet_id"] = $result_outlet->id;

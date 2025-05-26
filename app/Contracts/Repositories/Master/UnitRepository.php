@@ -25,10 +25,18 @@ class UnitRepository extends BaseRepository implements UnitInterface
         return $this->model->create($data);
     }
 
-        public function customQuery(array $data): mixed
+    public function customQuery(array $data): mixed
     {
         return $this->model->query()
         ->when(count($data) > 0, function ($query) use ($data){
+            if(isset($data["search"])){
+                $query->where(function ($query2) use ($data) {
+                    $query2->where('name', 'like', '%' . $data["search"] . '%')
+                    ->orwhere('code', 'like', '%' . $data["search"] . '%');
+                });
+                unset($data["search"]);
+            }
+        
             foreach ($data as $index => $value){
                 $query->where($index, $value);
             }
