@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers\Master;
 
-use App\Contracts\Interfaces\Auth\UserInterface;
-use App\Contracts\Interfaces\Master\ProductDetailInterface;
-use App\Contracts\Interfaces\Master\ProductStockInterface;
-use App\Contracts\Interfaces\Master\WarehouseInterface;
-use App\Contracts\Interfaces\Master\WarehouseStockInterface;
-use App\Helpers\BaseResponse;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Master\WarehouseRequest;
-use App\Http\Requests\WarehouseStockRequest;
-use App\Services\Master\WarehouseService;
 use Illuminate\Http\Request;
+use App\Helpers\BaseResponse;
+use App\Services\Auth\UserService;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Services\Master\WarehouseService;
+use App\Http\Requests\WarehouseStockRequest;
+use App\Http\Requests\Master\WarehouseRequest;
+use App\Contracts\Interfaces\Auth\UserInterface;
+use App\Contracts\Interfaces\Master\WarehouseInterface;
+use App\Contracts\Interfaces\Master\ProductStockInterface;
+use App\Contracts\Interfaces\Master\ProductDetailInterface;
+use App\Contracts\Interfaces\Master\WarehouseStockInterface;
 
 class WarehouseController extends Controller
 {
@@ -23,10 +24,11 @@ class WarehouseController extends Controller
     private ProductDetailInterface $productDetail;
     private ProductStockInterface $productStock;
     private WarehouseService $warehouseService;
+    private UserService $userService;
 
     public function __construct(WarehouseInterface $warehouse, UserInterface $user, 
     WarehouseStockInterface $warehouseStock, ProductDetailInterface $productDetail,
-    ProductStockInterface $productStock, WarehouseService $warehouseService
+    ProductStockInterface $productStock, WarehouseService $warehouseService, UserService $userService
     )
     {
         $this->warehouse = $warehouse; 
@@ -35,6 +37,7 @@ class WarehouseController extends Controller
         $this->productDetail = $productDetail; 
         $this->productStock = $productStock; 
         $this->warehouseService = $warehouseService;
+        $this->userService = $userService;
     }
 
     /**
@@ -42,7 +45,7 @@ class WarehouseController extends Controller
      */
     public function index(Request $request)
     {
-        $per_page = $request->per_page ?? 10;
+        $per_page = $request->per_page ?? 8;
         $page = $request->page ?? 1;
         $payload = [
             "is_delete" => 0
@@ -82,12 +85,36 @@ class WarehouseController extends Controller
             $user = $data["user_id"];
             unset($data["user_id"]);
 
+            // cek apakah ada menginputkan user baru
+            $userCreate = [];
+            if(isset($data["users"])){
+                $userCreate = $data["users"];
+                unset($data["users"]);
+            }
+            $userLogin = auth()->user();
+
             $mapWarehouse = $this->warehouseService->dataWarehouse($data);
             $result_warehouse = $this->warehouse->store($mapWarehouse);
 
             if($user){
                 $result_user = $this->user->customQuery(["user_id" => $user])->get();
                 foreach($result_user as $dataUser) $dataUser->update(["warehouse_id" => $result_warehouse->id]);
+            }
+
+            // cek apakah ada user dan apakah user create tersebut adalah array
+            if($userCreate && is_array($userCreate) && !empty($userCreate) && count($userCreate) > 0) {
+                // jika ada maka tambahkan user tersebut ke database
+                foreach($userCreate as $userData) {
+                    $mapping = $this->userService->mappingDataUser($userData);
+                    $mapping["warehouse_id"] = $result_warehouse->id;
+                    if($userLogin && $userLogin->outlet_id) {
+                        $mapping['outlet_id'] = $userLogin->outlet_id;
+                    }
+                    if($userLogin && $userLogin->store_id) {
+                        $mapping['store_id'] = $userLogin->store_id;
+                    }
+                    $this->user->store($mapping);
+                }
             }
     
             DB::commit();
@@ -187,7 +214,7 @@ class WarehouseController extends Controller
 
     public function listWarehouseStock(Request $request)
     {
-        $per_page = $request->per_page ?? 10;
+        $per_page = $request->per_page ?? 8;
         $page = $request->page ?? 1;
         $payload = [];
 

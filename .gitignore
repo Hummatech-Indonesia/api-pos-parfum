@@ -17,11 +17,8 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-<<<<<<< Updated upstream
-/storage
-=======
 /storage/framework
 composer.lock
 storage/logs/laravel.log
 storage/logs/laravel.log
->>>>>>> Stashed changes
+

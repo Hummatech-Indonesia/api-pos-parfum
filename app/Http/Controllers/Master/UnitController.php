@@ -26,7 +26,7 @@ class UnitController extends Controller
      */
     public function index(Request $request)
     {
-        $per_page = $request->per_page ?? 10;
+        $per_page = $request->per_page ?? 8;
         $page = $request->page ?? 1;
         $payload = [];
 
@@ -138,6 +138,7 @@ class UnitController extends Controller
     {
         try {
             $payload = [];
+            if($request->search) $payload['search'] = $request->search;
             $data = $this->unit->customQuery($payload)->get();
 
 
