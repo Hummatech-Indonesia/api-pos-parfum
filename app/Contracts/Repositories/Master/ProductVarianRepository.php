@@ -84,4 +84,9 @@ class ProductVarianRepository extends BaseRepository implements ProductVarianInt
         return $this->show($id)->update(["is_delete" => 1]);
     }
 
+    public function where(array $data) : mixed
+    {
+        return $this->model->query()->where($data)->first();
+    }
+
 }

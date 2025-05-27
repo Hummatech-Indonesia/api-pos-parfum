@@ -10,8 +10,9 @@ use App\Contracts\Interfaces\Eloquent\ShowInterface;
 use App\Contracts\Interfaces\Eloquent\StoreInterface;
 use App\Contracts\Interfaces\Eloquent\UpdateInterface;
 
-interface ProductVarianInterface extends GetInterface, StoreInterface, CustomQueryInterface, CustomPaginateInterface, ShowInterface, UpdateInterface, DeleteInterface
+interface ProductBundlingDetailInterface extends GetInterface, StoreInterface, ShowInterface, UpdateInterface, DeleteInterface
 {
-    public function checkActive(mixed $id): mixed;
-    public function where(array $data) : mixed;
+    public function restore(mixed $id): mixed;
+    
+    public function paginate(int $perPage = 10): mixed;
 }

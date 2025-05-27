@@ -155,6 +155,7 @@ class StockRequestController extends Controller
 
         DB::beginTransaction();
         try {
+            $newTotal = 0;
 
             // Update status
             $stockRequest->update([
@@ -162,6 +163,7 @@ class StockRequestController extends Controller
             ]);
 
             // Update each detail
+
             foreach ($data['product_detail'] as $detail) {
                 $existingDetail = $this->stockRequestDetail->customQuery([
                     'stock_request_id' => $id,
@@ -171,7 +173,10 @@ class StockRequestController extends Controller
                 if ($existingDetail && $data["status"] == "approved") {
                     $this->stockRequestDetail->update($existingDetail->id, [
                         'sended_stock' => $detail['sended_stock'],
+                        'price' => $detail['price'] ?? $existingDetail->price,
                     ]);
+
+                    $newTotal += ($detail['sended_stock'] * ($detail['price'] ?? $existingDetail->price));
 
                     $productStock = $this->productStock->customQuery([
                         "warehouse_id" => auth()->user()->warehouse_id,
@@ -199,6 +204,10 @@ class StockRequestController extends Controller
                     }
                 }
             }
+            // Update total di stock request
+        if ($data["status"] == "approved") {
+            $stockRequest->update(['total' => $newTotal]);
+        }
 
             DB::commit();
             return BaseResponse::Ok('Berhasil mengupdate stock request', null);

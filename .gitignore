@@ -19,6 +19,3 @@ yarn-error.log
 /.vscode
 /storage/framework
 composer.lock
-storage/logs/laravel.log
-storage/logs/laravel.log
-
