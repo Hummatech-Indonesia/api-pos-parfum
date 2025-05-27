@@ -7,9 +7,10 @@ use App\Contracts\Interfaces\Eloquent\GetInterface;
 use App\Contracts\Interfaces\Eloquent\ShowInterface;
 use App\Contracts\Interfaces\Eloquent\StoreInterface;
 use App\Contracts\Interfaces\Eloquent\CustomPaginateInterface;
+use App\Contracts\Interfaces\Eloquent\CustomQueryInterface;
 use App\Contracts\Interfaces\Eloquent\UpdateInterface;
 
-interface ProductBundlingInterface extends GetInterface, StoreInterface, ShowInterface, UpdateInterface, DeleteInterface
+interface ProductBundlingInterface extends GetInterface, StoreInterface, ShowInterface, UpdateInterface, DeleteInterface, CustomQueryInterface, CustomPaginateInterface
 {
     public function restore(mixed $id): mixed;
 

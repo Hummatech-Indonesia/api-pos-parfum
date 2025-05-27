@@ -2,7 +2,11 @@
 
 namespace App\Http\Requests\Master;
 
+use App\Helpers\BaseResponse;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\JsonResponse;
 
 class ProductBundlingDetailRequest extends FormRequest
 {
@@ -16,7 +20,7 @@ class ProductBundlingDetailRequest extends FormRequest
         return [
             'product_detail_id' => 'required|uuid|exists:product_details,id',
             'unit' => 'nullable|string',
-            'unit_id' => 'nullable|uuid',
+            'unit_id' => 'nullable',
         ];
     }
 
@@ -29,6 +33,11 @@ class ProductBundlingDetailRequest extends FormRequest
             'unit.string' => 'Unit harus berupa teks.',
             'unit_id.uuid' => 'Format Unit ID tidak valid.',
         ];
+    }
+
+    public function failedValidation(Validator $validator): JsonResponse
+    {
+        throw new HttpResponseException(BaseResponse::Error("Kesalahan dalam validasi", $validator->errors()));
     }
 
 }

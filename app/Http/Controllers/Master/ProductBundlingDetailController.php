@@ -58,6 +58,7 @@ class ProductBundlingDetailController extends Controller
 
     public function update(ProductBundlingDetailRequest $request, string $id)
     {
+        // dd($request->all());
         $data = $request->validated();
 
         DB::beginTransaction();
@@ -77,7 +78,7 @@ class ProductBundlingDetailController extends Controller
         try {
             $this->productBundlingDetail->delete($id);
             DB::commit();
-            return BaseResponse::Ok("Berhasil menghapus data secara soft delete", null);
+            return BaseResponse::Ok("Berhasil menghapus data ", null);
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);

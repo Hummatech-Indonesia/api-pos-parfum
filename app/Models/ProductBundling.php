@@ -28,4 +28,10 @@ class ProductBundling extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function details()
+    {
+        return $this->hasMany(ProductBundlingDetail::class, 'product_bundling_id');
+    }
+
+
 }

@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('product_bundling_details', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->foreignUuid('product_bundling_id')->constrained('product_bundlings');
             $table->foreignUuid('product_detail_id')->constrained('product_details');
-            $table->string('unit')->nullable();
-            $table->foreignUuid('unit_id')->nullable();
+            $table->string('unit');
+            $table->foreignUuid('unit_id')->constrained('units');
+            $table->double('quantity');
             $table->timestamps();
             $table->softDeletes();
         });

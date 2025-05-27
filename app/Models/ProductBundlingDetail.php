@@ -12,7 +12,7 @@ class ProductBundlingDetail extends Model
     use HasFactory, SoftDeletes, HasUuids;
 
     protected $fillable = [
-        'id', 'product_detail_id', 'unit', 'unit_id'
+        'product_bundling_id', 'product_detail_id', 'unit', 'unit_id', 'quantity',
     ];
 
     public $incrementing = false;
@@ -22,4 +22,15 @@ class ProductBundlingDetail extends Model
     {
         return $this->belongsTo(ProductDetail::class);
     }
+
+    public function bundling()
+    {
+        return $this->belongsTo(ProductBundling::class, 'product_bundling_id');
+    }
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
+    }
+
 }
