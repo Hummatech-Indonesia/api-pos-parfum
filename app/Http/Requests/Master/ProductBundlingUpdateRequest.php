@@ -20,9 +20,9 @@ class ProductBundlingUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'category_id' => 'required|exists:categories,id',
+            // 'name' => 'required|string|max:255',
+            // 'description' => 'required|string',
+            // 'category_id' => 'required|exists:categories,id',
 
             'details' => 'required|array|min:1',
             'details.*.unit' => 'required|string',
