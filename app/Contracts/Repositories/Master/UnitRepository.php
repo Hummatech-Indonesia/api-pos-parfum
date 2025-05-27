@@ -43,7 +43,7 @@ class UnitRepository extends BaseRepository implements UnitInterface
         });
     }
 
-    public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
+    public function customPaginate(int $pagination = 8, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
         ->when(count($data) > 0, function ($query) use ($data){

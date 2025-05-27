@@ -26,7 +26,7 @@ class UnitController extends Controller
      */
     public function index(Request $request)
     {
-        $per_page = $request->per_page ?? 10;
+        $per_page = $request->per_page ?? 8;
         $page = $request->page ?? 1;
         $payload = [];
 
