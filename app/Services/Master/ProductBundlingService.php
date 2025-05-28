@@ -88,4 +88,17 @@ class ProductBundlingService
             $bundling->delete();
         });
     }
+
+    public function restoreBundling(string $id): ProductBundling
+    {
+        return DB::transaction(function () use ($id) {
+            $bundling = ProductBundling::withTrashed()->findOrFail($id);
+            $bundling->restore();
+
+            $bundling->details()->withTrashed()->restore();
+
+            return $bundling->load('details');
+        });
+    }
+
 }

@@ -26,7 +26,10 @@ class ProductBundlingController extends Controller
         try {
             $perPage = $request->per_page ?? 10;
             $page = $request->page ?? 1;
-            $payload = $request->only(['search', 'name', 'category_id', 'product_id', 'created_from', 'created_to']);
+            $payload = $request->only(['search', 'name', 'category', 'product', 'mulai_tanggal', 'sampai_tanggal']);
+            $payload['created_from'] = $payload['mulai_tanggal'] ?? null;
+            $payload['created_to'] = $payload['sampai_tanggal'] ?? null;
+
 
             $data = $this->repository->customPaginate($perPage, $page, $payload)->toArray();
             $result = $data["data"];
@@ -55,10 +58,17 @@ class ProductBundlingController extends Controller
     public function show(string $id)
     {
         try {
-            $data = $this->repository->show($id)->load('details');
-            return BaseResponse::Ok("Detail bundling ditemukan", $data);
+            $bundling = $this->repository->show($id);
+
+            if (!$bundling) {
+                return BaseResponse::Notfound("Bundling dengan ID $id tidak ditemukan");
+            }
+
+            $bundling->load('details');
+
+            return BaseResponse::Ok("Detail bundling ditemukan", $bundling);
         } catch (\Throwable $e) {
-            return BaseResponse::Error($e->getMessage(), null);
+            return BaseResponse::Error("Terjadi kesalahan: " . $e->getMessage(), null);
         }
     }
 
@@ -67,6 +77,8 @@ class ProductBundlingController extends Controller
         DB::beginTransaction();
         try {
             $bundling = $this->repository->show($id);
+            if (!$bundling) return BaseResponse::Notfound("Bundling tidak ditemukan");
+
             $data = $request->validated();
             $updated = $this->service->updateBundling($bundling, $data);
             DB::commit();
@@ -82,19 +94,27 @@ class ProductBundlingController extends Controller
         DB::beginTransaction();
         try {
             $bundling = $this->repository->show($id);
+            if (!$bundling) return BaseResponse::Notfound("Bundling tidak ditemukan");
+
+            $bundling->load('details');
+
+            $deletedData = $bundling->toArray();
+
             $this->service->deleteBundling($bundling);
+
             DB::commit();
-            return BaseResponse::Ok("Berhasil hapus bundling", null);
+            return BaseResponse::Ok("Berhasil hapus bundling", $deletedData);
         } catch (\Throwable $e) {
             DB::rollBack();
             return BaseResponse::Error($e->getMessage(), null);
         }
     }
 
+
     public function restore(string $id)
     {
         try {
-            $data = $this->repository->restore($id);
+            $data = $this->service->restoreBundling($id);
             return BaseResponse::Ok("Berhasil restore bundling", $data);
         } catch (\Throwable $e) {
             return BaseResponse::Error($e->getMessage(), null);
