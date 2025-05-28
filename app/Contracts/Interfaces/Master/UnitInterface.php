@@ -14,4 +14,6 @@ interface UnitInterface extends GetInterface, StoreInterface, CustomPaginateInte
     public function allDataTrashed(): mixed;
 
     public function all(): mixed;
+
+    public function cekUnit(mixed $name, mixed $code);
 }

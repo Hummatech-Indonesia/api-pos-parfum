@@ -10,5 +10,6 @@ use App\Contracts\Interfaces\Eloquent\UpdateInterface;
         
 interface ProductBlendInterface extends GetInterface, StoreInterface, UpdateInterface, ShowInterface, DeleteInterface
 {
-    public function customPaginate($perPage, $page, array $filters = [], array $with = []);
+    public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed;
+    public function show(mixed $id): mixed;
 }
