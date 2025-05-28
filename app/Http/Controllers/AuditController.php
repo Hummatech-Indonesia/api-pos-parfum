@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Contracts\Repositories\AuditRepository;
 use App\Helpers\BaseResponse;
 use App\Http\Requests\AuditRequest;
+use App\Models\Audit;
 use App\Services\AuditService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -186,7 +187,7 @@ class AuditController extends Controller
 
     public function restore(string $id)
     {
-        $audit = $this->auditRepository->show($id,);
+        $audit = Audit::withTrashed()->find($id);
         if (!$audit) return BaseResponse::Notfound("sampah audit tidak ditemukan");
         try {
             $audit = $this->auditRepository->restore($id);

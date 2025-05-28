@@ -7,6 +7,7 @@ use App\Helpers\BaseResponse;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\SettingRequest;
 use App\Contracts\Repositories\SettingRepository;
+use App\Models\Setting;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class SettingController extends Controller
@@ -162,7 +163,7 @@ class SettingController extends Controller
     }
 
     public function restore(string $id)
-    {        $setting = $this->settingRepository->show($id);
+    {        $setting = Setting::withTrashed()->find($id);
         if (!$setting) return BaseResponse::Notfound("sampah setting tidak ditemukan");
         try {
             $setting = $this->settingRepository->restore($id);
