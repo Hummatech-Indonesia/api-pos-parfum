@@ -24,7 +24,7 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
 
     public function show(mixed $id): mixed
     {
-        return $this->model->query()->findOrFail($id);
+        return $this->model->query()->with(['productBlendDetails', 'productDetail', 'warehouse'])->findOrFail($id);
     }
 
     public function update(mixed $id, array $data): mixed
@@ -37,30 +37,22 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
         return $this->model->query()->findOrFail($id)->delete();
     }
 
-    public function customPaginate($perPage, $page, array $filters = [], array $with = [])
+    public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
-        $query = ProductBlend::query();
+        $query = $this->model->query()->with(['productBlendDetails', 'productDetail', 'warehouse']);
 
-        // Load relasi seperti productBlendDetails
-        if (!empty($with)) {
-            $query->with($with);
+            if (isset($data["search"])) {
+                $query->where(function ($q) use ($data) {
+                    $q->where('date', 'like', '%' . $data["search"] . '%')
+                        ->orWhereHas('productDetail', function ($q) use ($data) {
+                            $q->where('material', 'like', '%' . $data["search"] . '%')
+                                ->orWhere('price', 'like', '%' . $data["search"] . '%');
+                        });
+                })->orWhereHas('warehouse', function ($q) use ($data) {
+                    $q->where('name', 'like', '%' . $data["search"] . '%');
+                });
+                unset($data["search"]);
+            }
+            return $query->paginate($pagination, ['*'], 'page', $page);
         }
-
-        // Filter search
-        if (!empty($filters['search'])) {
-            $query->where('code', 'like', '%' . $filters['search'] . '%');
-        }
-
-        // Filter is_delete
-        if (isset($filters['is_delete'])) {
-            $query->where('is_delete', $filters['is_delete']);
-        }
-
-        // Filter store_id
-        if (!empty($filters['store_id'])) {
-            $query->where('store_id', $filters['store_id']);
-        }
-
-        return $query->paginate($perPage, ['*'], 'page', $page);
-    }
 }
