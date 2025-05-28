@@ -80,7 +80,7 @@ class AuditController extends Controller
             $audit = $this->auditRepository->show($id);
 
             if (!$audit) {
-                return BaseResponse::Notfound("audit dengan ID $id tidak ditemukan");
+                return BaseResponse::Notfound("audit tidak ditemukan");
             }
 
             return BaseResponse::Ok("Berhasil mengambil detail setting", $audit);
@@ -159,6 +159,8 @@ class AuditController extends Controller
     {
         try {
             $payload = [];
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+
             $data = $this->auditRepository->customQuery($payload)->get();
 
             return BaseResponse::Ok("Berhasil mengambil data audit", $data);
