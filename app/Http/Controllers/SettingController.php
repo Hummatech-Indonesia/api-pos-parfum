@@ -162,7 +162,8 @@ class SettingController extends Controller
     }
 
     public function restore(string $id)
-    {
+    {        $setting = $this->settingRepository->show($id);
+        if (!$setting) return BaseResponse::Notfound("sampah setting tidak ditemukan");
         try {
             $setting = $this->settingRepository->restore($id);
             return BaseResponse::Ok("setting berhasil dikembalikan", $setting);

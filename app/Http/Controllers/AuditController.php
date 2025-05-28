@@ -186,6 +186,8 @@ class AuditController extends Controller
 
     public function restore(string $id)
     {
+        $audit = $this->auditRepository->show($id,);
+        if (!$audit) return BaseResponse::Notfound("sampah audit tidak ditemukan");
         try {
             $audit = $this->auditRepository->restore($id);
             return BaseResponse::Ok("Audit berhasil dikembalikan", $audit);
