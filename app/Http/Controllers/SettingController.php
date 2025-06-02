@@ -77,7 +77,7 @@ class SettingController extends Controller
             $setting = $this->settingRepository->show($id);
 
             if (!$setting) {
-                return BaseResponse::Notfound("Setting dengan ID $id tidak ditemukan");
+                return BaseResponse::Notfound("Setting tidak ditemukan");
             }
 
             return BaseResponse::Ok("Berhasil mengambil detail setting", $setting);
@@ -163,7 +163,8 @@ class SettingController extends Controller
     }
 
     public function restore(string $id)
-    {        $setting = Setting::withTrashed()->find($id);
+    {
+        $setting = Setting::withTrashed()->find($id);
         if (!$setting) return BaseResponse::Notfound("sampah setting tidak ditemukan");
         try {
             $setting = $this->settingRepository->restore($id);
