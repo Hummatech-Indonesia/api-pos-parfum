@@ -13,4 +13,5 @@ use App\Contracts\Interfaces\Eloquent\UpdateInterface;
 interface ProductDetailInterface extends GetInterface, StoreInterface, CustomQueryInterface, CustomPaginateInterface, ShowInterface, UpdateInterface, DeleteInterface
 {
     public function checkActive(mixed $id): mixed;
+    public function find(string $id);
 }

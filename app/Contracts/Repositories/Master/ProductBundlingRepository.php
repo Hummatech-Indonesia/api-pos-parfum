@@ -27,7 +27,7 @@ class ProductBundlingRepository extends BaseRepository implements ProductBundlin
 
     public function show(mixed $id): mixed
     {
-        return $this->model->findOrFail($id);
+        return $this->model->find($id);
     }
 
     public function update(mixed $id, array $data): mixed
@@ -55,12 +55,11 @@ class ProductBundlingRepository extends BaseRepository implements ProductBundlin
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-            ->with('product', 'category', 'details') 
+            ->with(['product', 'category', 'details'])
             ->when(!empty($data), function ($query) use ($data) {
                 if (!empty($data['search'])) {
                     $query->where(function ($q) use ($data) {
-                        $q->where('name', 'like', '%' . $data['search'] . '%')
-                        ->orWhere('description', 'like', '%' . $data['search'] . '%');
+                        $q->where('name', 'like', '%' . $data['search'] . '%');
                     });
                 }
 
@@ -68,16 +67,28 @@ class ProductBundlingRepository extends BaseRepository implements ProductBundlin
                     $query->where('name', 'like', '%' . $data['name'] . '%');
                 }
 
-                if (!empty($data['category_id'])) {
-                    $query->where('category_id', $data['category_id']);
+                if (!empty($data['category'])) {
+                    $query->whereHas('category', function ($q) use ($data) {
+                        $q->where('name', 'like', '%' . $data['category'] . '%');
+                    });
                 }
 
-                if (!empty($data['product_id'])) {
-                    $query->where('product_id', $data['product_id']);
+                if (!empty($data['product'])) {
+                    $query->whereHas('product', function ($q) use ($data) {
+                        $q->where('name', 'like', '%' . $data['product'] . '%');
+                    });
                 }
 
                 if (!empty($data['created_from']) && !empty($data['created_to'])) {
-                    $query->whereBetween('created_at', [$data['created_from'], $data['created_to']]);
+                    $query->whereBetween('created_at', [
+                        $data['created_from'] . ' 00:00:00',
+                        $data['created_to'] . ' 23:59:59'
+                    ]);
+
+                    } elseif (!empty($data['created_from'])) {
+                        $query->where('created_at', '>=', $data['created_from'] . ' 00:00:00');
+                    } elseif (!empty($data['created_to'])) {
+                        $query->where('created_at', '<=', $data['created_to'] . ' 23:59:59');
                 }
             })
             ->paginate($pagination, ['*'], 'page', $page);

@@ -2,7 +2,11 @@
 
 namespace App\Http\Requests\Master;
 
+use App\Helpers\BaseResponse;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\JsonResponse;
 
 class ProductBundlingRequest extends FormRequest
 {
@@ -79,5 +83,10 @@ class ProductBundlingRequest extends FormRequest
             'details.*.product_detail.price.required' => 'Harga produk wajib diisi.',
             'details.*.product_detail.price_discount.numeric' => 'Diskon harga harus berupa angka.',
         ];
+    }
+
+    public function failedValidation(Validator $validator): JsonResponse
+    {
+        throw new HttpResponseException(BaseResponse::Error("Kesalahan dalam validasi", $validator->errors()));
     }
 }

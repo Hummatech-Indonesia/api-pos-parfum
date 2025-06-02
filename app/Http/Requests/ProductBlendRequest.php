@@ -29,13 +29,14 @@ class ProductBlendRequest extends FormRequest
             'date' => 'required|date',
 
             'product_blend' => 'required|array',
+            'product_blend.*.product_detail_id' => 'required|exists:product_details,id',
             'product_blend.*.unit_id' => 'required|exists:units,id',
             'product_blend.*.result_stock' => 'required|numeric|min:0',
             // 'product_blend.*.unit_name' => 'required|string',
             // 'product_blend.*.code' => 'required|string|max:255',
             'product_blend.*.image' => 'nullable|image|mimes:png,jpg,jpeg',
             'product_blend.*.unit_type' => 'required|in:weight,volume,unit',
-            'product_blend.*.varian_name' => 'required|string|max:255',
+            // 'product_blend.*.varian_name' => 'required|string|max:255',
             'product_blend.*.category_id' => 'sometimes|exists:categories,id',
             'product_blend.*.price' => 'required|numeric|min:0',
 
@@ -69,6 +70,9 @@ class ProductBlendRequest extends FormRequest
             'product_blend.required' => 'Data campuran produk wajib diisi.',
             'product_blend.array' => 'Data campuran produk harus berupa array.',
 
+            
+            'product_blend.*.product_detail_id.required' => 'Produk detail wajib dipilih.',
+            'product_blend.*.product_detail_id.exists' => 'Produk detail yang dipilih tidak valid.',
             'product_blend.*.unit_id.required' => 'Unit wajib dipilih.',
             'product_blend.*.unit_id.exists' => 'Unit yang dipilih tidak valid.',
 

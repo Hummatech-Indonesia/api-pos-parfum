@@ -108,7 +108,9 @@ class AuditService
             throw $ve;
         } catch (\Exception $e) {
             Log::error('Error update audit: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            throw new \RuntimeException('Terjadi kesalahan saat memperbarui audit.' . $e->getMessage());
+            throw ValidationException::withMessages([
+                'server' => ['Terjadi kesalahan saat memperbarui audit.']
+            ]);
         }
     }
 
@@ -124,7 +126,7 @@ class AuditService
                     'store_id' => $data['store_id'],
                     'date' => $data['date'],
                     'user_id' => auth()->id(),
-                    'status' => 'pending',  
+                    'status' => 'pending',
                 ]);
 
                 foreach ($data['products'] as $index => $product) {
@@ -159,7 +161,9 @@ class AuditService
             });
         } catch (\Exception $e) {
             Log::error('Error in storeAudit: ' . $e->getMessage());
-            throw $e; // biar errornya muncul dan tidak silent fail
+            throw ValidationException::withMessages([
+                'server' => ['Gagal menyimpan data audit.']
+            ]);
         }
     }
 

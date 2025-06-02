@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('stock_requests', function (Blueprint $table) {
-            $table->decimal('total')->nullable();
-        });
+        if (!Schema::hasColumn('stock_requests', 'total')) {
+            Schema::table('stock_requests', function (Blueprint $table) {
+                $table->decimal('total', 15, 2)->nullable();
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('stock_request', function (Blueprint $table) {
-            //
-        });
+        if (Schema::hasColumn('stock_requests', 'total')) {
+            Schema::table('stock_requests', function (Blueprint $table) {
+                $table->dropColumn('total');
+            });
+        }
     }
 };

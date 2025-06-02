@@ -2,7 +2,11 @@
 
 namespace App\Http\Requests\Master;
 
+use App\Helpers\BaseResponse;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\JsonResponse;
 
 class ProductBundlingUpdateRequest extends FormRequest
 {
@@ -67,5 +71,10 @@ class ProductBundlingUpdateRequest extends FormRequest
             'details.*.product_detail_id.uuid' => 'Product detail ID harus dalam format UUID.',
             'details.*.product_detail_id.exists' => 'Product detail ID tidak ditemukan di database.',
         ];
+    }
+
+    public function failedValidation(Validator $validator): JsonResponse
+    {
+        throw new HttpResponseException(BaseResponse::Error("Kesalahan dalam validasi", $validator->errors()));
     }
 }

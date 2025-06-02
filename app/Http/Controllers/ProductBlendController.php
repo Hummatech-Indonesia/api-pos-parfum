@@ -2,153 +2,163 @@
 
 namespace App\Http\Controllers;
 
-use App\Contracts\Interfaces\Master\ProductDetailInterface;
-use App\Contracts\Interfaces\Master\ProductInterface;
-use App\Contracts\Interfaces\ProductBlendInterface;
+use App\Contracts\Interfaces\Master\{ProductDetailInterface, ProductInterface, ProductStockInterface};
+use App\Contracts\Interfaces\{ProductBlendInterface, ProductBlendDetailInterface};
 use App\Helpers\BaseResponse;
 use App\Http\Requests\ProductBlendRequest;
-use App\Models\ProductBlend;
-use App\Services\ProductBlendService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ProductBlendController extends Controller
 {
-    private ProductBlendService $productBlendService;
     private ProductBlendInterface $productBlend;
     private ProductInterface $product;
     private ProductDetailInterface $productDetail;
+    private ProductStockInterface $productStock;
+    private ProductBlendDetailInterface $productBlendDetail;
 
-    public function __construct(ProductBlendService $productBlendService, ProductBlendInterface $productBlend, ProductInterface $product, ProductDetailInterface $productDetail)
-    {
-        $this->productBlendService = $productBlendService;
+    public function __construct(
+        ProductBlendInterface $productBlend,
+        ProductInterface $product,
+        ProductDetailInterface $productDetail,
+        ProductStockInterface $productStock,
+        ProductBlendDetailInterface $productBlendDetail
+    ) {
         $this->productBlend = $productBlend;
         $this->product = $product;
         $this->productDetail = $productDetail;
+        $this->productStock = $productStock;
+        $this->productBlendDetail = $productBlendDetail;
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $per_page = $request->per_page ?? 10;
         $page = $request->page ?? 1;
-
         $payload = [];
 
         if ($request->search) $payload["search"] = $request->search;
 
         try {
             $data = $this->productBlend->customPaginate($per_page, $page, $payload, ['productBlendDetails'])->toArray();
-
             $result = $data['data'];
             unset($data['data']);
-
             return BaseResponse::Paginate('Berhasil mengambil list data product blend!', $result, $data);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
 
-
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(ProductBlendRequest $request)
     {
         DB::beginTransaction();
 
         try {
-            $data = $this->productBlendService->store($request);
+            $data = $request->validated();
 
-            $productBlend = $data['store_product_blend']; // ambil data campuran pertama
-            $data['product_blend_id'] = $this->productBlend->store($productBlend)->id;
-
-            $this->productBlendService->storeBlendDetail($data);
-            $product = $this->productBlendService->storeProduct($request);
-            // $product_id = $this->product->store($product)->id;
-
-            
-            $data = $this->productBlendService->storeVarian($data);
-            
             foreach ($data['product_blend'] as $productBlend) {
-                $this->productBlend->update($data['product_blend_id'], ['product_id' => $product_id]); //ambil product detail
-                $this->productDetail->store([
-                    // 'product_id' => $product_id,
-                    'category_id' => $productBlend['category_id'],
-                    // 'product_varian_id' => $data['product_varian_id'],
-                    'price' => $productBlend['price'],
-                ]);
+                $data['store_product_blend'] = [
+                    'store_id' => auth()->user()->store_id,
+                    'warehouse_id' => auth()->user()->warehouse_id,
+                    'result_stock' => $productBlend['result_stock'],
+                    'product_detail_id' => $productBlend['product_detail_id'],
+                    'unit_id' => $productBlend['unit_id'],
+                    'date' => $data['date'] ?? now(),
+                ];
             }
 
-            //flow ketika nambh stok sama ngurangi stok
+            $image = null;
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                $image = $request->file('image')->store('public/product');
+            }
 
-            DB::commit();
-            return BaseResponse::Ok("Produk berhasil dibuat", $data);
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            return BaseResponse::Error($th->getMessage(), null);
-        }
-    }
+            $product = $this->product->store([
+                'store_id' => auth()->user()->store_id,
+                'name' => $data['name'],
+                'image' => $image,
+                'unit_type' => $data['product_blend'][0]['unit_type'],
+            ]);
+            $product_id = $product->id;
 
-    //JADI SATU FLOW 
-    //DIKASI FILTER
+            $blend = $this->productBlend->store($data['store_product_blend']);
+            $data['product_blend_id'] = $blend->id;
 
-    public function blend(ProductBlend $productBlend)
-    {
-        DB::beginTransaction();
+            foreach ($data['product_blend'] as $productBlend) {
+                foreach ($productBlend['product_blend_details'] as $blendDetail) {
+                    $stock = $this->productStock->checkStock($blendDetail['product_detail_id']);
 
-        try {
-            $blendDetails = $productBlend->productBlendDetails;
-
-            foreach ($blendDetails as $detail) {
-                $productDetail = $detail->productDetail;
-                if ($productDetail->stock < $detail->used_stock) {
-                    return BaseResponse::Error("Stok bahan '{$detail->productDetail->product->name}' tidak cukup untuk melakukan pencampuran.", null);
-                } else {
-                    $productDetail->stock -= $detail->used_stock;
-                    $productDetail->save();
-
-                    $productHasil = $productBlend->product->details;
-                    foreach ($productHasil as $productDetailHasil) {
-                        $productDetailHasil->stock += $productBlend->result_stock;
-                        $productDetailHasil->save();
+                    if (!$stock) {
+                        $this->productStock->store([
+                            'warehouse_id' => auth()->user()->warehouse_id,
+                            'product_detail_id' => $blendDetail['product_detail_id'],
+                        ]);
+                    } elseif ($stock->stock < $blendDetail['used_stock']) {
+                        DB::rollBack();
+                        return BaseResponse::Error("Stok bahan tidak cukup", null);
+                    } else {
+                        $stock->stock -= $blendDetail['used_stock'];
+                        $stock->save();
                     }
+
+                    $this->productBlendDetail->store([
+                        'product_blend_id' => $data['product_blend_id'],
+                        'product_detail_id' => $blendDetail['product_detail_id'],
+                        'used_stock' => $blendDetail['used_stock'],
+                        'unit_id' => $productBlend['unit_id'],
+                    ]);
+                }
+            }
+
+            foreach ($data['product_blend'] as $productBlend) {
+                $detail = $this->productDetail->store([
+                    'product_id' => $product_id,
+                    'category_id' => $productBlend['category_id'] ?? null,
+                    'price' => $productBlend['price'] ?? 0,
+                ]);
+
+                $stock = $this->productStock->checkNewStock($productBlend['product_detail_id'], $product_id);
+
+                if (!$stock) {
+                    $stock = $this->productStock->store([
+                        'warehouse_id' => auth()->user()->warehouse_id,
+                        'product_detail_id' => $detail->id,
+                        'product_id' => $product_id,
+                        'stock' => 0,
+                    ]);
                 }
 
-                DB::commit();
-
-                return BaseResponse::Ok('Pencampuran berhasil dilakukan!', null);
+                $stock->stock += $productBlend['result_stock'];
+                $stock->save();
             }
+
+            DB::commit();
+            return BaseResponse::Ok("Berhasil melakukan pencampuran produk", $data);
         } catch (\Throwable $th) {
             DB::rollBack();
-            return BaseResponse::Error($th->getMessage(), null);
+            return BaseResponse::Error("Gagal mencampur produk: " . $th->getMessage(), null);
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        //DIKASI DETAIL
+        if (!Str::isUuid($id)) {
+            return BaseResponse::Error("ID produk blend tidak valid.", null);
+        }
+
+        $check_product_blend = $this->productBlend->show($id);
+        if (!$check_product_blend) return BaseResponse::Notfound("Tidak dapat menemukan data produk blend!");
+
+        return BaseResponse::Ok("Berhasil mengambil detail produk blend!", $check_product_blend);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
-        //
+        // Not implemented yet
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        //
+        // Not implemented yet
     }
 }

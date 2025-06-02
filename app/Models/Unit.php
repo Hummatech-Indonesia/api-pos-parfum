@@ -28,4 +28,12 @@ class Unit extends Model
     {
         return $this->hasMany(ProductBlendDetail::class);
     }
+    
+    public function audit(){
+        return $this->hasMany(Audit::class);
+    }
+
+    public function productBundlingDetail() {
+        return $this->hasMany(ProductBundlingDetail::class);
+    }
 }
