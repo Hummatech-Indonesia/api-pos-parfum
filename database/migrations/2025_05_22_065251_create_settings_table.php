@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('settings', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name')->nullable();
-            $table->text('descriptions')->nullable();
-            $table->string('code')->nullable();
-            $table->boolean('value_active');
-            $table->text('value_text');
-            $table->string('group')->nullable();
-            $table->foreignUuid('store_id')->constrained('stores');
+            $table->string('name');
+            $table->text('descriptions');
+            $table->string('code');
+            $table->boolean('value_active')->nullable();
+            $table->text('value_text')->nullable();
+            $table->string('group');
+            $table->foreignUuid('store_id')->constrained();
             $table->softDeletes();
             $table->timestamps();
         });

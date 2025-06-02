@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use App\Helpers\BaseResponse;
+use App\Http\Controllers\AuditController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BelajarController;
 use App\Http\Controllers\SettingController;
@@ -18,6 +19,8 @@ use App\Http\Controllers\Master\ProductDetailController;
 use App\Http\Controllers\Master\ProductVarianController;
 use App\Http\Controllers\Transaction\ShiftUserController;
 use App\Http\Controllers\Master\DiscountVoucherController;
+use App\Http\Controllers\Master\ProductBundlingController;
+use App\Http\Controllers\Master\ProductBundlingDetailController;
 use App\Http\Controllers\ProductBlendController;
 use App\Http\Controllers\Transaction\TransactionController;
 
@@ -56,6 +59,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('product-details/stock', [ProductDetailController::class, 'stockProduct']);
         Route::post('warehouses/add/stock', [WarehouseController::class, 'warehouseStock']);
         Route::get('warehouses/history/stock', [WarehouseController::class, 'listWarehouseStock']);
+    });
+
+        // API FOR ROLE OWNER & WAREHOUSE
+    Route::middleware('role:owner|warehouse')->group(function () {
+        Route::Resource('/product-bundling', ProductBundlingController::class);
+        Route::post('/product-bundling/{id}/restore', [ProductBundlingController::class, 'restore']);
+        Route::apiResource('/product-bundling-detail', ProductBundlingDetailController::class);
+        Route::post('/product-bundling-detail/{id}/restore', [ProductBundlingDetailController::class, 'restore']);
     });
 
     // API FOR ROLE OWNER
@@ -97,9 +108,26 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource("stock-request", StockRequestController::class)->only(['store', 'destroy']);
     });
 
+    Route::middleware('role:outlet|admin|owner')->group(function () {
+        Route::post('audit/{id}/restore', [AuditController::class, 'restore']);
+        Route::get("audit/no-paginate", [AuditController::class, 'list']);
+        Route::get("audit/alltrashed", [AuditController::class, 'trashed']);
+        Route::resource("audit", AuditController::class)->only(['update', 'destroy', 'index', 'show']);
+    });
+
+    Route::middleware('role:auditor|admin|owner')->group(function () {
+        Route::post('audit/{id}/restore', [AuditController::class, 'restore']);
+        Route::resource("audit", AuditController::class)->only(['store', 'index', 'destroy', 'show']);
+    });
+
     // API FOR ROLE ADMIN, WAREHOUSE & OWNER
     Route::middleware('role:admin|owner|warehouse')->group(function () {
-        Route::resource("setting", SettingController::class)->only(['store', 'destroy', 'update']);
+        Route::post('setting/{id}/restore', [SettingController::class, 'restore']);
+        Route::get("setting/no-paginate", [SettingController::class, 'listWSetting']);
+        Route::get("setting/alltrashed", [SettingController::class, 'trashed']);
+        Route::get("audit/no-paginate", [AuditController::class, 'list']);
+        Route::get("audit/alltrashed", [AuditController::class, 'trashed']);
+        Route::resource("setting", SettingController::class);
     });
 
     // API FOR DATA USER
@@ -132,9 +160,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get("shifts/no-paginate", [ShiftUserController::class, 'getData']);
     Route::resource("shifts", ShiftUserController::class)->except(['destroy']);
     // API FOR UNIT
-    Route::get("unit/all", [UnitController::class, 'list']);
+    Route::get("unit/no-paginate", [UnitController::class, 'list']);
     Route::get("unit/alltrashed", [UnitController::class, 'trashed']);
     Route::resource("unit", UnitController::class)->except(['create', 'edit']);
-    // API FOR PRODUCT BLEND
+    //API FOR PRODUCT BLEND
     Route::apiResource("product-blend", ProductBlendController::class);
 });

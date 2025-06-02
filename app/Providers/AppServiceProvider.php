@@ -30,6 +30,8 @@ use App\Contracts\Interfaces\Master\ProductVarianInterface;
 use App\Contracts\Interfaces\Master\WarehouseStockInterface;
 use App\Contracts\Interfaces\Transaction\ShiftUserInterface;
 use App\Contracts\Interfaces\Master\DiscountVoucherInterface;
+use App\Contracts\Interfaces\Master\ProductBundlingDetailInterface;
+use App\Contracts\Interfaces\Master\ProductBundlingInterface;
 use App\Contracts\Repositories\Master\ProductStockRepository;
 use App\Contracts\Repositories\Master\StockRequestRepository;
 use App\Contracts\Interfaces\Transaction\TransactionInterface;
@@ -46,9 +48,13 @@ use App\Contracts\Repositories\Transaction\TransactionRepository;
 use App\Contracts\Repositories\Transaction\VoucherUsedRepository;
 use App\Contracts\Repositories\Master\StockRequestDetailRepository;
 use App\Contracts\Interfaces\Transaction\TransactionDetailInterface;
+use App\Contracts\Repositories\Master\ProductBundlingDetailRepository;
+use App\Contracts\Repositories\Master\ProductBundlingRepository;
 use App\Contracts\Repositories\ProductBlendDetailRepository;
 use App\Contracts\Repositories\ProductBlendRepository;
 use App\Contracts\Repositories\Transaction\TransactionDetailRepository;
+use App\Models\ProductBundling;
+use App\Models\ProductBundlingDetail;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -72,9 +78,12 @@ class AppServiceProvider extends ServiceProvider
         TransactionDetailInterface::class => TransactionDetailRepository::class,
         VoucherUsedInterface::class => VoucherUsedRepository::class,
         ShiftUserInterface::class => ShiftUserRepository::class,
+        SettingInterface::class => SettingRepository::class,
         RoleInterface::class => RoleRepository::class,
         SettingInterface::class => SettingRepository::class,
         UnitInterface::class => UnitRepository::class,
+        ProductBundlingInterface::class => ProductBundlingRepository::class,
+        ProductBundlingDetailInterface::class => ProductBundlingDetailRepository::class,
         ProductBlendInterface::class => ProductBlendRepository::class,
         ProductBlendDetailInterface::class => ProductBlendDetailRepository::class,
     ];

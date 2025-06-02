@@ -30,6 +30,7 @@ class StockRequestUpdateRequest extends FormRequest
             'product_detail' => 'required|array',
             'product_detail.*.product_detail_id' => 'required|uuid',
             'product_detail.*.sended_stock' => 'required|integer|min:0',
+            'product_detail.*.price' => 'numeric|min:0',
         ];
     }
 
@@ -44,6 +45,8 @@ class StockRequestUpdateRequest extends FormRequest
             'product_detail.*.sended_stock.required' => 'Stock tidak boleh kosong!',
             'product_detail.*.sended_stock.integer' => 'Stock harus berupa integer!',
             'product_detail.*.sended_stock.min' => 'Stock minimal adalah 0!',
+            'product_detail.*.price.numeric' => 'Price harus berupa angka',
+            'product_detail.*.price.min' => 'Price minimal 0',
         ];
     }
 

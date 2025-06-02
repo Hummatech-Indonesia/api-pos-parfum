@@ -25,7 +25,25 @@ class UnitRepository extends BaseRepository implements UnitInterface
         return $this->model->create($data);
     }
 
-    public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
+    public function customQuery(array $data): mixed
+    {
+        return $this->model->query()
+        ->when(count($data) > 0, function ($query) use ($data){
+            if(isset($data["search"])){
+                $query->where(function ($query2) use ($data) {
+                    $query2->where('name', 'like', '%' . $data["search"] . '%')
+                    ->orwhere('code', 'like', '%' . $data["search"] . '%');
+                });
+                unset($data["search"]);
+            }
+        
+            foreach ($data as $index => $value){
+                $query->where($index, $value);
+            }
+        });
+    }
+
+    public function customPaginate(int $pagination = 8, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
         ->when(count($data) > 0, function ($query) use ($data){
@@ -62,7 +80,7 @@ class UnitRepository extends BaseRepository implements UnitInterface
 
     public function delete(mixed $id): mixed
     {
-        return $this->show($id)->destroy($id);
+        return $this->model->destroy($id);
     }
 
     public function all(): mixed

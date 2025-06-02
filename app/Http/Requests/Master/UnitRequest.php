@@ -27,7 +27,18 @@ class UnitRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
-            'code' => 'required|string'
+            'code' => 'required|string|unique:units,code'
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Nama unit tidak boleh kosong!',
+            'name.string' => 'Nama harus berupa string',
+            'code.required' => 'Kode unit tidak boleh kosong',
+            'code.string' => 'Kode harus berupa string',
+            'code.unique' => 'Kode sudah digunakan, silahkan menggunakan kode lainnya'
         ];
     }
 

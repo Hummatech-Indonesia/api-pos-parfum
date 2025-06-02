@@ -2,20 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Contracts\Repositories\AuditRepository;
 use App\Helpers\BaseResponse;
+use App\Http\Requests\AuditRequest;
+use App\Models\Audit;
+use App\Services\AuditService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Http\Requests\SettingRequest;
-use App\Contracts\Repositories\SettingRepository;
-use App\Models\Setting;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Models\Ausit;
 
-class SettingController extends Controller
+class AuditController extends Controller
 {
-    private $settingRepository;
-    public function __construct(SettingRepository $settingRepository)
+    private $auditRepository, $service;
+    public function __construct(AuditRepository $auditRepository, AuditService $service)
     {
-        $this->settingRepository = $settingRepository;
+        $this->auditRepository = $auditRepository;
+        $this->service = $service;
     }
     /**
      * Display a listing of the resource.
@@ -24,7 +26,7 @@ class SettingController extends Controller
     {
         $per_page = $request->per_page ?? 8;
         $page = $request->page ?? 1;
-        $payload = $request->only(['search', 'name']);
+        $payload = $request->only(['search', 'name', 'status', 'date']);
 
         $data['user_id'] = auth()?->user()?->id;
 
@@ -32,13 +34,13 @@ class SettingController extends Controller
         if ($request->search) $payload["search"] = $request->search;
 
         if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+
         try {
-            $data =  $this->settingRepository->customPaginate($per_page, $page, $payload)->toArray();
+            $data =  $this->auditRepository->customPaginate($per_page, $page, $payload)->toArray();
 
             $result = $data["data"];
             unset($data["data"]);
-
-            return BaseResponse::Paginate("Berhasil mengambil semua setting", $result, $data);
+            return BaseResponse::Paginate("Berhasil mengambil semua audit", $result, $data);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), data: null);
         }
@@ -47,9 +49,11 @@ class SettingController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(SettingRequest $request)
+    public function store(AuditRequest $request)
     {
         $data = $request->validated();
+
+        $settingData['user_id'] = auth()?->user()?->id;
 
         if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $data['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
@@ -57,11 +61,11 @@ class SettingController extends Controller
 
         try {
 
-            $settingData = $this->settingRepository->store($data);
+            $settingData = $this->service->storeAudit($data);
 
             DB::commit();
 
-            return BaseResponse::Ok('Berhasil menambahkan setting', $settingData);
+            return BaseResponse::Ok('Berhasil menambahkan audit', $settingData);
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
@@ -74,13 +78,13 @@ class SettingController extends Controller
     public function show(string $id)
     {
         try {
-            $setting = $this->settingRepository->show($id);
+            $audit = $this->auditRepository->show($id);
 
-            if (!$setting) {
-                return BaseResponse::Notfound("Setting tidak ditemukan");
+            if (!$audit) {
+                return BaseResponse::Notfound("audit tidak ditemukan");
             }
 
-            return BaseResponse::Ok("Berhasil mengambil detail setting", $setting);
+            return BaseResponse::Ok("Berhasil mengambil detail setting", $audit);
         } catch (\Throwable $th) {
             return BaseResponse::Error("Terjadi kesalahan: " . $th->getMessage(), null);
         }
@@ -89,24 +93,44 @@ class SettingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(SettingRequest $request, string $id)
+    public function update(AuditRequest $request, string $id)
     {
-        $setting = $this->settingRepository->show($id);
-        if (!$setting) return BaseResponse::Notfound("setting tidak ditemukan");
+        $audit = $this->auditRepository->show($id,);
+        if (!$audit) return BaseResponse::Notfound("audit tidak ditemukan");
 
         $settingData = $request->validated();
 
+        $data['user_id'] = auth()?->user()?->id;
+
         if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $settingData['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+
 
         DB::beginTransaction();
         try {
 
-            $updatedSetting = $this->settingRepository->update($id, $settingData);
+            $update = $this->service->updateAudit($audit, $settingData);
 
             DB::commit();
-            return BaseResponse::Ok('Berhasil memperbarui setting', $updatedSetting);
+            return BaseResponse::Ok('Berhasil memperbarui Audit', $update);
         } catch (\Throwable $th) {
             DB::rollBack();
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+    public function getData(Request $request)
+    {
+
+        $payload = [];
+
+        // check query filter
+        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+
+        try {
+            $data = $this->auditRepository->customQuery($payload)->get();
+
+            return BaseResponse::Ok("Berhasil mengambil data audit", $data);
+        } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
@@ -116,31 +140,31 @@ class SettingController extends Controller
      */
     public function destroy(string $id)
     {
-        $setting = $this->settingRepository->show($id);
-        if (!$setting) return BaseResponse::Notfound("setting tidak ditemukan");
+        $audit = $this->auditRepository->show($id,);
+        if (!$audit) return BaseResponse::Notfound("audit tidak ditemukan");
         DB::beginTransaction();
 
         try {
 
-            $setting->delete();
+            $this->service->deleteAudit($audit);
 
             DB::commit();
-            return BaseResponse::Ok('Berhasil menghapus setting', null);
+            return BaseResponse::Ok('Berhasil menghapus audit', null);
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
 
-    public function listWSetting(Request $request)
+    public function list(Request $request)
     {
         try {
             $payload = [];
-
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
-            $data = $this->settingRepository->customQuery($payload)->get();
 
-            return BaseResponse::Ok("Berhasil mengambil data setting", $data);
+            $data = $this->auditRepository->customQuery($payload)->get();
+
+            return BaseResponse::Ok("Berhasil mengambil data audit", $data);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -153,10 +177,9 @@ class SettingController extends Controller
 
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
-            $data = $this->settingRepository->allDataTrashed($payload);
+            $data = $this->auditRepository->allDataTrashed($payload);
 
-
-            return BaseResponse::Ok("Berhasil mengambil data sampah setting", $data);
+            return BaseResponse::Ok("Berhasil mengambil data audit", $data);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -164,13 +187,13 @@ class SettingController extends Controller
 
     public function restore(string $id)
     {
-        $setting = Setting::withTrashed()->find($id);
-        if (!$setting) return BaseResponse::Notfound("sampah setting tidak ditemukan");
+        $audit = Audit::withTrashed()->find($id);
+        if (!$audit) return BaseResponse::Notfound("sampah audit tidak ditemukan");
         try {
-            $setting = $this->settingRepository->restore($id);
-            return BaseResponse::Ok("setting berhasil dikembalikan", $setting);
+            $audit = $this->auditRepository->restore($id);
+            return BaseResponse::Ok("Audit berhasil dikembalikan", $audit);
         } catch (\Throwable $th) {
-            return BaseResponse::Error("Gagal mengembalikan setting: " . $th->getMessage(), null);
+            return BaseResponse::Error("Gagal mengembalikan audit: " . $th->getMessage(), null);
         }
     }
 }
