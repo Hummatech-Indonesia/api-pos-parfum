@@ -16,4 +16,8 @@ class Unit extends Model
     protected $primaryKey = "id";
 
     protected $guarded = [];
+
+    public function audit(){
+        return $this->hasMany(Audit::class);
+    }
 }
