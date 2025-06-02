@@ -104,7 +104,8 @@ class OutletController extends Controller
                     if($userLogin && $userLogin->store_id) {
                         $mapping['store_id'] = $userLogin->store_id;
                     }
-                    $this->user->store($mapping);
+                    $createUser = $this->user->store($mapping);
+                    $createUser->syncRoles(['owner','warehouse']);
                 }
             }
     

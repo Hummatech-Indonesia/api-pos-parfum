@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\ProductBlend;
+use App\Models\ProductBlendDetail;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -16,4 +18,14 @@ class Unit extends Model
     protected $primaryKey = "id";
 
     protected $guarded = [];
+
+    public function productBlends()
+    {
+        return $this->hasMany(ProductBlend::class);
+    }
+    
+    public function productBlendDetails()
+    {
+        return $this->hasMany(ProductBlendDetail::class);
+    }
 }
