@@ -45,8 +45,28 @@ class ProductBundlingController extends Controller
     {
         DB::beginTransaction();
         try {
-            $data = $request->validated();
-            $bundling = $this->service->storeBundling($data);
+            $validated = $request->validated();
+
+            $productData = [
+                'id' => uuid_create(),
+                'store_id' => $validated['product']['store_id'],
+                'name' => $validated['product']['name'],
+                'unit_type' => $validated['product']['unit_type'],
+                'image' => $validated['product']['image'] ?? null,
+                'qr_code' => $validated['product']['qr_code'] ?? null,
+                'is_delete' => 0,
+                'category_id' => $validated['product']['category_id'] ?? null,
+            ];
+
+            $bundlingData = [
+                'id' => $validated['id'] ?? uuid_create(),
+                'name' => $validated['name'],
+                'description' => $validated['description'] ?? null,
+            ];
+
+            $detailsData = $validated['details'];
+
+            $bundling = $this->service->storeBundling($productData, $bundlingData, $detailsData);
             DB::commit();
             return BaseResponse::Ok("Berhasil membuat bundling", $bundling);
         } catch (\Throwable $e) {
