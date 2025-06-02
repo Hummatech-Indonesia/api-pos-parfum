@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('stock_request_details', function (Blueprint $table) {
-            $table->decimal('price')->nullable();
-        });
+        if (!Schema::hasColumn('stock_request_details', 'price')) {
+            Schema::table('stock_request_details', function (Blueprint $table) {
+                $table->decimal('price')->nullable();
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('stock_request_details', function (Blueprint $table) {
-            //
-        });
+        if (Schema::hasColumn('stock_request_details', 'price')) {
+            Schema::table('stock_request_details', function (Blueprint $table) {
+                $table->dropColumn('price');
+            });
+        }
     }
 };

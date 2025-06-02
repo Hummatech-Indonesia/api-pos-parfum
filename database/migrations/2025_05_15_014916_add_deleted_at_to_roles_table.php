@@ -9,18 +9,24 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-        public function up()
+    public function up(): void
     {
-        Schema::table('roles', function (Blueprint $table) {
-            $table->softDeletes(); // ini akan menambahkan kolom deleted_at nullable
-        });
+        if (!Schema::hasColumn('roles', 'deleted_at')) {
+            Schema::table('roles', function (Blueprint $table) {
+                $table->softDeletes();
+            });
+        }
     }
 
-    public function down()
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
-        Schema::table('roles', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        if (Schema::hasColumn('roles', 'deleted_at')) {
+            Schema::table('roles', function (Blueprint $table) {
+                $table->dropSoftDeletes(); // Menghapus kolom deleted_at
+            });
+        }
     }
-
 };
