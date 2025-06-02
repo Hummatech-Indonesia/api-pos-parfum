@@ -35,4 +35,9 @@ class ProductBlendDetail extends Model
     {
         return $this->belongsTo(Unit::class);
     }
+    
+    public function productStock(): BelongsTo
+    {
+        return $this->belongsTo(ProductStock::class);
+    }
 }

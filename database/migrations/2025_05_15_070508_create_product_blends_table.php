@@ -16,7 +16,7 @@ return new class extends Migration
 
         Schema::create('product_blends', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('product_id')->nullable()->constrained();
+            $table->foreignUuid('product_detail_id')->nullable()->constrained();
             $table->foreignUuid('store_id')->constrained();
             $table->foreignUuid('warehouse_id')->constrained();
             $table->double('result_stock'); //nambah stock

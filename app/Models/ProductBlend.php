@@ -23,9 +23,9 @@ class ProductBlend extends Model
         'date' => 'datetime',
     ];
 
-    public function product(): BelongsTo
+    public function productDetail(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(ProductDetail::class);
     }
 
     public function store(): BelongsTo

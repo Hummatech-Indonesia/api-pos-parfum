@@ -40,6 +40,7 @@ class ProductRequest extends FormRequest
             "product_details.*.variant_name" => 'nullable',
             "product_details.*.material" => "nullable",
             "product_details.*.unit" => "nullable",
+            "product_details.*.stock" => "nullable",
             "product_details.*.capacity" => "nullable",
             "product_details.*.weight" => "nullable",
             "product_details.*.density" => "nullable",
