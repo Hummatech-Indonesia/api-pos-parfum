@@ -137,5 +137,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource("unit", UnitController::class)->except(['create', 'edit']);
     // API FOR PRODUCT BLEND
     Route::apiResource("product-blend", ProductBlendController::class);
-    Route::post("product-blend/{productBlend}", [ProductBlendController::class, 'blend']);
 });

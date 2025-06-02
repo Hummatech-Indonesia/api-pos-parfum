@@ -70,8 +70,6 @@ class ProductBlendService
                     throw new \Exception("Stok tidak cukup untuk {$productName}");
                 }
 
-                $stock->stock -= $detail['used_stock'];
-                $stock->save();
             }
         }
     }
@@ -103,17 +101,14 @@ class ProductBlendService
             // Cari stok berdasarkan warehouse dan product_detail_id
             $stock = $this->productStock->getFromProductDetail($productBlend['product_detail_id']);
 
-            if ($stock) {
-                $stock->stock += $productBlend['result_stock'];
-                $stock->save();
-            } else {
+            
                 $this->productStock->store([
                     'warehouse_id' => auth()->user()->warehouse_id,
                     'product_id' => $productDetail->product_id,
                     'product_detail_id' => $productDetail->id,
                     'stock' => $productBlend['result_stock'],
                 ]);
-            }
+            
         }
 
         return $data;
