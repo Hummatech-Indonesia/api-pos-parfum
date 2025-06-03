@@ -89,6 +89,7 @@ Route::middleware('auth:sanctum')->group(function() {
     });
     
     // API FOR DATA USER
+    Route::post("users/sync", [UserController::class, 'syncStoreData']);
     Route::resource("users", UserController::class)->except(['store','destroy','update']);
     // API FOR DATA OUTLET
     Route::resource("outlets", OutletController::class)->except(['store','destroy','update']);
