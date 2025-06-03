@@ -12,7 +12,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\ProductDetail;
 use App\Models\ProductStock;
-use Illuminate\Validation\ValidationException;
 
 class AuditController extends Controller
 {
@@ -68,15 +67,11 @@ class AuditController extends Controller
                 $productDetail = ProductDetail::with('product')->find($product['product_detail_id']);
 
                 if (!$productDetail) {
-                    throw ValidationException::withMessages([
-                        'products' => ["Inputan produk ke-" . ($index + 1) . " tidak ditemukan."]
-                    ]);
+                    return BaseResponse::Error("Inputan produk ke-" . ($index + 1) . " tidak ditemukan.", null);
                 }
 
                 if ($productDetail->product->store_id !== $validated['store_id']) {
-                    throw ValidationException::withMessages([
-                        'products' => ["Inputan produk ke-" . ($index + 1) . " tidak sesuai dengan toko."]
-                    ]);
+                    return BaseResponse::Error("Inputan produk ke-" . ($index + 1) . " tidak sesuai dengan toko.", null);
                 }
             }
             $mappedDetails = $this->service->mapAuditDetails($validated['products'], $audit);
@@ -124,9 +119,7 @@ class AuditController extends Controller
             $data = $request->validated();
 
             if ($audit->status !== 'pending') {
-                throw ValidationException::withMessages([
-                    'status' => ['Data tidak dapat diubah karena Anda sudah memberikan tanggapan.'],
-                ]);
+                return BaseResponse::Error('Data tidak dapat diubah karena Anda sudah memberikan tanggapan.', null);
             }
 
             $updateData = $this->service->updateAuditData($data, $audit);
@@ -222,9 +215,7 @@ class AuditController extends Controller
         try {
 
             if ($audit->status !== 'pending') {
-                throw ValidationException::withMessages([
-                    'status' => ['Data tidak dapat dihapus karena Anda sudah memberikan tanggapan.'],
-                ]);
+                return BaseResponse::Error('Data tidak dapat dihapus karena Anda sudah memberikan tanggapan.', null);
             }
 
             $this->auditRepository->delete($audit);
