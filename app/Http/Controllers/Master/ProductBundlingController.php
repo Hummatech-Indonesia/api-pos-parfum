@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Master;
 
 use App\Contracts\Interfaces\Master\ProductBundlingInterface;
+use App\Contracts\Interfaces\Master\ProductInterface;
+use App\Contracts\Interfaces\Master\ProductBundlingDetailInterface;
+use App\Contracts\Interfaces\Master\ProductDetailInterface;
 use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\ProductBundlingRequest;
@@ -14,11 +17,20 @@ use Illuminate\Support\Facades\DB;
 class ProductBundlingController extends Controller
 {
     private $repository, $service;
+    private $productRepo, $bundlingDetailRepo, $productDetailRepo;
 
-    public function __construct(ProductBundlingInterface $repository, ProductBundlingService $service)
-    {
+    public function __construct(
+        ProductBundlingInterface $repository,
+        ProductBundlingService $service,
+        ProductInterface $productRepo,
+        ProductBundlingDetailInterface $bundlingDetailRepo,
+        ProductDetailInterface $productDetailRepo
+    ) {
         $this->repository = $repository;
         $this->service = $service;
+        $this->productRepo = $productRepo;
+        $this->bundlingDetailRepo = $bundlingDetailRepo;
+        $this->productDetailRepo = $productDetailRepo;
     }
 
     public function index(Request $request)
@@ -29,7 +41,6 @@ class ProductBundlingController extends Controller
             $payload = $request->only(['search', 'name', 'category', 'product', 'mulai_tanggal', 'sampai_tanggal']);
             $payload['created_from'] = $payload['mulai_tanggal'] ?? null;
             $payload['created_to'] = $payload['sampai_tanggal'] ?? null;
-
 
             $data = $this->repository->customPaginate($perPage, $page, $payload)->toArray();
             $result = $data["data"];
@@ -47,28 +58,35 @@ class ProductBundlingController extends Controller
         try {
             $validated = $request->validated();
 
-            $productData = [
-                'id' => uuid_create(),
-                'store_id' => $validated['product']['store_id'],
-                'name' => $validated['product']['name'],
-                'unit_type' => $validated['product']['unit_type'],
-                'image' => $validated['product']['image'] ?? null,
-                'qr_code' => $validated['product']['qr_code'] ?? null,
-                'is_delete' => 0,
-                'category_id' => $validated['product']['category_id'] ?? null,
-            ];
+            $productData = $this->service->mapProductData($validated['product']);
+            $bundlingData = $this->service->mapBundlingData($validated);
+            $detailsData = $this->service->mapDetailData($validated['details']);
 
-            $bundlingData = [
-                'id' => $validated['id'] ?? uuid_create(),
-                'name' => $validated['name'],
-                'description' => $validated['description'] ?? null,
-            ];
+            $product = $this->productRepo->store($productData);
 
-            $detailsData = $validated['details'];
+            $bundlingData['product_id'] = $product->id;
+            $bundlingData['category_id'] = $product->category_id;
+            $bundling = $this->repository->store($bundlingData);
 
-            $bundling = $this->service->storeBundling($productData, $bundlingData, $detailsData);
+            foreach ($detailsData as $detail) {
+                $productDetail = $this->productDetailRepo->store([
+                    'id' => uuid_create(),
+                    'product_id' => $product->id,
+                    'category_id' => $product->category_id,
+                    ...$detail['product_detail'],
+                ]);
+
+                $this->bundlingDetailRepo->store([
+                    'product_bundling_id' => $bundling->id,
+                    'product_detail_id' => $productDetail->id,
+                    'unit' => $detail['unit'],
+                    'unit_id' => $detail['unit_id'],
+                    'quantity' => $detail['quantity'],
+                ]);
+            }
+
             DB::commit();
-            return BaseResponse::Ok("Berhasil membuat bundling", $bundling);
+            return BaseResponse::Ok("Berhasil membuat bundling", $this->repository->show($bundling->id)->load('details'));
         } catch (\Throwable $e) {
             DB::rollBack();
             return BaseResponse::Error($e->getMessage(), null);
@@ -100,9 +118,26 @@ class ProductBundlingController extends Controller
             if (!$bundling) return BaseResponse::Notfound("Bundling tidak ditemukan");
 
             $data = $request->validated();
-            $updated = $this->service->updateBundling($bundling, $data);
+            $detailsData = $this->service->mapDetailData($data['details']);
+
+            // Delete existing details
+            foreach ($bundling->details as $detail) {
+                $this->bundlingDetailRepo->delete($detail->id);
+            }
+
+            // Re-create details
+            foreach ($detailsData as $detail) {
+                $this->bundlingDetailRepo->store([
+                    'product_bundling_id' => $bundling->id,
+                    'product_detail_id' => $detail['product_detail_id'],
+                    'unit' => $detail['unit'],
+                    'unit_id' => $detail['unit_id'],
+                    'quantity' => $detail['quantity'],
+                ]);
+            }
+
             DB::commit();
-            return BaseResponse::Ok("Berhasil update bundling", $updated);
+            return BaseResponse::Ok("Berhasil update bundling", $this->repository->show($bundling->id)->load('details'));
         } catch (\Throwable $e) {
             DB::rollBack();
             return BaseResponse::Error($e->getMessage(), null);
@@ -117,10 +152,13 @@ class ProductBundlingController extends Controller
             if (!$bundling) return BaseResponse::Notfound("Bundling tidak ditemukan");
 
             $bundling->load('details');
-
             $deletedData = $bundling->toArray();
 
-            $this->service->deleteBundling($bundling);
+            foreach ($bundling->details as $detail) {
+                $this->bundlingDetailRepo->delete($detail->id);
+            }
+
+            $this->repository->delete($bundling->id);
 
             DB::commit();
             return BaseResponse::Ok("Berhasil hapus bundling", $deletedData);
@@ -130,13 +168,21 @@ class ProductBundlingController extends Controller
         }
     }
 
-
     public function restore(string $id)
     {
+        DB::beginTransaction();
         try {
-            $data = $this->service->restoreBundling($id);
-            return BaseResponse::Ok("Berhasil restore bundling", $data);
+            $this->repository->restore($id);
+
+            $bundling = $this->repository->show($id);
+            foreach ($bundling->details()->withTrashed()->get() as $detail) {
+                $this->bundlingDetailRepo->restore($detail->id);
+            }
+
+            DB::commit();
+            return BaseResponse::Ok("Berhasil restore bundling", $bundling->load('details'));
         } catch (\Throwable $e) {
+            DB::rollBack();
             return BaseResponse::Error($e->getMessage(), null);
         }
     }
