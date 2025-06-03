@@ -6,10 +6,13 @@ use App\Contracts\Repositories\AuditRepository;
 use App\Helpers\BaseResponse;
 use App\Http\Requests\AuditRequest;
 use App\Models\Audit;
+use App\Models\AuditDetail;
 use App\Services\AuditService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\Ausit;
+use App\Models\ProductDetail;
+use App\Models\ProductStock;
+use Illuminate\Validation\ValidationException;
 
 class AuditController extends Controller
 {
@@ -51,24 +54,42 @@ class AuditController extends Controller
      */
     public function store(AuditRequest $request)
     {
-        $data = $request->validated();
-
-        $settingData['user_id'] = auth()?->user()?->id;
-
-        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $data['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
-
         DB::beginTransaction();
 
         try {
+            $validated = $request->validated();
 
-            $settingData = $this->service->storeAudit($data);
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $validated['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+
+            $data = $this->service->storeAudit($validated);
+            $audit = Audit::create($data);
+
+            foreach ($validated['products'] as $index => $product) {
+                $productDetail = ProductDetail::with('product')->find($product['product_detail_id']);
+
+                if (!$productDetail) {
+                    throw ValidationException::withMessages([
+                        'products' => ["Inputan produk ke-" . ($index + 1) . " tidak ditemukan."]
+                    ]);
+                }
+
+                if ($productDetail->product->store_id !== $validated['store_id']) {
+                    throw ValidationException::withMessages([
+                        'products' => ["Inputan produk ke-" . ($index + 1) . " tidak sesuai dengan toko."]
+                    ]);
+                }
+            }
+            $mappedDetails = $this->service->mapAuditDetails($validated['products'], $audit);
+
+            foreach ($mappedDetails as $detailData) {
+                AuditDetail::create($detailData);
+            }
 
             DB::commit();
-
-            return BaseResponse::Ok('Berhasil menambahkan audit', $settingData);
+            return BaseResponse::Ok('Berhasil membuat audit', $audit->load('details'));
         } catch (\Throwable $th) {
             DB::rollBack();
-            return BaseResponse::Error($th->getMessage(), null);
+            return BaseResponse::Error('Gagal membuat audit: ' . $th->getMessage(), null);
         }
     }
 
@@ -93,30 +114,82 @@ class AuditController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(AuditRequest $request, string $id)
+    public function update(AuditRequest $request, $id)
     {
-        $audit = $this->auditRepository->show($id,);
+        $audit = $this->auditRepository->show($id);
         if (!$audit) return BaseResponse::Notfound("audit tidak ditemukan");
-
-        $settingData = $request->validated();
-
-        $data['user_id'] = auth()?->user()?->id;
-
-        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $settingData['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
-
-
         DB::beginTransaction();
-        try {
 
-            $update = $this->service->updateAudit($audit, $settingData);
+        try {
+            $data = $request->validated();
+
+            if ($audit->status !== 'pending') {
+                throw ValidationException::withMessages([
+                    'status' => ['Data tidak dapat diubah karena Anda sudah memberikan tanggapan.'],
+                ]);
+            }
+
+            $updateData = $this->service->updateAuditData($data, $audit);
+
+            $audit->update($updateData);
+
+            $mappedDetails = $this->service->mapAuditDetails($data['products'], $audit);
+
+            foreach ($mappedDetails as $detailData) {
+                $detail = $audit->details()
+                    ->where('product_detail_id', $detailData['product_detail_id'])
+                    ->first();
+
+                if ($detail) {
+                    $detail->update([
+                        'audit_stock' => $detailData['audit_stock'],
+                        'unit_id' => $detailData['unit_id'],
+                    ]);
+                } else {
+                    AuditDetail::create($detailData);
+                }
+            }
+
+            if (($updateData['status'] ?? $audit->status) === 'approved') {
+                $outlet = $audit->outlet;
+                $details = $audit->details;
+
+                foreach ($details as $detail) {
+                    $productStock = ProductStock::where('outlet_id', $outlet->id)
+                        ->where('product_detail_id', $detail->product_detail_id)
+                        ->first();
+
+                    $oldStock = $productStock?->stock ?? 0;
+
+                    if ($detail->old_stock == 0) {
+                        $detail->old_stock = $oldStock;
+                    }
+
+                    $difference = $detail->audit_stock - $oldStock;
+
+                    if ($productStock) {
+                        $productStock->stock += $difference;
+                        $productStock->save();
+                    } else {
+                        ProductStock::create([
+                            'outlet_id' => $outlet->id,
+                            'product_detail_id' => $detail->product_detail_id,
+                            'stock' => $detail->audit_stock,
+                        ]);
+                    }
+
+                    $detail->save();
+                }
+            }
 
             DB::commit();
-            return BaseResponse::Ok('Berhasil memperbarui Audit', $update);
+            return BaseResponse::Ok('Audit berhasil diperbarui', $audit->fresh());
         } catch (\Throwable $th) {
             DB::rollBack();
-            return BaseResponse::Error($th->getMessage(), null);
+            return BaseResponse::Error('Gagal memperbarui audit.  ' . $th->getMessage(), null);
         }
     }
+
 
     public function getData(Request $request)
     {
@@ -140,19 +213,27 @@ class AuditController extends Controller
      */
     public function destroy(string $id)
     {
-        $audit = $this->auditRepository->show($id,);
-        if (!$audit) return BaseResponse::Notfound("audit tidak ditemukan");
+        $audit = $this->auditRepository->show($id);
+        if (!$audit) return BaseResponse::Notfound("Audit tidak ditemukan");
+
+
         DB::beginTransaction();
 
         try {
 
-            $this->service->deleteAudit($audit);
+            if ($audit->status !== 'pending') {
+                throw ValidationException::withMessages([
+                    'status' => ['Data tidak dapat dihapus karena Anda sudah memberikan tanggapan.'],
+                ]);
+            }
+
+            $this->auditRepository->delete($audit);
 
             DB::commit();
             return BaseResponse::Ok('Berhasil menghapus audit', null);
         } catch (\Throwable $th) {
             DB::rollBack();
-            return BaseResponse::Error($th->getMessage(), null);
+            return BaseResponse::Error('Gagal menghapus audit. ' . $th->getMessage(), null);
         }
     }
 

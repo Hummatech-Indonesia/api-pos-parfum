@@ -35,13 +35,17 @@ class AuditRepository extends BaseRepository implements AuditInterface
 
     public function delete(mixed $id): mixed
     {
-        return $this->show($id)->delete();
+        $audit = $this->model->find($id);
+
+        $audit->details()->delete();
+
+        return $audit->delete();
     }
 
     public function customPaginate(int $pagination = 8, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-            ->with( 'details')
+            ->with('details')
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (isset($data["search"])) {
                     $query->where(function ($query2) use ($data) {
