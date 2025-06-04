@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer('stock')->default(0);
             $table->integer('capacity')->default(0);
             $table->double('weight')->default(0);
-            $table->double('density')->default(0);
+            $table->double('density')->default(0); 
             $table->double('price')->default(0);
             $table->double('price_discount')->default(0);
             $table->tinyInteger('is_delete')->default(0);

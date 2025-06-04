@@ -15,7 +15,6 @@ class ProductDetail extends Model
     public $incrementing = false;
     protected $keyType = "string";
     protected $primaryKey = "id";
-
     protected $guarded = [];
 
     /**

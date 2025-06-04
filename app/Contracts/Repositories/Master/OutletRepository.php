@@ -35,7 +35,7 @@ class OutletRepository extends BaseRepository implements OutletInterface
         });
     }
 
-    public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
+    public function customPaginate(int $pagination = 8, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
         ->with('store','users')

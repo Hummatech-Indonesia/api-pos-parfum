@@ -75,6 +75,8 @@ class UserController extends Controller
         try {
             $user = $this->userService->mappingDataUser($data);
             $user["store_id"] = auth()?->user()?->store?->id;
+            $user["outlet_id"] = auth()?->user()?->outlet?->id; // menambahkan outlet_id ke user yang ditambahkan berdasarkan user yang login
+            $user["warehouse_id"] = auth()?->user()?->warehouse?->id;
             $result_user = $this->user->store($user);
     
             $result_user->syncRoles($request->role);

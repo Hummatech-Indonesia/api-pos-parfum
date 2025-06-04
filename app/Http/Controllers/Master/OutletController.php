@@ -2,26 +2,29 @@
 
 namespace App\Http\Controllers\Master;
 
-use App\Contracts\Interfaces\Auth\UserInterface;
-use App\Contracts\Interfaces\Master\OutletInterface;
-use App\Helpers\BaseResponse;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Master\OutletRequest;
-use App\Services\Master\OutletService;
 use Illuminate\Http\Request;
+use App\Helpers\BaseResponse;
+use App\Services\Auth\UserService;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Services\Master\OutletService;
+use App\Http\Requests\Master\OutletRequest;
+use App\Contracts\Repositories\Auth\UserRepository;
+use App\Contracts\Repositories\Master\OutletRepository;
 
 class OutletController extends Controller
 {
-    private OutletInterface $outlet;
-    private UserInterface $user;
+    private OutletRepository $outlet;
+    private UserRepository $user;
     private $outletService;
+    private UserService $userService;
 
-    public function __construct(OutletInterface $outlet, UserInterface $user, OutletService $outletService)
+    public function __construct(OutletRepository $outlet, UserRepository $user, OutletService $outletService, UserService $userService)
     {
         $this->outlet = $outlet; 
         $this->user = $user; 
         $this->outletService = $outletService;
+        $this->userService = $userService;
     }
 
     /**
@@ -29,7 +32,7 @@ class OutletController extends Controller
      */
     public function index(Request $request)
     {
-        $per_page = $request->per_page ?? 10;
+        $per_page = $request->per_page ?? 8;
         $page = $request->page ?? 1;
         $payload = [
             "is_delete" => 0
@@ -70,8 +73,16 @@ class OutletController extends Controller
         DB::beginTransaction();
         try {
             // check has data user or not 
-            $user = $data["user_id"];
+            $user = $data["user_id"]; // menambahkan/mengganti outlet_id yang dimiliki user yang di iputkan
             unset($data["user_id"]);
+
+            // cek apakah ada menginputkan user baru
+            $userCreate = [];
+            if(isset($data["users"])){
+                $userCreate = $data["users"];
+                unset($data["users"]);
+            }
+            $userLogin = auth()->user();
 
             $mapOutlet = $this->outletService->dataOutlet($data);
             $result_outlet = $this->outlet->store($mapOutlet);
@@ -79,6 +90,23 @@ class OutletController extends Controller
             if($user){
                 $result_user = $this->user->customQuery(["user_id" => $user])->get();
                 foreach($result_user as $dataUser) $dataUser->update(["outlet_id" => $result_outlet->id]);
+            }
+
+            // cek apakah ada user create dan apakah user create tersebut adalah array
+            if($userCreate && is_array($userCreate) && !empty($userCreate) && count($userCreate) > 0) {
+                // jika ada maka tambahkan user tersebut ke database
+                foreach($userCreate as $userData) {
+                    $mapping = $this->userService->mappingDataUser($userData);
+                    $mapping["outlet_id"] = $result_outlet->id;
+                    if($userLogin && $userLogin->warehouse_id) {
+                        $mapping['warehouse_id'] = $userLogin->warehouse_id;
+                    }
+                    if($userLogin && $userLogin->store_id) {
+                        $mapping['store_id'] = $userLogin->store_id;
+                    }
+                    $createUser = $this->user->store($mapping);
+                    $createUser->syncRoles(['outlet']);
+                }
             }
     
             DB::commit();
