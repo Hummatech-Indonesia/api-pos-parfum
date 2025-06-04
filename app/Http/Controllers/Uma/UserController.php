@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Uma;
 use App\Contracts\Interfaces\Auth\UserInterface;
 use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Master\UserSyncRequest;
 use App\Http\Requests\UserRequest;
 use App\Services\Auth\UserService;
 use Illuminate\Http\Request;
@@ -178,13 +179,38 @@ class UserController extends Controller
     }
 
     public function listRole(Request $request)
-    {
+    {   
         try{
 
             $role = $this->userService->mapRole();
 
             return BaseResponse::Ok("Behasil mengambil data role!", $role);
         }catch(\Throwable $th){
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+    public function syncStoreData(UserSyncRequest $request)
+    {
+        $data = $request->validated();
+        DB::beginTransaction();
+        try {
+            foreach ($data["users"] as $user) {
+                try {
+                    $user["email"] = str_replace(" ", "", explode(" ", $user["name"])[0]) . date("ymdhms") . "@gmail.com";
+                    $user["password"] = bcrypt("password");
+                    $user["store_id"] = auth()?->user()?->store?->id;
+                    $result_user = $this->user->store($user);
+    
+                    $result_user->syncRoles(["member"]);
+                }catch(\Throwable $th){
+                    Log::error("Error sync user => ". $th->getMessage());
+                }
+            }
+            DB::commit();
+            return BaseResponse::Ok("Berhasil sikronisasi member!", null);
+        }catch (\Throwable $th) {
+            DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
