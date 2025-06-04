@@ -206,9 +206,9 @@ class AuditController extends Controller
      */
     public function destroy(string $id)
     {
+        
         $audit = $this->auditRepository->show($id);
         if (!$audit) return BaseResponse::Notfound("Audit tidak ditemukan");
-
 
         DB::beginTransaction();
 
@@ -218,7 +218,7 @@ class AuditController extends Controller
                 return BaseResponse::Error('Data tidak dapat dihapus karena Anda sudah memberikan tanggapan.', null);
             }
 
-            $this->auditRepository->delete($audit);
+            $this->auditRepository->delete($id);
 
             DB::commit();
             return BaseResponse::Ok('Berhasil menghapus audit', null);
