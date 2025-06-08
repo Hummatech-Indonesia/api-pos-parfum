@@ -27,12 +27,13 @@ class DiscountVoucherRequest extends FormRequest
         return [
             "store_id" => 'nullable',
             'product_id' => 'nullable',
+            'product_detail_id' => 'nullable',
             'outlet_id' => 'nullable',
             'name' => 'required',
             'desc' => 'nullable',
             'max_used' => 'nullable',
             'min' => 'nullable',
-            'discount' => 'required',
+            'discount' => 'required|integer|min:0',
             'expired' => 'sometimes|after:today',
             'active' => 'nullable'
         ];
@@ -50,11 +51,11 @@ class DiscountVoucherRequest extends FormRequest
     public function prepareForValidation()
     {
         // if(!$this->store_id) $this->merge(["store_id" => auth()?->user()?->store?->id || auth()?->user()?->store_id]);
-        if(!$this->min) $this->merge(["min" => 0]);
+        if (!$this->min) $this->merge(["min" => 0]);
     }
 
     public function failedValidation(Validator $validator)
     {
-        return new HttpResponseException(BaseResponse::error("Kesalahan dalam validasi!", $validator->errors()));
+        throw new HttpResponseException(BaseResponse::error("Kesalahan dalam validasi!", $validator->errors()));
     }
 }

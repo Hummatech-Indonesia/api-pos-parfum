@@ -14,47 +14,109 @@ use Illuminate\Validation\ValidationException;
 class AuditService
 {
 
-public function updateAuditData(array $data, Audit $audit): array
-{
+    public function updateAuditData(array $data, Audit $audit): array
+    {
 
-    return [
-        'status' => $data['status'] ?? $audit->status,
-        'reason' => $data['reason'] ?? $audit->reason,
-    ];
-}
-public function mapAuditDetails(array $products, Audit $audit): array
-{
-    $mappedDetails = [];
-
-    foreach ($products as $product) {
-        // Ambil stok lama jika tersedia
-        $productStock = ProductStock::where('outlet_id', $audit->outlet_id)
-            ->where('product_detail_id', $product['product_detail_id'])
-            ->first();
-
-        $oldStock = $productStock?->stock ?? 0;
-
-        $mappedDetails[] = [
-            'audit_id' => $audit->id,
-            'product_detail_id' => $product['product_detail_id'],
-            'old_stock' => $oldStock,
-            'audit_stock' => $product['audit_stock'],
-            'unit_id' => $product['unit_id'],
+        return [
+            'status' => $data['status'] ?? $audit->status,
+            'reason' => $data['reason'] ?? $audit->reason,
         ];
     }
+    public function mapAuditDetails(array $products, Audit $audit): array
+    {
+        $mappedDetails = [];
 
-    return $mappedDetails;
-}
-public function storeaudit(array $data): array
-{
-    return [
-        'name' => $data['name'],
-        'description' => $data['description'],
-        'outlet_id' => $data['outlet_id'],
-        'store_id' => $data['store_id'],
-        'date' => $data['date'],
-        'user_id' => auth()->id(),
-        'status' => 'pending',
-    ];
-}
+        foreach ($products as $product) {
+            // Ambil stok lama jika tersedia
+            $productStock = ProductStock::where('outlet_id', $audit->outlet_id)
+                ->where('product_detail_id', $product['product_detail_id'])
+                ->first();
+
+            $oldStock = $productStock?->stock ?? 0;
+
+            $mappedDetails[] = [
+                'audit_id' => $audit->id,
+                'product_detail_id' => $product['product_detail_id'],
+                'old_stock' => $oldStock,
+                'audit_stock' => $product['audit_stock'],
+                'unit_id' => $product['unit_id'],
+            ];
+        }
+
+        return $mappedDetails;
+    }
+    public function storeaudit(array $data): array
+    {
+        return [
+            'name' => $data['name'],
+            'description' => $data['description'],
+            'outlet_id' => $data['outlet_id'],
+            'store_id' => $data['store_id'],
+            'date' => $data['date'],
+            'user_id' => auth()->id(),
+            'status' => 'pending',
+        ];
+    }
+    public function transformAudit(Audit $audit): array
+    {
+        $items = $audit->details->map(function ($detail) {
+            return [
+                'id' => $detail->id,
+                'product_detail_id' => $detail->product_detail_id,
+                'old_stock' => $detail->old_stock,
+                'audit_stock' => $detail->audit_stock,
+                'difference' => $detail->audit_stock - $detail->old_stock,
+                'unit' => [
+                    'id' => $detail->unit->id ?? null,
+                    'name' => $detail->unit->name ?? null,
+                    'code' => $detail->unit->code ?? null,
+                ],
+                'product' => [
+                    'id' => $detail->productDetail->id ?? null,
+                    'material' => $detail->productDetail->material ?? null,
+                    'unit' => $detail->productDetail->unit ?? null,
+                    'stock' => $detail->productDetail->stock ?? null,
+                    'capacity' => $detail->productDetail->capacity ?? null,
+                    'weight' => $detail->productDetail->weight ?? null,
+                    'density' => $detail->productDetail->density ?? null,
+                    'price' => $detail->productDetail->price ?? null,
+                    'discount_price' => $detail->productDetail->price_discount ?? null,
+                    'variant_name' => $detail->productDetail->variant_name ?? null,
+                ]
+            ];
+        });
+
+        return [
+            'audit' => [
+                'id' => $audit->id,
+                'name' => $audit->name,
+                'description' => $audit->description,
+                'status' => $audit->status,
+                'reason' => $audit->reason,
+                'date' => $audit->date,
+                'created_at' => $audit->created_at,
+                'updated_at' => $audit->updated_at,
+            ],
+            'store' => [
+                'id' => $audit->store->id,
+                'name' => $audit->store->name,
+                'address' => $audit->store->address,
+                'logo' => $audit->store->logo,
+                'tax' => $audit->store->tax,
+            ],
+            'outlet' => [
+                'id' => $audit->outlet->id,
+                'name' => $audit->outlet->name,
+                'address' => $audit->outlet->address,
+                'phone' => $audit->outlet->telp,
+                'image' => $audit->outlet->image,
+            ],
+            'audit_items' => $items,
+            'summary' => [
+                'total_items' => $items->count(),
+                'items_with_discrepancy' => $items->where('difference', '!=', 0)->count(),
+                'total_shortage' => $items->sum(fn($i) => max(0, -$i['difference']))
+            ]
+        ];
+    }
 }

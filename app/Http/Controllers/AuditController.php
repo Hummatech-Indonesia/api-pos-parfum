@@ -100,7 +100,9 @@ class AuditController extends Controller
                 return BaseResponse::Notfound("audit tidak ditemukan");
             }
 
-            return BaseResponse::Ok("Berhasil mengambil detail setting", $audit);
+            $transformedAudit = $this->service->transformAudit($audit);
+
+            return BaseResponse::Ok("Berhasil mengambil detail audit", $transformedAudit);
         } catch (\Throwable $th) {
             return BaseResponse::Error("Terjadi kesalahan: " . $th->getMessage(), null);
         }
