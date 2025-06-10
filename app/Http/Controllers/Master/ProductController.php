@@ -58,12 +58,14 @@ class ProductController extends Controller
         if ($request->orderby_total_stock) $payload["orderby_total_stock"] = $request->orderby_total_stock;
         if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
-        $data = $this->product->customPaginate($per_page, $page, $payload)->toArray();
+        $data = $this->product->customPaginate($per_page, $page, $payload);
+        $data->load(['details.productStockWarehouse']);
 
-        $result = $data["data"];
+        $paginate = $data->toArray();
+        $result = $paginate["data"];
         unset($data["data"]);
 
-        return BaseResponse::Paginate('Berhasil mengambil list data product !', $result, $data);
+        return BaseResponse::Paginate('Berhasil mengambil list data product !', $result, $paginate);
     }
 
     /**
@@ -134,6 +136,8 @@ class ProductController extends Controller
     {
         $check_product = $this->product->checkActiveWithDetailV2($id);
         if (!$check_product) return BaseResponse::Notfound("Tidak dapat menemukan data product !");
+
+        $check_product->load(['details.productStockWarehouse', 'details.productStockOutlet']);
 
         return BaseResponse::Ok("Berhasil mengambil detail product !", $check_product);
     }
