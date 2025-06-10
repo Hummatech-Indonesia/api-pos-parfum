@@ -23,10 +23,13 @@ class AuditRepository extends BaseRepository implements AuditInterface
         return $this->model->create($data);
     }
 
-    public function show(mixed $id): mixed
+    public function show(mixed $id): ?Audit
     {
-        return $this->model->query()->find($id);
+        return $this->model->query()
+            ->with('details', 'details.unit', 'details.productDetail', 'outlet', 'store')
+            ->find($id);
     }
+
 
     public function update(mixed $id, array $data): mixed
     {

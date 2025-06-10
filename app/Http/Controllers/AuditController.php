@@ -100,7 +100,9 @@ class AuditController extends Controller
                 return BaseResponse::Notfound("audit tidak ditemukan");
             }
 
-            return BaseResponse::Ok("Berhasil mengambil detail setting", $audit);
+            $transformedAudit = $this->service->transformAudit($audit);
+
+            return BaseResponse::Ok("Berhasil mengambil detail audit", $transformedAudit);
         } catch (\Throwable $th) {
             return BaseResponse::Error("Terjadi kesalahan: " . $th->getMessage(), null);
         }
@@ -206,9 +208,9 @@ class AuditController extends Controller
      */
     public function destroy(string $id)
     {
+        
         $audit = $this->auditRepository->show($id);
         if (!$audit) return BaseResponse::Notfound("Audit tidak ditemukan");
-
 
         DB::beginTransaction();
 
@@ -218,7 +220,7 @@ class AuditController extends Controller
                 return BaseResponse::Error('Data tidak dapat dihapus karena Anda sudah memberikan tanggapan.', null);
             }
 
-            $this->auditRepository->delete($audit);
+            $this->auditRepository->delete($id);
 
             DB::commit();
             return BaseResponse::Ok('Berhasil menghapus audit', null);

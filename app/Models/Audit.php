@@ -26,7 +26,7 @@ class Audit extends Model
 
     public function unit()
     {
-        $this->belongsTo(Unit::class);
+        return $this->belongsTo(Unit::class);
     }
 
     public function store()

@@ -11,7 +11,7 @@ class AuditDetail extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
 
-        protected $guarded = ['id'];
+    protected $guarded = ['id'];
     protected $keyType = 'string';
     public $incrementing = false;
     protected $table = 'audit_details';
@@ -24,9 +24,9 @@ class AuditDetail extends Model
     }
     public function productDetail()
     {
-        $this->belongsTo(ProductDetail::class);
+        return $this->belongsTo(ProductDetail::class);
     }
-        public function unit()
+    public function unit()
     {
         return $this->belongsTo(Unit::class);
     }
