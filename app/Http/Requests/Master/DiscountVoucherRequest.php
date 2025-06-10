@@ -30,11 +30,13 @@ class DiscountVoucherRequest extends FormRequest
             'product_detail_id' => 'nullable',
             'outlet_id' => 'nullable',
             'name' => 'required',
-            'desc' => 'nullable',
+            'desc' => 'sometimes',
             'max_used' => 'nullable',
-            'min' => 'nullable',
+            'minimum_purchase' => 'sometimes',
             'discount' => 'required|integer|min:0',
-            'expired' => 'sometimes|after:today',
+            'end_date' => 'sometimes|date',
+            'start_date' => 'sometimes|date',
+            // 'expired' => 'sometimes|after:today',
             'active' => 'nullable'
         ];
     }
