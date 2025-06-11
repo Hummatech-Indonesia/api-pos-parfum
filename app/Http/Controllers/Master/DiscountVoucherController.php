@@ -41,7 +41,7 @@ class DiscountVoucherController extends Controller
         $result = $data["data"];
         unset($data["data"]);
 
-        return BaseResponse::Paginate('Berhasil mengambil list data product varian!', $result, $data);
+        return BaseResponse::Paginate('Berhasil mengambil list data!', $result, $data);
     }
 
     /**
@@ -57,7 +57,8 @@ class DiscountVoucherController extends Controller
         $validator = $request->validated();
         $validator['expired'] = $request->end_date;
         $validator['min'] = $request->minimum_purchase;
-        unset($validator['end_date'], $validator['minimum_purchase']);
+        $validator['type'] = $request->category;
+        unset($validator['end_date'], $validator['minimum_purchase'],$validator['category']);
 
         DB::beginTransaction();
         try {
@@ -66,7 +67,7 @@ class DiscountVoucherController extends Controller
             $result_product = $this->discountVoucher->store($validator);
 
             DB::commit();
-            return BaseResponse::Ok('Berhasil membuat product varian', $result_product);
+            return BaseResponse::Ok('Berhasil membuat data', $result_product);
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
@@ -79,9 +80,9 @@ class DiscountVoucherController extends Controller
     public function show(string $id)
     {
         $check_product = $this->discountVoucher->show($id);
-        if (!$check_product) return BaseResponse::Notfound("Tidak dapat menemukan data product varian!");
+        if (!$check_product) return BaseResponse::Notfound("Tidak dapat menemukan data!");
 
-        return BaseResponse::Ok("Berhasil mengambil detail product varian!", $check_product);
+        return BaseResponse::Ok("Berhasil mengambil detail!", $check_product);
     }
 
     /**
@@ -100,10 +101,11 @@ class DiscountVoucherController extends Controller
         $validator = $request->validated();
         $validator['expired'] = $request->end_date;
         $validator['min'] = $request->minimum_purchase;
-        unset($validator['end_date'], $validator['minimum_purchase']);
+        $validator['type'] = $request->category;
+        unset($validator['end_date'], $validator['minimum_purchase'], $validator['category']);
 
         $check = $this->discountVoucher->checkActive($id);
-        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data product varian!");
+        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data!");
 
         DB::beginTransaction();
         try {
@@ -111,7 +113,7 @@ class DiscountVoucherController extends Controller
             $result_product = $this->discountVoucher->update($id, $validator);
 
             DB::commit();
-            return BaseResponse::Ok('Berhasil update data product varian', $result_product);
+            return BaseResponse::Ok('Berhasil update data', $result_product);
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
@@ -125,7 +127,7 @@ class DiscountVoucherController extends Controller
     {
 
         $check = $this->discountVoucher->checkActive($id);
-        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data product varian!");
+        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data!");
 
         DB::beginTransaction();
         try {
@@ -147,7 +149,7 @@ class DiscountVoucherController extends Controller
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             $data = $this->discountVoucher->customQuery($payload)->get();
 
-            return BaseResponse::Ok("Berhasil mengambil data product varian", $data);
+            return BaseResponse::Ok("Berhasil mengambil data", $data);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }

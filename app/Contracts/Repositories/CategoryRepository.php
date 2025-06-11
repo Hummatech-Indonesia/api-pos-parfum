@@ -79,4 +79,4 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
     {
         return $this->show($id)->update(["is_delete" => 1]);
     }
-}
+}   

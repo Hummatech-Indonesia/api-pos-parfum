@@ -37,7 +37,8 @@ class DiscountVoucherRequest extends FormRequest
             'end_date' => 'sometimes|date',
             'start_date' => 'sometimes|date',
             // 'expired' => 'sometimes|after:today',
-            'active' => 'nullable'
+            'active' => 'nullable',
+            'category' => 'sometimes'
         ];
     }
 
