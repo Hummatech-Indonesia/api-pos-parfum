@@ -29,7 +29,7 @@ class DiscountVoucherRepository extends BaseRepository implements DiscountVouche
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
-        ->with('store','details')
+        ->with('store','details','details.varian')
         ->where('is_delete', 0)
         ->when(count($data) > 0, function ($query) use ($data){
             foreach ($data as $index => $value){
@@ -41,7 +41,7 @@ class DiscountVoucherRepository extends BaseRepository implements DiscountVouche
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-        ->with('store','details')
+        ->with('store','details','details.varian')
         ->when(count($data) > 0, function ($query) use ($data){
             if(isset($data["search"])){
                 $query->where(function ($query2) use ($data) {
@@ -60,12 +60,12 @@ class DiscountVoucherRepository extends BaseRepository implements DiscountVouche
 
     public function show(mixed $id): mixed
     {
-        return $this->model->with('store','details')->find($id);
+        return $this->model->with('store','details','details.varian')->find($id);
     }
 
     public function checkActive(mixed $id): mixed
     {
-        return $this->model->with('store','details')->where('is_delete',0)->find($id);
+        return $this->model->with('store','details','details.varian')->where('is_delete',0)->find($id);
     }
 
     public function update(mixed $id, array $data): mixed

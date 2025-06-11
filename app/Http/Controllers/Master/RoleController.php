@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\Master\RoleRequest;
+use App\Models\Role;
 
 class RoleController extends Controller
 {
@@ -24,9 +25,11 @@ class RoleController extends Controller
     public function index(Request $request)
     {
         try {
-            $perPage = $request->query('per_page'); 
-            $data = $this->role->get($perPage);
-            return BaseResponse::Ok('Berhasil mengambil list role!', $data);
+            $perPage = $request->query('per_page');
+            $query = Role::withCount('users');
+
+            $roles = $perPage ? $query->paginate($perPage) : $query->get();
+            return BaseResponse::Ok('Berhasil mengambil list role!', $roles);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -107,5 +110,4 @@ class RoleController extends Controller
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
-
 }

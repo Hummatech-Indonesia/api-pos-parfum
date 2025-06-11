@@ -58,7 +58,13 @@ class WarehouseController extends Controller
 
         $data = $this->warehouse->customPaginate($per_page, $page, $payload)->toArray();
 
-        $result = $data["data"];
+        $result = collect($data["data"])->map(function ($warehouse) {
+            $warehouseModel = $this->warehouse->show($warehouse['id']);
+            $warehouse['product_stocks'] = $warehouseModel->productStocks()
+                ->with(['productDetail.product', 'outlet'])
+                ->get();
+            return $warehouse;
+        });
         unset($data["data"]);
 
         return BaseResponse::Paginate('Berhasil mengambil list data warehouse!', $result, $data);
@@ -132,9 +138,14 @@ class WarehouseController extends Controller
     public function show(string $id)
     {
         $check_warehouse = $this->warehouse->show($id);
-        if(!$check_warehouse) return BaseResponse::Notfound("Tidak dapat menemukan data warehouse!");
-        
+        if(!$check_warehouse) {
+            return BaseResponse::Notfound("Tidak dapat menemukan data warehouse!");
+        }
+
+        $check_warehouse->load(['productStocks.productDetail.product', 'productStocks.outlet']);
+
         return BaseResponse::Ok("Berhasil mengambil detail warehouse!", $check_warehouse);
+
     }
 
     /**

@@ -17,4 +17,9 @@ class Role extends Model
     protected $primaryKey = 'id';
 
     protected $dates = ['deleted_at'];
+
+    public function users()
+    {
+        return $this->morphedByMany(User::class, 'model', 'model_has_roles');
+    }
 }
