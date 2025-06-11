@@ -58,7 +58,18 @@ class OutletRepository extends BaseRepository implements OutletInterface
 
     public function show(mixed $id): mixed
     {
-        return $this->model->with('store','users')->find($id);
+        return $this->model
+        ->with([
+            'store',
+            'users',
+            'store.transactions' => function ($q) {
+                $q->select('id', 'store_id', 'transaction_code', 'total_price', 'transaction_status', 'created_at');
+            },
+            'store.transactions.transaction_details' => function ($q) {
+                $q->select('id', 'transaction_id', 'quantity');
+            },
+        ])
+        ->find($id);
     }
 
     public function checkActive(mixed $id): mixed

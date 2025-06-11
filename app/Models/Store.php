@@ -43,4 +43,14 @@ class Store extends Model
         return $this->where('is_delete',0)->where('is_active',1)->hasMany(ProductDetail::class);
     }
 
+    public function transactions() : HasMany
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function outlets() : HasMany
+    {
+        return $this->hasMany(Outlet::class);
+    }
+
 }
