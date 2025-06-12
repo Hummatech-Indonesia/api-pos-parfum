@@ -11,9 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-// produk 
-// produk detIL
-
+        if(!Schema::hasTable('product_blends'))
         Schema::create('product_blends', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('product_detail_id')->nullable()->constrained();
@@ -24,9 +22,6 @@ return new class extends Migration
             $table->dateTime('date');
             $table->timestamps();
         });
-
-
-        //product_stock => membuat / menambah stock baru
     }
 
     /**

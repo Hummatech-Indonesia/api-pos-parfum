@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if(!Schema::hasTable('audit_details'))
         Schema::create('audit_details', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('audit_id')->constrained();

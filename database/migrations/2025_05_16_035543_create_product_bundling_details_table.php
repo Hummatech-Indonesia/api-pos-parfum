@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if(!Schema::hasTable('product_bundling_details'))
         Schema::create('product_bundling_details', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('product_bundling_id')->constrained('product_bundlings');
