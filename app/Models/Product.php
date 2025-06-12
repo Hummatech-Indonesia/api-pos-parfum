@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Product extends Model
 {
@@ -46,11 +47,19 @@ class Product extends Model
 
     public function discountVoucher(): HasMany
     {
-        return $this->hasMany(ProductDetail::class)->where('is_delete',0);
+        return $this->hasMany(DiscountVoucher::class)->where('is_delete',0);
     }
 
     public function discountVoucherActive(): HasMany
     {
-        return $this->where('is_delete',0)->where('is_active',1)->hasMany(ProductDetail::class);
+        return $this->where('is_delete',0)->where('is_active',1)->hasMany(DiscountVoucher::class);
+    }
+
+    /**
+     * Relation table product with product bundling
+     */
+    public function productBundling(): HasOne
+    {
+        return $this->hasOne(ProductBundling::class);
     }
 }
