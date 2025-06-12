@@ -27,7 +27,7 @@ class ProductRepository extends BaseRepository implements ProductInterface
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
-        ->with('store')
+        ->with('store','productBundling.details')
         ->when(count($data) > 0, function ($query) use ($data){
             foreach ($data as $index => $value){
                 $query->where($index, $value);
@@ -42,7 +42,8 @@ class ProductRepository extends BaseRepository implements ProductInterface
                 'store', 'category', 
                 'details' => function ($q) {
                     $q->withSum('productStockOutlet','stock')->withSum('productStockWarehouse','stock');
-                }
+                },
+                'productBundling'
             ])
             ->withSum('details', 'stock'); // Menjumlahkan stok dari detail_product
 
