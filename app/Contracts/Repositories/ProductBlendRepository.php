@@ -24,7 +24,7 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
 
     public function show(mixed $id): mixed
     {
-        return $this->model->query()->with(['productBlendDetails', 'productDetail', 'warehouse'])->findOrFail($id);
+        return $this->model->query()->with(['productBlendDetails', 'productDetail', 'warehouse:id'])->findOrFail($id);
     }
 
     public function update(mixed $id, array $data): mixed
@@ -39,7 +39,7 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
-        $query = $this->model->query()->with(['productBlendDetails', 'productDetail', 'warehouse']);
+        $query = $this->model->query()->with(['productBlendDetails', 'productDetail', 'warehouse:id']);
 
             if (isset($data["search"])) {
                 $query->where(function ($q) use ($data) {
