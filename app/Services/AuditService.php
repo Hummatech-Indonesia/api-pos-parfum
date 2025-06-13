@@ -69,7 +69,6 @@ class AuditService
                 'unit' => [
                     'id' => $detail->unit->id ?? null,
                     'name' => $detail->unit->name ?? null,
-                    'code' => $detail->unit->code ?? null,
                 ],
                 'product' => [
                     'id' => $detail->productDetail->id ?? null,
@@ -100,16 +99,10 @@ class AuditService
             'store' => [
                 'id' => $audit->store->id,
                 'name' => $audit->store->name,
-                'address' => $audit->store->address,
-                'logo' => $audit->store->logo,
-                'tax' => $audit->store->tax,
             ],
             'outlet' => [
                 'id' => $audit->outlet->id,
                 'name' => $audit->outlet->name,
-                'address' => $audit->outlet->address,
-                'phone' => $audit->outlet->telp,
-                'image' => $audit->outlet->image,
             ],
             'audit_items' => $items,
             'summary' => [
