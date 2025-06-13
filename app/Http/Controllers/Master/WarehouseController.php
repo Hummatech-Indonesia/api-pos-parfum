@@ -142,9 +142,19 @@ class WarehouseController extends Controller
             return BaseResponse::Notfound("Tidak dapat menemukan data warehouse!");
         }
 
-        $check_warehouse->load(['productStocks.productDetail.product', 'productStocks.outlet']);
+        $per_page = $request->per_page ?? 5;
+        $page = $request->page ?? 1;
 
-        return BaseResponse::Ok("Berhasil mengambil detail warehouse!", $check_warehouse);
+        $productStocks = $check_warehouse->productStocks()
+            ->with(['productDetail.product', 'outlet'])
+            ->paginate($per_page, ['*'], 'page', $page);
+
+        // $check_warehouse->load(['productStocks.productDetail.product', 'productStocks.outlet']);
+
+        return BaseResponse::Ok("Berhasil mengambil detail warehouse!", [
+            "warehouse" => $check_warehouse,
+            "product_stocks" => $productStocks
+        ]);
 
     }
 
