@@ -38,7 +38,7 @@ class OutletRepository extends BaseRepository implements OutletInterface
     public function customPaginate(int $pagination = 8, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-        ->with('store','users')
+        ->with('store:id','users')
         ->when(count($data) > 0, function ($query) use ($data){
             if(isset($data["search"])){
                 $query->where(function ($query2) use ($data) {
@@ -59,16 +59,7 @@ class OutletRepository extends BaseRepository implements OutletInterface
     public function show(mixed $id): mixed
     {
         return $this->model
-        ->with([
-            'store',
-            'users',
-            'store.transactions' => function ($q) {
-                $q->select('id', 'store_id', 'transaction_code', 'total_price', 'transaction_status', 'created_at');
-            },
-            'store.transactions.transaction_details' => function ($q) {
-                $q->select('id', 'transaction_id', 'quantity');
-            },
-        ])
+        ->with(['store:id', 'users'])
         ->find($id);
     }
 
