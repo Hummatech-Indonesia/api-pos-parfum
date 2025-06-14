@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers\Master;
 
-use App\Contracts\Interfaces\Master\ProductDetailInterface;
-use App\Contracts\Interfaces\Master\ProductInterface;
-use App\Contracts\Interfaces\Master\ProductStockInterface;
+use Illuminate\Http\Request;
 use App\Enums\UploadDiskEnum;
 use App\Helpers\BaseResponse;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Master\ProductDetailRequest;
-use App\Services\Master\ProductService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Services\Master\ProductService;
 use Illuminate\Support\Facades\Validator;
+use App\Services\Master\ProductDetailService;
+use App\Http\Requests\Master\ProductDetailRequest;
+use App\Contracts\Interfaces\Master\ProductInterface;
+use App\Contracts\Interfaces\Master\ProductStockInterface;
+use App\Contracts\Interfaces\Master\ProductDetailInterface;
 
 class ProductDetailController extends Controller
 {
@@ -20,14 +21,16 @@ class ProductDetailController extends Controller
     private ProductDetailInterface $productDetail;
     private ProductService $productService;
     private ProductStockInterface $productStock;
+    private ProductDetailService $productDetailService;
 
     public function __construct(ProductInterface $product, ProductDetailInterface $productDetail, ProductService $productService,
-    ProductStockInterface $productStock)
+    ProductStockInterface $productStock, ProductDetailService $productDetailService)
     {
         $this->product = $product;
         $this->productDetail = $productDetail;
         $this->productService = $productService;
         $this->productStock = $productStock;
+        $this->productDetailService = $productDetailService;
     }
 
     /**
@@ -68,9 +71,11 @@ class ProductDetailController extends Controller
     {
         $data = $request->validated();
 
+
         DB::beginTransaction();
         try {
-            $result_product = $this->productDetail->store($data);
+            $mapping = $this->productDetailService->dataProductDetail($data);
+            $result_product = $this->productDetail->store($mapping);
 
             DB::commit();
             return BaseResponse::Ok('Berhasil membuat product ', $result_product);
@@ -109,7 +114,9 @@ class ProductDetailController extends Controller
 
         DB::beginTransaction();
         try {
-            $result_product = $this->productDetail->update($id, $data);
+            $productDetail = $this->productDetail->show($id);
+            $mapping = $this->productDetailService->dataProductDetailUpdate($data, $productDetail);
+            $result_product = $this->productDetail->update($id, $mapping);
 
             DB::commit();
             return BaseResponse::Ok('Berhasil update product', $result_product);

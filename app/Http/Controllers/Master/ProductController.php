@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers\Master;
 
-use App\Contracts\Interfaces\CategoryInterface;
-use App\Contracts\Interfaces\Master\ProductDetailInterface;
-use App\Contracts\Interfaces\Master\ProductInterface;
-use App\Contracts\Interfaces\Master\ProductStockInterface;
-use App\Contracts\Interfaces\Master\ProductVarianInterface;
+use Illuminate\Http\Request;
 use App\Enums\UploadDiskEnum;
 use App\Helpers\BaseResponse;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Master\ProductRequest;
-use App\Services\Master\ProductService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Services\Master\ProductService;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\Master\ProductRequest;
+use App\Services\Master\ProductDetailService;
+use App\Contracts\Interfaces\CategoryInterface;
+use App\Contracts\Interfaces\Master\ProductInterface;
+use App\Contracts\Interfaces\Master\ProductStockInterface;
+use App\Contracts\Interfaces\Master\ProductDetailInterface;
+use App\Contracts\Interfaces\Master\ProductVarianInterface;
 
 class ProductController extends Controller
 {
@@ -24,6 +25,7 @@ class ProductController extends Controller
     private ProductVarianInterface $productVarian;
     private CategoryInterface $category;
     private ProductStockInterface $productStock;
+    private ProductDetailService $productDetailService;
 
     public function __construct(
         ProductInterface $product,
@@ -31,7 +33,8 @@ class ProductController extends Controller
         ProductService $productService,
         ProductVarianInterface $productVarian,
         CategoryInterface $category,
-        ProductStockInterface $productStock
+        ProductStockInterface $productStock,
+        ProductDetailService $productDetailService
     ) {
         $this->product = $product;
         $this->productDetail = $productDetail;
@@ -39,6 +42,7 @@ class ProductController extends Controller
         $this->category = $category;
         $this->productService = $productService;
         $this->productStock = $productStock;
+        $this->productDetailService = $productDetailService;
     }
 
     /**
@@ -111,7 +115,8 @@ class ProductController extends Controller
                     }
                 }
 
-                $storedDetail = $this->productDetail->store($detail);
+                $mappingDetail = $this->productDetailService->dataProductDetail($detail);
+                $storedDetail = $this->productDetail->store($mappingDetail);
 
                 $this->productStock->store([
                     'warehouse_id' => auth()->user()->warehouse_id,
@@ -197,8 +202,11 @@ class ProductController extends Controller
                     });
 
                     unset($detail["product_detail_id"]);
-                    $this->productDetail->update($idDetail, $detail);
+                    $productDetailShow = $this->productDetail->show($idDetail);
+                    $mappingDetailUpdate = $this->productDetailService->dataProductDetailUpdate($detail, $productDetailShow);
+                    $this->productDetail->update($idDetail, $mappingDetailUpdate);
                 } else {
+                    $mappingDetail = $this->productDetailService->dataProductDetail($detail);
                     $this->productDetail->store($detail);
                 }
             }
