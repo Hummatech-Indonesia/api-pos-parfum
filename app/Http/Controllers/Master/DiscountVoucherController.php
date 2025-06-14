@@ -7,6 +7,7 @@ use App\Enums\UploadDiskEnum;
 use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\DiscountVoucherRequest;
+use App\Models\ProductDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -58,12 +59,30 @@ class DiscountVoucherController extends Controller
         $validator['expired'] = $request->end_date;
         $validator['min'] = $request->minimum_purchase;
         $validator['type'] = $request->category;
-        unset($validator['end_date'], $validator['minimum_purchase'],$validator['category']);
+        unset($validator['end_date'], $validator['minimum_purchase'], $validator['category']);
+
+        $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+        $validator["store_id"] = $store_id;
+
+
 
         DB::beginTransaction();
         try {
+            if (isset($validator['product_detail_id'])) {
+                $isValid = ProductDetail::where('id', $validator['product_detail_id'])
+                    ->whereHas('product', function ($query) use ($store_id) {
+                        $query->where('store_id', $store_id);
+                    })
+                    ->exists();
+
+                if (!$isValid) {
+                    return BaseResponse::Error("Produk yang dipilih tidak valid untuk store Anda.", null);
+                }
+            }
             $store_id = null;
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $validator["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+
+
             $result_product = $this->discountVoucher->store($validator);
 
             DB::commit();

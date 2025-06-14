@@ -125,7 +125,18 @@ class OutletController extends Controller
         $check_outlet = $this->outlet->show($id);
         if(!$check_outlet) return BaseResponse::Notfound("Tidak dapat menemukan data outlet!");
 
-        return BaseResponse::Ok("Berhasil mengambil detail outlet!", $check_outlet);
+        $page = request()->get('transaction_page') ?? 1;
+
+        $transactions = optional($check_outlet->store)->transactions()
+            ->with('transaction_details:id,transaction_id,quantity')
+            ->select('id', 'transaction_code', 'total_price', 'transaction_status', 'created_at')
+            ->latest()
+            ->paginate(5, ['*'], 'transaction_page', $page);
+
+        return BaseResponse::Ok("Berhasil mengambil detail outlet!", [
+            'outlet' => $check_outlet,
+            'transactions' => $transactions,
+        ]);
     }
 
     /**

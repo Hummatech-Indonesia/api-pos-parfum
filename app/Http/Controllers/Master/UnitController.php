@@ -103,10 +103,10 @@ class UnitController extends Controller
         DB::beginTransaction();
         try {
             $mapping = $this->unitService->dataUnit($data);
-            $result_unit = $this->unit->update($id, $mapping);
+            $this->unit->update($id, $mapping);
 
             DB::commit();
-            return BaseResponse::Ok('Berhasil update data unit', $result_unit);
+            return BaseResponse::Ok('Berhasil update data unit', ["name" => $request->name, "code" => $request->code]);
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
@@ -138,7 +138,7 @@ class UnitController extends Controller
     {
         try {
             $payload = [];
-            if($request->search) $payload['search'] = $request->search;
+            if ($request->search) $payload['search'] = $request->search;
             $data = $this->unit->customQuery($payload)->get();
 
 
