@@ -75,7 +75,7 @@ class OutletRepository extends BaseRepository implements OutletInterface
 
     public function delete(mixed $id): mixed
     {
-        return $this->show($id)->update(["is_delete" => 1]);
+        return $this->model->select('id')->show($id)->update(["is_delete" => 1]);
     }
 
 }

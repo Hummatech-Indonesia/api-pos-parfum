@@ -26,19 +26,38 @@ class AuditRepository extends BaseRepository implements AuditInterface
     public function show(mixed $id): ?Audit
     {
         return $this->model->query()
-            ->with('details', 'details.unit', 'details.productDetail', 'outlet', 'store')
+            ->with([
+                'details',
+                'details.unit' => function ($query) {
+                    $query->select('id', 'name');
+                },
+                'details.productDetail',
+                'outlet' => function ($query) {
+                    $query->select('id', 'name');
+                },
+                'store' => function ($query) {
+                    $query->select('id', 'name');
+                }
+            ])
             ->find($id);
     }
 
 
+
     public function update(mixed $id, array $data): mixed
     {
-        return $this->model->find($id)->update($data);
+        $this->model->findOrFail($id)->update($data);
+
+        return $this->show($id);
     }
 
     public function delete(mixed $id): mixed
     {
-        $audit = $this->model->find($id);
+        $audit = $this->model->select('id')->find($id);
+
+        if (!$audit) {
+            return false;
+        }
 
         $audit->details()->delete();
 
@@ -102,7 +121,7 @@ class AuditRepository extends BaseRepository implements AuditInterface
 
     public function restore(string $id): Audit
     {
-        $audit = $this->model->withTrashed()->findOrFail($id);
+        $audit = $this->model->select('id', 'name')->withTrashed()->findOrFail($id);
         $audit->restore();
 
         // Restore juga semua AuditDetail yang terhapus
