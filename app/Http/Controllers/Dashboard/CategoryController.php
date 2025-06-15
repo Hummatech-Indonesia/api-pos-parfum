@@ -6,6 +6,7 @@ use App\Contracts\Interfaces\CategoryInterface;
 use App\Enums\UploadDiskEnum;
 use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Dashboard\CategoryRequest;
 use App\Services\CategoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -57,14 +58,9 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CategoryRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            "name" => "required|unique:categories,name",
-        ],[
-            'name.required' => 'Nama kategori harus diisi!',
-            'name.unique' => 'Nama kategori telah digunakan!'
-        ]);
+        $validator = Validator::make($request->all(), []);
         
         if ($validator->fails()) {
             return BaseResponse::error("Kesalahan dalam input data!", $validator->errors());
@@ -106,14 +102,9 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(CategoryRequest $request, string $id)
     {
-        $validator = Validator::make($request->all(), [
-            "name" => "required|unique:categories,name," . $id,
-        ],[
-            'name.required' => 'Nama kategori harus diisi!',
-            'name.unique' => 'Nama kategori telah digunakan!'
-        ]);
+        $validator = Validator::make($request->all(), []);
         
         if ($validator->fails()) {
             return BaseResponse::error("Kesalahan dalam input data!", $validator->errors());
@@ -125,10 +116,10 @@ class CategoryController extends Controller
         DB::beginTransaction();
         try {
 
-            $result_category = $this->category->update($id, ["name" => $request->name]);
+            $this->category->update($id, ["name" => $request->name]);
     
             DB::commit();
-            return BaseResponse::Ok('Berhasil update data category', $result_category);
+            return BaseResponse::Ok('Berhasil update data category', ["name" => $request->name]);
         }catch(\Throwable $th){
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);

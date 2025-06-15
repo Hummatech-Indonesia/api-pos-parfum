@@ -178,7 +178,7 @@ class AuditController extends Controller
             }
 
             DB::commit();
-            return BaseResponse::Ok('Audit berhasil diperbarui', $audit->fresh());
+            return BaseResponse::Ok('Audit berhasil diperbarui', $this->auditRepository->show($audit->id));
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error('Gagal memperbarui audit.  ' . $th->getMessage(), null);
@@ -208,7 +208,7 @@ class AuditController extends Controller
      */
     public function destroy(string $id)
     {
-        
+
         $audit = $this->auditRepository->show($id);
         if (!$audit) return BaseResponse::Notfound("Audit tidak ditemukan");
 

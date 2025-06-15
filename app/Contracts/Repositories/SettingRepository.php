@@ -27,15 +27,18 @@ class SettingRepository extends BaseRepository implements SettingInterface
     {
         return $this->model->query()->find($id);
     }
-
+    
     public function update(mixed $id, array $data): mixed
     {
-        return $this->model->find($id)->update($data);
+        $model = $this->model->select('id')->findOrFail($id);
+        $model->update($data);
+
+        return $this->show($id);
     }
 
     public function delete(mixed $id): mixed
     {
-        return $this->show($id)->delete();
+        return $this->model->select('id')->find($id)->delete();
     }
 
     public function customPaginate(int $pagination = 8, int $page = 1, ?array $data): mixed
@@ -52,7 +55,6 @@ class SettingRepository extends BaseRepository implements SettingInterface
                 if (!empty($data['name'])) {
                     $query->where('name', 'like', '%' . $data['name'] . '%');
                 }
-
             })
             ->paginate($pagination, ['*'], 'page', $page);
         // ->appends(['search' => $request->search, 'year' => $request->year]);
@@ -81,7 +83,7 @@ class SettingRepository extends BaseRepository implements SettingInterface
 
     public function restore(string $id)
     {
-        $audit = $this->model->withTrashed()->findOrFail($id);
+        $audit = $this->model->select('id', 'name')->withTrashed()->findOrFail($id);
         $audit->restore();
         return $audit;
     }
