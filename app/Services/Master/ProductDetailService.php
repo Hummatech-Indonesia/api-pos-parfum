@@ -29,18 +29,18 @@ class ProductDetailService {
 
             $result = [
                 "product_id" => $data["product_id"],
-                "category_id" => $data["category_id"],
-                "product_varian_id" => $data["product_varian_id"],
+                "category_id" => $data["category_id"] ?? null,
+                "product_varian_id" => $data["product_varian_id"] ?? null,
                 "product_image" => $image,
-                "material" => $data["material"],
-                "unit" => $data["unit"],
+                "material" => $data["material"] ?? null,
+                "unit" => $data["unit"] ?? null,
                 "stock" => $data["stock"] ?? 0,
-                "capacity" => $data["capacity"],
-                "weight" => $data["weight"],
-                "density" => $data["density"],
-                "price" => $data["price"],
-                "price_discount" => $data["price_discount"],
-                "product_code" => $data["product_code"]
+                "capacity" => $data["capacity"] ?? 0,
+                "weight" => $data["weight"] ?? 0,
+                "density" => $data["density"] ?? 0,
+                "price" => $data["price"] ?? 0,
+                "price_discount" => $data["price_discount"] ?? 0,
+                "product_code" => $data["product_code"] ?? null
             ];
             return $result;
         }catch(\Throwable $th){
