@@ -77,7 +77,7 @@ class DiscountVoucherRepository extends BaseRepository implements DiscountVouche
         $model = $this->model->select('id')->findOrFail($id);
         $model->update($data);
 
-        return $model->fresh();
+        return $this->show($id);
     }
 
     public function delete(mixed $id): mixed
