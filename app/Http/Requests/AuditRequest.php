@@ -44,10 +44,10 @@ class AuditRequest extends FormRequest
             return [
                 'status' => 'sometimes|string|in:pending,approved,rejected',
                 'reason' => 'required_if:status,rejected|string|nullable',
-                'products' => 'sometimes|array|min:1',
-                'products.*.product_detail_id' => 'sometimes|uuid',
-                'products.*.audit_stock' => 'sometimes|integer|min:0',
-                'products.*.unit_id' => 'sometimes|uuid',
+                'products' => 'nullable|array|min:1',
+                'products.*.product_detail_id' => 'nullable|uuid',
+                'products.*.audit_stock' => 'nullable|integer|min:0',
+                'products.*.unit_id' => 'nullable|uuid',
             ];
         }
 
