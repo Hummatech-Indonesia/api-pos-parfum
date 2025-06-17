@@ -59,7 +59,7 @@ class AuditService
     }
     public function transformAudit(Audit $audit): array
     {
-        $items = $audit->details->map(function ($detail) {
+        $items = $audit->auditDetails->map(function ($detail) {
             return [
                 'id' => $detail->id,
                 'product_detail_id' => $detail->product_detail_id,
