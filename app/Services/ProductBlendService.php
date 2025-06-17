@@ -44,6 +44,7 @@ class ProductBlendService
                 'product_detail_id' => $productBlend['product_detail_id'],
                 'unit_id' => $productBlend['unit_id'],
                 'date' => $data['date'] ?? now(),
+                'description' => $productBlend['description'],
             ];
         }
 

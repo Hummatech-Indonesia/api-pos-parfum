@@ -41,7 +41,7 @@ class ProductBlendController extends Controller
         if ($request->search) $payload["search"] = $request->search;
 
         try {
-            $data = $this->productBlend->customPaginate($per_page, $page, $payload, ['productBlendDetails'])->toArray();
+            $data = $this->productBlend->customPaginate($per_page, $page, $payload)->toArray();
             $result = $data['data'];
             unset($data['data']);
             return BaseResponse::Paginate('Berhasil mengambil list data product blend!', $result, $data);
@@ -65,6 +65,7 @@ class ProductBlendController extends Controller
                     'product_detail_id' => $productBlend['product_detail_id'],
                     'unit_id' => $productBlend['unit_id'],
                     'date' => $data['date'] ?? now(),
+                    'description' => $productBlend['description'],
                 ];
             }
 
@@ -147,7 +148,20 @@ class ProductBlendController extends Controller
         }
 
         $check_product_blend = $this->productBlend->show($id);
-        if (!$check_product_blend) return BaseResponse::Notfound("Tidak dapat menemukan data produk blend!");
+
+        if (!$check_product_blend) {
+            return BaseResponse::Notfound("Tidak dapat menemukan data produk blend!");
+        }
+
+        $page = request()->get('transaction_page') ?? 1;
+
+        $productBlendDetails = $check_product_blend->productBlendDetails()
+            ->with([
+                'productDetail:id,product_id,variant_name',
+            ])
+            ->paginate(5, ['*'], 'transaction_page', $page);
+
+        $check_product_blend->setRelation('productBlendDetails', $productBlendDetails);
 
         return BaseResponse::Ok("Berhasil mengambil detail produk blend!", $check_product_blend);
     }
