@@ -115,6 +115,7 @@ class AuditController extends Controller
     {
         $audit = $this->auditRepository->show($id);
         if (!$audit) return BaseResponse::Notfound("audit tidak ditemukan");
+
         DB::beginTransaction();
 
         try {
@@ -125,23 +126,25 @@ class AuditController extends Controller
             }
 
             $updateData = $this->service->updateAuditData($data, $audit);
-
             $audit->update($updateData);
 
-            $mappedDetails = $this->service->mapAuditDetails($data['products'], $audit);
+            // Update AuditDetails hanya jika products tersedia di request
+            if (isset($data['products']) && is_array($data['products'])) {
+                $mappedDetails = $this->service->mapAuditDetails($data['products'], $audit);
 
-            foreach ($mappedDetails as $detailData) {
-                $detail = $audit->details()
-                    ->where('product_detail_id', $detailData['product_detail_id'])
-                    ->first();
+                foreach ($mappedDetails as $detailData) {
+                    $detail = $audit->details()
+                        ->where('product_detail_id', $detailData['product_detail_id'])
+                        ->first();
 
-                if ($detail) {
-                    $detail->update([
-                        'audit_stock' => $detailData['audit_stock'],
-                        'unit_id' => $detailData['unit_id'],
-                    ]);
-                } else {
-                    AuditDetail::create($detailData);
+                    if ($detail) {
+                        $detail->update([
+                            'audit_stock' => $detailData['audit_stock'],
+                            'unit_id' => $detailData['unit_id'],
+                        ]);
+                    } else {
+                        AuditDetail::create($detailData);
+                    }
                 }
             }
 
@@ -184,6 +187,7 @@ class AuditController extends Controller
             return BaseResponse::Error('Gagal memperbarui audit.  ' . $th->getMessage(), null);
         }
     }
+
 
 
     public function getData(Request $request)
