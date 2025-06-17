@@ -34,7 +34,7 @@ class Audit extends Model
         return $this->belongsTo(Store::class);
     }
 
-    public function details()
+    public function auditDetails()
     {
         return $this->hasMany(AuditDetail::class);
     }

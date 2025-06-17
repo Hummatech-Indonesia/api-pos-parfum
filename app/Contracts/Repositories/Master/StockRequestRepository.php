@@ -63,7 +63,7 @@ class StockRequestRepository extends BaseRepository implements StockRequestInter
 
     public function delete(mixed $id): mixed
     {
-        return $this->model->select('id')->show($id)->update(["is_delete" => 1]);
+        return $this->model->select('id')->findOrFail($id)->update(["is_delete" => 1]);
     }
 
 }

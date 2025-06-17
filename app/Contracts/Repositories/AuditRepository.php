@@ -27,15 +27,18 @@ class AuditRepository extends BaseRepository implements AuditInterface
     {
         return $this->model->query()
             ->with([
-                'details',
-                'details.unit' => function ($query) {
+                'auditDetails',
+                'auditDetails.unit' => function ($query) {
                     $query->select('id', 'name');
                 },
-                'details.productDetail',
+                'auditDetails.productDetail',
                 'outlet' => function ($query) {
                     $query->select('id', 'name');
                 },
                 'store' => function ($query) {
+                    $query->select('id', 'name');
+                },
+                'auditDetails.details.product' => function ($query) {
                     $query->select('id', 'name');
                 }
             ])
@@ -67,7 +70,9 @@ class AuditRepository extends BaseRepository implements AuditInterface
     public function customPaginate(int $pagination = 8, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-            ->with('details')
+            ->with(['auditDetails', 'auditDetails.details.product' => function ($query) {
+                $query->select('id', 'name');
+            }])
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (isset($data["search"])) {
                     $query->where(function ($query2) use ($data) {
