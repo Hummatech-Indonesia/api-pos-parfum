@@ -111,46 +111,36 @@ class AuditController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(AuditRequest $request, $id)
+    public function update(Request $request, $id)
     {
+        $request->validate([
+            'status' => 'required|string|in:pending,approved,rejected',
+            'reason' => 'required_if:status,rejected|nullable|string',
+        ]);
+
         $audit = $this->auditRepository->show($id);
-        if (!$audit) return BaseResponse::Notfound("audit tidak ditemukan");
+
+        if (!$audit) {
+            return BaseResponse::Notfound("Audit tidak ditemukan");
+        }
+
+        if ($audit->status !== 'pending') {
+            return BaseResponse::Error('Audit tidak dapat diubah karena sudah ditanggapi.', null);
+        }
 
         DB::beginTransaction();
-
         try {
-            $data = $request->validated();
+            $updateData = [
+                'status' => $request->status,
+                'reason' => $request->status === 'rejected' ? $request->reason : null,
+            ];
 
-            if ($audit->status !== 'pending') {
-                return BaseResponse::Error('Data tidak dapat diubah karena Anda sudah memberikan tanggapan.', null);
-            }
-
-            $updateData = $this->service->updateAuditData($data, $audit);
             $audit->update($updateData);
 
-            // Update AuditDetails hanya jika products tersedia di request
-            if (isset($data['products']) && is_array($data['products'])) {
-                $mappedDetails = $this->service->mapAuditDetails($data['products'], $audit);
-
-                foreach ($mappedDetails as $detailData) {
-                    $detail = $audit->details()
-                        ->where('product_detail_id', $detailData['product_detail_id'])
-                        ->first();
-
-                    if ($detail) {
-                        $detail->update([
-                            'audit_stock' => $detailData['audit_stock'],
-                            'unit_id' => $detailData['unit_id'],
-                        ]);
-                    } else {
-                        AuditDetail::create($detailData);
-                    }
-                }
-            }
-
-            if (($updateData['status'] ?? $audit->status) === 'approved') {
+            // Jika approved, update stok seperti biasa
+            if ($updateData['status'] === 'approved') {
                 $outlet = $audit->outlet;
-                $details = $audit->details;
+                $details = $audit->auditDetails;
 
                 foreach ($details as $detail) {
                     $productStock = ProductStock::where('outlet_id', $outlet->id)
@@ -181,10 +171,10 @@ class AuditController extends Controller
             }
 
             DB::commit();
-            return BaseResponse::Ok('Audit berhasil diperbarui', $this->auditRepository->show($audit->id));
+            return BaseResponse::Ok('Status audit berhasil diperbarui', $audit);
         } catch (\Throwable $th) {
             DB::rollBack();
-            return BaseResponse::Error('Gagal memperbarui audit.  ' . $th->getMessage(), null);
+            return BaseResponse::Error('Gagal memperbarui status audit. ' . $th->getMessage(), null);
         }
     }
 
@@ -272,6 +262,76 @@ class AuditController extends Controller
             return BaseResponse::Ok("Audit berhasil dikembalikan", $audit);
         } catch (\Throwable $th) {
             return BaseResponse::Error("Gagal mengembalikan audit: " . $th->getMessage(), null);
+        }
+    }
+
+    public function updateStatusWithProducts(AuditRequest $request, $id)
+    {
+        $audit = $this->auditRepository->show($id);
+
+        if (!$audit) {
+            return BaseResponse::Notfound("Audit tidak ditemukan");
+        }
+
+        if ($audit->status !== 'pending') {
+            return BaseResponse::Error('Audit tidak dapat diubah karena sudah ditanggapi.', null);
+        }
+
+        DB::beginTransaction();
+        try {
+            // Mapping status dan reason via service
+            $updateData = $this->service->updateAuditData($request->all(), $audit);
+            $audit->update($updateData);
+
+            $outlet = $audit->outlet;
+
+            // Mapping auditDetails via service
+            $mappedDetails = $this->service->mapAuditDetails($request->products, $audit);
+
+            foreach ($mappedDetails as $detail) {
+                $productDetailId = $detail['product_detail_id'];
+                $auditStock = $detail['audit_stock'];
+                $unitId = $detail['unit_id'];
+                $oldStock = $detail['old_stock'];
+
+                // Update or create audit_detail
+                $auditDetail = $audit->auditDetails()
+                    ->where('product_detail_id', $productDetailId)
+                    ->first();
+
+                if ($auditDetail) {
+                    $auditDetail->old_stock = $oldStock;
+                    $auditDetail->audit_stock = $auditStock;
+                    $auditDetail->unit_id = $unitId;
+                    $auditDetail->save();
+                } else {
+                    $audit->auditDetails()->create($detail);
+                }
+
+                // Jika approved, update ke ProductStock
+                if ($updateData['status'] === 'approved') {
+                    $productStock = ProductStock::where('outlet_id', $outlet->id)
+                        ->where('product_detail_id', $productDetailId)
+                        ->first();
+
+                    if ($productStock) {
+                        $productStock->stock = $auditStock;
+                        $productStock->save();
+                    } else {
+                        ProductStock::create([
+                            'outlet_id' => $outlet->id,
+                            'product_detail_id' => $productDetailId,
+                            'stock' => $auditStock,
+                        ]);
+                    }
+                }
+            }
+
+            DB::commit();
+            return BaseResponse::Ok('Status audit berhasil diperbarui', $audit->fresh('auditDetails'));
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return BaseResponse::Error('Gagal memperbarui status audit: ' . $th->getMessage(), null);
         }
     }
 }

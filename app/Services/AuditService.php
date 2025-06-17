@@ -22,12 +22,13 @@ class AuditService
             'reason' => $data['reason'] ?? $audit->reason,
         ];
     }
-    public function mapAuditDetails(array $products, Audit $audit): array
+    public function mapAuditDetails(?array $products, Audit $audit): array
     {
+        if (empty($products)) return [];
+
         $mappedDetails = [];
 
         foreach ($products as $product) {
-            // Ambil stok lama jika tersedia
             $productStock = ProductStock::where('outlet_id', $audit->outlet_id)
                 ->where('product_detail_id', $product['product_detail_id'])
                 ->first();
