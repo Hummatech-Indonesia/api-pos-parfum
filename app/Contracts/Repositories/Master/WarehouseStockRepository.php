@@ -19,7 +19,7 @@ class WarehouseStockRepository extends BaseRepository implements WarehouseStockI
         return $this->model->get();
     }
 
-    public function store(array $data): mixed
+    public function store(array $data): mixed   
     {
         return $this->model->create($data);
     }
@@ -72,7 +72,7 @@ class WarehouseStockRepository extends BaseRepository implements WarehouseStockI
 
     public function delete(mixed $id): mixed
     {
-        return $this->show($id)->update(["is_delete" => 1]);
+        return $this->model->select('id')->show($id)->update(["is_delete" => 1]);
     }
 
 }

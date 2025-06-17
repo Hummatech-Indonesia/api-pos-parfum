@@ -46,6 +46,8 @@ class ProductRequest extends FormRequest
             "product_details.*.density" => "nullable",
             "product_details.*.price" => "nullable",
             "product_details.*.price_discount" => "nullable",
+            "product_details.*.product_code" => "nullable",
+            "product_details.*.product_image" => "nullable|image|mimes:png,jpg,jpeg|max:2048",
         ];
     }
 
@@ -61,6 +63,9 @@ class ProductRequest extends FormRequest
             'unit_type.required' => 'Tipe unit harus diisi!',
             'unit_type.in' => 'Tipe unit yang bidsa dipakai adalah weight, volume, atau unit!',
             'product_details.array' => 'Data produk varian tidak valid!',
+            'product_details.product_image' => 'Format detail gambar tidak valid!',
+            'product_details.product_image' => 'Gambar detail yang bisa dipakai adalah jpg, png, dan jpeg!',
+            'product_details.product_image' => "Gambar detail maximal adalah 2mb",
             // 'product_details.*.product_varian_id.unique' => 'Varian ini telah ada, silahkan pilih varian tanpa memembuat ulang!',
             // 'product_details.*.category_id.unique' => 'Kategori ini telah ada, silahkan pilih kategori tanpa memembuat ulang!'
         ];

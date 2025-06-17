@@ -91,6 +91,7 @@ class ProductBlendController extends Controller
 
                     if (!$stock) {
                         $this->productStock->store([
+                            'outlet_id' => auth()->user()->outlet_id,
                             'warehouse_id' => auth()->user()->warehouse_id,
                             'product_detail_id' => $blendDetail['product_detail_id'],
                         ]);
@@ -122,6 +123,7 @@ class ProductBlendController extends Controller
 
                 if (!$stock) {
                     $stock = $this->productStock->store([
+                        'outlet_id' => auth()->user()->outlet_id,
                         'warehouse_id' => auth()->user()->warehouse_id,
                         'product_detail_id' => $detail->id,
                         'product_id' => $product_id,

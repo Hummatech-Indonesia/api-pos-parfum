@@ -36,13 +36,18 @@ class ProductDetailRequest extends FormRequest
             "density" => "nullable",
             "price" => "nullable",
             "price_discount" => "nullable",
+            "product_code" => "nullable",
+            "product_image" => "nullable|image|mimes:png,jpg,jpeg|max:2048",
         ];
     }
 
     public function messages(): array
     {
         return [
-            "product_id.required" => "Produk detail harus mencantumkan produk masternya!"
+            "product_id.required" => "Produk detail harus mencantumkan produk masternya!",
+            'product_image' => 'Format detail gambar tidak valid!',
+            'product_image' => 'Gambar detail yang bisa dipakai adalah jpg, png, dan jpeg!',
+            'product_image' => "Gambar detail maximal adalah 2mb",
         ];
     }
     
