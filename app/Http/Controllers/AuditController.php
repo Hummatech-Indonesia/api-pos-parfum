@@ -81,7 +81,7 @@ class AuditController extends Controller
             }
 
             DB::commit();
-            return BaseResponse::Ok('Berhasil membuat audit', $audit->load('details'));
+            return BaseResponse::Ok('Berhasil membuat audit', $audit->load('auditDetails'));
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error('Gagal membuat audit: ' . $th->getMessage(), null);
