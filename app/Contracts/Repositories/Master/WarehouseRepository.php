@@ -80,4 +80,22 @@ class WarehouseRepository extends BaseRepository implements WarehouseInterface
         return $this->model->select('id')->findOrFail($id)->update(["is_delete" => 1]);
     }
 
+    public function withProductStocks($warehouseId): mixed
+    {
+        return $this->model->with([
+            'productStocks.productDetail.product',
+            'productStocks.outlet',
+            'store',
+            'users'
+        ])->findOrFail($warehouseId);
+    }
+
+    public function getProductStocksPaginated($warehouseId, $perPage, $page): mixed
+    {
+        return $this->model->findOrFail($warehouseId)
+            ->productStocks()
+            ->with(['productDetail.product', 'outlet'])
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
 }

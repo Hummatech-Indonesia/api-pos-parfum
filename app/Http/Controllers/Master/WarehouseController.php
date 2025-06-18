@@ -59,10 +59,8 @@ class WarehouseController extends Controller
         $data = $this->warehouse->customPaginate($per_page, $page, $payload)->toArray();
 
         $result = collect($data["data"])->map(function ($warehouse) {
-            $warehouseModel = $this->warehouse->show($warehouse['id']);
-            $warehouse['product_stocks'] = $warehouseModel->productStocks()
-                ->with(['productDetail.product', 'outlet'])
-                ->get();
+            $warehouseModel = $this->warehouse->withProductStocks($warehouse['id']);
+            $warehouse['product_stocks'] = $warehouseModel->productStocks;
             return $warehouse;
         });
         unset($data["data"]);
@@ -145,11 +143,7 @@ class WarehouseController extends Controller
         $per_page = $request->per_page ?? 5;
         $page = $request->page ?? 1;
 
-        $productStocks = $check_warehouse->productStocks()
-            ->with(['productDetail.product', 'outlet'])
-            ->paginate($per_page, ['*'], 'page', $page);
-
-        // $check_warehouse->load(['productStocks.productDetail.product', 'productStocks.outlet']);
+        $productStocks = $this->warehouse->getProductStocksPaginated($id, $per_page, $page);
 
         return BaseResponse::Ok("Berhasil mengambil detail warehouse!", [
             "warehouse" => $check_warehouse,
