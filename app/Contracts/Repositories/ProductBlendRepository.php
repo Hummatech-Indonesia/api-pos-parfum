@@ -4,6 +4,7 @@ namespace App\Contracts\Repositories;
 
 use App\Contracts\Interfaces\ProductBlendInterface;
 use App\Models\ProductBlend;
+use Illuminate\Support\Str;
 
 class ProductBlendRepository extends BaseRepository implements ProductBlendInterface
 {
@@ -25,8 +26,29 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
     public function show(mixed $id): mixed
     {
         return $this->model->query()
-        ->withCount('productDetail as used_product_count')
-        ->findOrFail($id);
+            ->withCount('productDetail as used_product_count')
+            ->findOrFail($id);
+    }
+
+    public function getDetailWithPagination(string $id, int $page = 1, int $perPage = 5)
+    {
+        if (!Str::isUuid($id)) {
+            return ['status' => false, 'error' => 'invalid_uuid'];
+        }
+
+        $blend = $this->model->with([])->find($id);
+
+        if (!$blend) {
+            return ['status' => false, 'error' => 'not_found'];
+        }
+
+        $details = $blend->productBlendDetails()
+            ->with(['productDetail:id,product_id,variant_name'])
+            ->paginate($perPage, ['*'], 'transaction_page', $page);
+
+        $blend->setRelation('productBlendDetails', $details);
+
+        return ['status' => true, 'data' => $blend];
     }
 
     public function update(mixed $id, array $data): mixed
@@ -46,7 +68,7 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
             'productBlendDetails.productDetail.product:id,name',
             'warehouse:id',
         ])
-        ->withCount('productDetail as used_product_count');
+            ->withCount('productDetail as used_product_count');
 
         if (isset($data["search"])) {
             $search = $data["search"];

@@ -145,27 +145,19 @@ class ProductBlendController extends Controller
 
     public function show(string $id)
     {
-        if (!Str::isUuid($id)) {
-            return BaseResponse::Error("ID produk blend tidak valid.", null);
-        }
+        $page = request()->get('transaction_page') ?? 1;
 
-        $check_product_blend = $this->productBlend->show($id);
+        $result = $this->productBlend->getDetailWithPagination($id, $page);
 
-        if (!$check_product_blend) {
+        if (!$result['status']) {
+            if ($result['error'] === 'invalid_uuid') {
+                return BaseResponse::Error("ID produk blend tidak valid.", null);
+            }
+
             return BaseResponse::Notfound("Tidak dapat menemukan data produk blend!");
         }
 
-        $page = request()->get('transaction_page') ?? 1;
-
-        $productBlendDetails = $check_product_blend->productBlendDetails()
-            ->with([
-                'productDetail:id,product_id,variant_name',
-            ])
-            ->paginate(5, ['*'], 'transaction_page', $page);
-
-        $check_product_blend->setRelation('productBlendDetails', $productBlendDetails);
-
-        return BaseResponse::Ok("Berhasil mengambil detail produk blend!", $check_product_blend);
+        return BaseResponse::Ok("Berhasil mengambil detail produk blend!", $result['data']);
     }
 
     public function update(Request $request, string $id)
