@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Dashboard;
 
-use App\Http\Requests\BaseRequest;
+use App\Helpers\BaseResponse;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
 
-class CategoryRequest extends BaseRequest
+class CategoryRequest extends FormRequest
 {
 
     /**
@@ -42,5 +45,10 @@ class CategoryRequest extends BaseRequest
             'name.max' => 'Nama maksimal 255 karakter',
             'name.unique' => 'Nama kategori sudah digunakan di toko ini!'
         ];
+    }
+
+    public function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(BaseResponse::error("Kesalahan dalam validasi!", $validator->errors()));
     }
 }

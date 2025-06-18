@@ -60,21 +60,17 @@ class CategoryController extends Controller
      */
     public function store(CategoryRequest $request)
     {
-        $validator = Validator::make($request->all(), []);
-        
-        if ($validator->fails()) {
-            return BaseResponse::error("Kesalahan dalam input data!", $validator->errors());
-        }
-
         DB::beginTransaction();
         try {
-            $store_id = null;
-            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id; 
-            $result_category = $this->category->store(["name" => $request->name, "store_id" => $store_id]);
-    
+            $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id; 
+            $result_category = $this->category->store([
+                "name" => $request->name,
+                "store_id" => $store_id
+            ]);
+
             DB::commit();
             return BaseResponse::Ok('Berhasil membuat category', $result_category);
-        }catch(\Throwable $th){
+        } catch(\Throwable $th){
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -104,23 +100,16 @@ class CategoryController extends Controller
      */
     public function update(CategoryRequest $request, string $id)
     {
-        $validator = Validator::make($request->all(), []);
-        
-        if ($validator->fails()) {
-            return BaseResponse::error("Kesalahan dalam input data!", $validator->errors());
-        }
-
         $check = $this->category->checkActive($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data category!");
+        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data category!");
 
         DB::beginTransaction();
         try {
-
             $this->category->update($id, ["name" => $request->name]);
-    
+
             DB::commit();
             return BaseResponse::Ok('Berhasil update data category', ["name" => $request->name]);
-        }catch(\Throwable $th){
+        } catch(\Throwable $th){
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
