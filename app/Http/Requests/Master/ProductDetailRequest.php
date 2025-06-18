@@ -25,18 +25,18 @@ class ProductDetailRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "product_id" => "required",
-            "category_id" => "nullable",
-            "product_varian_id" => "nullable",
-            "variant_name" => "nullable",
-            "material" => "nullable",
-            "unit" => "nullable",
-            "capacity" => "nullable",
-            "weight" => "nullable",
-            "density" => "nullable",
-            "price" => "nullable",
-            "price_discount" => "nullable",
-            "product_code" => "nullable",
+            "product_id" => "required|uuid|exists:products,id",
+            "category_id" => "nullable|exists:categories,id",
+            "product_varian_id" => "nullable|uuid|exists:product_variants,id",
+            "variant_name" => "nullable|string",
+            "material" => "nullable|string",
+            "unit" => "nullable|string",
+            "capacity" => "nullable|numeric|min:0",
+            "weight" => "nullable|numeric|min:0",
+            "density" => "nullable|numeric|min:0",
+            "price" => "nullable|numeric|min:0",
+            "price_discount" => "nullable|numeric|min:0",
+            "product_code" => "nullable|string",
             "product_image" => "nullable|image|mimes:png,jpg,jpeg|max:2048",
         ];
     }
@@ -45,13 +45,20 @@ class ProductDetailRequest extends FormRequest
     {
         return [
             "product_id.required" => "Produk detail harus mencantumkan produk masternya!",
-            'product_image' => 'Format detail gambar tidak valid!',
-            'product_image' => 'Gambar detail yang bisa dipakai adalah jpg, png, dan jpeg!',
-            'product_image' => "Gambar detail maximal adalah 2mb",
+            "product_id.uuid" => "Format ID produk tidak valid!",
+            "product_id.exists" => "Produk master tidak ditemukan!",
+
+            "category_id.exists" => "Kategori tidak ditemukan.",
+            "product_varian_id.exists" => "Varian produk tidak ditemukan.",
+
+            "product_image.image" => "File harus berupa gambar.",
+            "product_image.mimes" => "Format gambar harus jpg, jpeg, atau png.",
+            "product_image.max" => "Ukuran gambar maksimal 2MB.",
         ];
     }
-    
-    public function failedValidation(Validator $validator){
+
+    public function failedValidation(Validator $validator)
+    {
         throw new HttpResponseException(BaseResponse::Error("Kesalahan dalam input data!", $validator->errors()));
     }
 }
