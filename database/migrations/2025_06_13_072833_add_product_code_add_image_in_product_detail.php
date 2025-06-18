@@ -11,9 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('product_details', 'product_code') && !Schema::hasColumn('product_details', 'product_image')) {
+        if (!Schema::hasColumn('product_details', 'product_code')) {
             Schema::table('product_details', function (Blueprint $table) {
                 $table->string('product_code')->nullable();
+            });
+        }
+        if (!Schema::hasColumn('product_details', 'product_image')) {
+            Schema::table('product_details', function (Blueprint $table) {
                 $table->string('product_image')->nullable();
             });
         }
@@ -24,9 +28,13 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (!Schema::hasColumn('product_details', 'product_code') && !Schema::hasColumn('product_details', 'product_image')) {
+        if (Schema::hasColumn('product_details', 'product_code')) {
             Schema::table('product_details', function (Blueprint $table) {
                 $table->dropColumn('product_code');
+            });
+        }
+        if (Schema::hasColumn('product_details', 'product_image')) {
+            Schema::table('product_details', function (Blueprint $table) {
                 $table->dropColumn('product_image');
             });
         }
