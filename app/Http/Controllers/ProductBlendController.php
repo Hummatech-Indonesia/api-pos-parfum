@@ -41,7 +41,7 @@ class ProductBlendController extends Controller
         if ($request->search) $payload["search"] = $request->search;
 
         try {
-            $data = $this->productBlend->customPaginate($per_page, $page, $payload, ['productBlendDetails'])->toArray();
+            $data = $this->productBlend->customPaginate($per_page, $page, $payload)->toArray();
             $result = $data['data'];
             unset($data['data']);
             return BaseResponse::Paginate('Berhasil mengambil list data product blend!', $result, $data);
@@ -65,6 +65,7 @@ class ProductBlendController extends Controller
                     'product_detail_id' => $productBlend['product_detail_id'],
                     'unit_id' => $productBlend['unit_id'],
                     'date' => $data['date'] ?? now(),
+                    'description' => $productBlend['description'],
                 ];
             }
 
@@ -90,6 +91,7 @@ class ProductBlendController extends Controller
 
                     if (!$stock) {
                         $this->productStock->store([
+                            'outlet_id' => auth()->user()->outlet_id,
                             'warehouse_id' => auth()->user()->warehouse_id,
                             'product_detail_id' => $blendDetail['product_detail_id'],
                         ]);
@@ -121,6 +123,7 @@ class ProductBlendController extends Controller
 
                 if (!$stock) {
                     $stock = $this->productStock->store([
+                        'outlet_id' => auth()->user()->outlet_id,
                         'warehouse_id' => auth()->user()->warehouse_id,
                         'product_detail_id' => $detail->id,
                         'product_id' => $product_id,
@@ -142,14 +145,19 @@ class ProductBlendController extends Controller
 
     public function show(string $id)
     {
-        if (!Str::isUuid($id)) {
-            return BaseResponse::Error("ID produk blend tidak valid.", null);
+        $page = request()->get('transaction_page') ?? 1;
+
+        $result = $this->productBlend->getDetailWithPagination($id, $page);
+
+        if (!$result['status']) {
+            if ($result['error'] === 'invalid_uuid') {
+                return BaseResponse::Error("ID produk blend tidak valid.", null);
+            }
+
+            return BaseResponse::Notfound("Tidak dapat menemukan data produk blend!");
         }
 
-        $check_product_blend = $this->productBlend->show($id);
-        if (!$check_product_blend) return BaseResponse::Notfound("Tidak dapat menemukan data produk blend!");
-
-        return BaseResponse::Ok("Berhasil mengambil detail produk blend!", $check_product_blend);
+        return BaseResponse::Ok("Berhasil mengambil detail produk blend!", $result['data']);
     }
 
     public function update(Request $request, string $id)

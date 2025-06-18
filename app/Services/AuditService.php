@@ -22,12 +22,13 @@ class AuditService
             'reason' => $data['reason'] ?? $audit->reason,
         ];
     }
-    public function mapAuditDetails(array $products, Audit $audit): array
+    public function mapAuditDetails(?array $products, Audit $audit): array
     {
+        if (empty($products)) return [];
+
         $mappedDetails = [];
 
         foreach ($products as $product) {
-            // Ambil stok lama jika tersedia
             $productStock = ProductStock::where('outlet_id', $audit->outlet_id)
                 ->where('product_detail_id', $product['product_detail_id'])
                 ->first();
@@ -59,7 +60,7 @@ class AuditService
     }
     public function transformAudit(Audit $audit): array
     {
-        $items = $audit->details->map(function ($detail) {
+        $items = $audit->auditDetails->map(function ($detail) {
             return [
                 'id' => $detail->id,
                 'product_detail_id' => $detail->product_detail_id,
@@ -69,7 +70,6 @@ class AuditService
                 'unit' => [
                     'id' => $detail->unit->id ?? null,
                     'name' => $detail->unit->name ?? null,
-                    'code' => $detail->unit->code ?? null,
                 ],
                 'product' => [
                     'id' => $detail->productDetail->id ?? null,
@@ -100,16 +100,10 @@ class AuditService
             'store' => [
                 'id' => $audit->store->id,
                 'name' => $audit->store->name,
-                'address' => $audit->store->address,
-                'logo' => $audit->store->logo,
-                'tax' => $audit->store->tax,
             ],
             'outlet' => [
                 'id' => $audit->outlet->id,
                 'name' => $audit->outlet->name,
-                'address' => $audit->outlet->address,
-                'phone' => $audit->outlet->telp,
-                'image' => $audit->outlet->image,
             ],
             'audit_items' => $items,
             'summary' => [

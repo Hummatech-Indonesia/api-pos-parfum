@@ -26,19 +26,41 @@ class AuditRepository extends BaseRepository implements AuditInterface
     public function show(mixed $id): ?Audit
     {
         return $this->model->query()
-            ->with('details', 'details.unit', 'details.productDetail', 'outlet', 'store')
+            ->with([
+                'auditDetails',
+                'auditDetails.unit' => function ($query) {
+                    $query->select('id', 'name');
+                },
+                'auditDetails.productDetail',
+                'outlet' => function ($query) {
+                    $query->select('id', 'name');
+                },
+                'store' => function ($query) {
+                    $query->select('id', 'name');
+                },
+                'auditDetails.details.product' => function ($query) {
+                    $query->select('id', 'name');
+                }
+            ])
             ->find($id);
     }
 
 
+
     public function update(mixed $id, array $data): mixed
     {
-        return $this->model->find($id)->update($data);
+        $this->model->findOrFail($id)->update($data);
+
+        return $this->show($id);
     }
 
     public function delete(mixed $id): mixed
     {
-        $audit = $this->model->find($id);
+        $audit = $this->model->select('id')->find($id);
+
+        if (!$audit) {
+            return false;
+        }
 
         $audit->details()->delete();
 
@@ -48,7 +70,9 @@ class AuditRepository extends BaseRepository implements AuditInterface
     public function customPaginate(int $pagination = 8, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-            ->with('details')
+            ->with(['auditDetails', 'auditDetails.details.product' => function ($query) {
+                $query->select('id', 'name');
+            }])
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (isset($data["search"])) {
                     $query->where(function ($query2) use ($data) {
@@ -102,7 +126,7 @@ class AuditRepository extends BaseRepository implements AuditInterface
 
     public function restore(string $id): Audit
     {
-        $audit = $this->model->withTrashed()->findOrFail($id);
+        $audit = $this->model->select('id', 'name')->withTrashed()->findOrFail($id);
         $audit->restore();
 
         // Restore juga semua AuditDetail yang terhapus

@@ -70,7 +70,9 @@ class ProductRepository extends BaseRepository implements ProductInterface
 
     public function show(mixed $id): mixed
     {
-        return $this->model->with('store','details')->find($id);
+        return $this->model->with(['store' => function ($query) {
+                    $query->select('id', 'name');
+                },'details'])->find($id);
     }
 
     public function checkActive(mixed $id): mixed
@@ -99,7 +101,7 @@ class ProductRepository extends BaseRepository implements ProductInterface
 
     public function delete(mixed $id): mixed
     {
-        return $this->show($id)->update(["is_delete" => 1]);
+        return $this->model->select('id')->findOrFail($id)->update(["is_delete" => 1]);
     }
 
 }

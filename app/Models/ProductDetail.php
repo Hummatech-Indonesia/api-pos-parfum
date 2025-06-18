@@ -56,4 +56,6 @@ class ProductDetail extends Model
     {
         return $this->hasOne(ProductStock::class)->where('warehouse_id',auth()->user()->warehouse_id);
     }
+
+    
 }

@@ -112,6 +112,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('audit/{id}/restore', [AuditController::class, 'restore']);
         Route::get("audit/no-paginate", [AuditController::class, 'list']);
         Route::get("audit/alltrashed", [AuditController::class, 'trashed']);
+        Route::put('/audit/{id}/detail', [AuditController::class, 'updateStatusWithProducts']);
         Route::resource("audit", AuditController::class)->only(['update', 'destroy', 'index', 'show']);
     });
 

@@ -44,6 +44,7 @@ class ProductBlendService
                 'product_detail_id' => $productBlend['product_detail_id'],
                 'unit_id' => $productBlend['unit_id'],
                 'date' => $data['date'] ?? now(),
+                'description' => $productBlend['description'],
             ];
         }
 
@@ -103,6 +104,7 @@ class ProductBlendService
 
             
                 $this->productStock->store([
+                    'outlet_id' => auth()->user()->outlet_id,
                     'warehouse_id' => auth()->user()->warehouse_id,
                     'product_id' => $productDetail->product_id,
                     'product_detail_id' => $productDetail->id,

@@ -39,6 +39,7 @@ class ProductBlendRequest extends FormRequest
             // 'product_blend.*.varian_name' => 'required|string|max:255',
             'product_blend.*.category_id' => 'sometimes|exists:categories,id',
             'product_blend.*.price' => 'required|numeric|min:0',
+            'product_blend.*.description' => 'nullable|string|max:255',
 
             'product_blend.*.product_blend_details' => 'required|array|min:1',
             'product_blend.*.product_blend_details.*.product_detail_id' => 'required|exists:product_details,id',

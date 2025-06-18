@@ -21,8 +21,8 @@ class OutletController extends Controller
 
     public function __construct(OutletRepository $outlet, UserRepository $user, OutletService $outletService, UserService $userService)
     {
-        $this->outlet = $outlet; 
-        $this->user = $user; 
+        $this->outlet = $outlet;
+        $this->user = $user;
         $this->outletService = $outletService;
         $this->userService = $userService;
     }
@@ -39,18 +39,18 @@ class OutletController extends Controller
         ];
 
         // check query filter
-        if($request->search) $payload["search"] = $request->search;
-        if($request->is_delete) $payload["is_delete"] = $request->is_delete;
-        if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+        if ($request->search) $payload["search"] = $request->search;
+        if ($request->is_delete) $payload["is_delete"] = $request->is_delete;
+        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
-        try{
+        try {
             $data = $this->outlet->customPaginate($per_page, $page, $payload)->toArray();
-            
+
             $result = $data["data"];
             unset($data["data"]);
-    
+
             return BaseResponse::Paginate('Berhasil mengambil list data outlet!', $result, $data);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
@@ -58,10 +58,7 @@ class OutletController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
@@ -78,7 +75,7 @@ class OutletController extends Controller
 
             // cek apakah ada menginputkan user baru
             $userCreate = [];
-            if(isset($data["users"])){
+            if (isset($data["users"])) {
                 $userCreate = $data["users"];
                 unset($data["users"]);
             }
@@ -87,31 +84,31 @@ class OutletController extends Controller
             $mapOutlet = $this->outletService->dataOutlet($data);
             $result_outlet = $this->outlet->store($mapOutlet);
 
-            if($user){
+            if ($user) {
                 $result_user = $this->user->customQuery(["user_id" => $user])->get();
-                foreach($result_user as $dataUser) $dataUser->update(["outlet_id" => $result_outlet->id]);
+                foreach ($result_user as $dataUser) $dataUser->update(["outlet_id" => $result_outlet->id]);
             }
 
             // cek apakah ada user create dan apakah user create tersebut adalah array
-            if($userCreate && is_array($userCreate) && !empty($userCreate) && count($userCreate) > 0) {
+            if ($userCreate && is_array($userCreate) && !empty($userCreate) && count($userCreate) > 0) {
                 // jika ada maka tambahkan user tersebut ke database
-                foreach($userCreate as $userData) {
+                foreach ($userCreate as $userData) {
                     $mapping = $this->userService->mappingDataUser($userData);
                     $mapping["outlet_id"] = $result_outlet->id;
-                    if($userLogin && $userLogin->warehouse_id) {
+                    if ($userLogin && $userLogin->warehouse_id) {
                         $mapping['warehouse_id'] = $userLogin->warehouse_id;
                     }
-                    if($userLogin && $userLogin->store_id) {
+                    if ($userLogin && $userLogin->store_id) {
                         $mapping['store_id'] = $userLogin->store_id;
                     }
                     $createUser = $this->user->store($mapping);
                     $createUser->syncRoles(['outlet']);
                 }
             }
-    
+
             DB::commit();
             return BaseResponse::Ok('Berhasil membuat outlet', $result_outlet);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -123,9 +120,16 @@ class OutletController extends Controller
     public function show(string $id)
     {
         $check_outlet = $this->outlet->show($id);
-        if(!$check_outlet) return BaseResponse::Notfound("Tidak dapat menemukan data outlet!");
+        if (!$check_outlet) return BaseResponse::Notfound("Tidak dapat menemukan data outlet!");
 
-        return BaseResponse::Ok("Berhasil mengambil detail outlet!", $check_outlet);
+        $page = request()->get('transaction_page') ?? 1;
+
+        $transactions = $this->outlet->getTransactionsByOutlet($id, 5, $page);
+
+        return BaseResponse::Ok("Berhasil mengambil detail outlet!", [
+            'outlet' => $check_outlet,
+            'transactions' => $transactions,
+        ]);
     }
 
     /**
@@ -144,7 +148,7 @@ class OutletController extends Controller
         $data = $request->validated();
 
         $check = $this->outlet->checkActive($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data outlet!");
+        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data outlet!");
 
         DB::beginTransaction();
         try {
@@ -155,14 +159,14 @@ class OutletController extends Controller
             $mapOutlet = $this->outletService->dataOutletUpdate($data, $check);
             $result_outlet = $this->outlet->update($id, $mapOutlet);
 
-            if($user){
+            if ($user) {
                 $result_user = $this->user->customQuery(["user_id" => $user])->get();
-                foreach($result_user as $dataUser) $dataUser->update(["outlet_id" => $result_outlet->id]);
+                foreach ($result_user as $dataUser) $dataUser->update(["outlet_id" => $result_outlet->id]);
             }
-    
+
             DB::commit();
             return BaseResponse::Ok('Berhasil update data outlet', $result_outlet);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -173,9 +177,9 @@ class OutletController extends Controller
      */
     public function destroy(string $id)
     {
-        
+
         $check = $this->outlet->checkActive($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data outlet!");
+        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data outlet!");
 
         DB::beginTransaction();
         try {
@@ -184,7 +188,7 @@ class OutletController extends Controller
 
             DB::commit();
             return BaseResponse::Ok('Berhasil menghapus data', null);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -192,16 +196,16 @@ class OutletController extends Controller
 
     public function listOutlet(Request $request)
     {
-        try{
+        try {
             $payload = [];
-            if($request->has('is_delete')) $payload["is_delete"] = $request->is_delete;
+            if ($request->has('is_delete')) $payload["is_delete"] = $request->is_delete;
 
-            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             $data = $this->outlet->customQuery($payload)->get();
 
             return BaseResponse::Ok("Berhasil mengambil data outlet", $data);
-        }catch(\Throwable $th) {
-          return BaseResponse::Error($th->getMessage(), null);  
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
         }
     }
 }

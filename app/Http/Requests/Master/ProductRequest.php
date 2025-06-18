@@ -27,52 +27,59 @@ class ProductRequest extends FormRequest
     {
         $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
         return [
-            "name" => "required",
+            "name" => "required|string",
             "image" => "nullable|image|mimes:png,jpg,jpeg|max:2048",
             "unit_type" => "required|in:weight,volume,unit",
-            "qr_code" => "nullable",
+            "qr_code" => "nullable|string",
             "category_id" => "required|exists:categories,id",
+
             "product_details" => "sometimes|array",
-            "product_details.*.product_detail_id" => "nullable",
-            "product_details.*.product_id" => "nullable",
-            "product_details.*.category_id" => 'nullable',
-            "product_details.*.product_varian_id" => 'nullable',
-            "product_details.*.variant_name" => 'nullable',
-            "product_details.*.material" => "nullable",
-            "product_details.*.unit" => "nullable",
-            "product_details.*.stock" => "nullable",
-            "product_details.*.capacity" => "nullable",
-            "product_details.*.weight" => "nullable",
-            "product_details.*.density" => "nullable",
-            "product_details.*.price" => "nullable",
-            "product_details.*.price_discount" => "nullable",
+            "product_details.*.product_detail_id" => "nullable|uuid",
+            "product_details.*.product_id" => "nullable|uuid|exists:products,id",
+            "product_details.*.category_id" => "nullable|exists:categories,id",
+            "product_details.*.product_varian_id" => "nullable|uuid|exists:product_variants,id",
+            "product_details.*.variant_name" => "nullable|string",
+            "product_details.*.material" => "nullable|string",
+            "product_details.*.unit" => "nullable|string",
+            "product_details.*.stock" => "nullable|numeric|min:0",
+            "product_details.*.capacity" => "nullable|numeric|min:0",
+            "product_details.*.weight" => "nullable|numeric|min:0",
+            "product_details.*.density" => "nullable|numeric|min:0",
+            "product_details.*.price" => "nullable|numeric|min:0",
+            "product_details.*.price_discount" => "nullable|numeric|min:0",
+            "product_details.*.product_code" => "nullable|string",
+            "product_details.*.product_image" => "nullable|image|mimes:png,jpg,jpeg|max:2048",
         ];
     }
 
     public function messages(): array
     {
-        return [ 
+        return [
             'name.required' => 'Nama produk harus di isi!',
             'image.image' => 'Format gambar tidak valid!',
             'image.mimes' => 'Gambar yang bisa dipakai adalah jpg, png, dan jpeg!',
-            'image.max' => "Gambar maximal adalah 2mb",
+            'image.max' => "Gambar maksimal adalah 2mb",
             'category_id.required' => 'Kategori harus diisi!',
             'category_id.exists' => 'Kategori tidak ada!',
             'unit_type.required' => 'Tipe unit harus diisi!',
             'unit_type.in' => 'Tipe unit yang bidsa dipakai adalah weight, volume, atau unit!',
             'product_details.array' => 'Data produk varian tidak valid!',
+            'product_details.product_image' => 'Format detail gambar tidak valid!',
+            'product_details.product_image|mimes:png,jpg,jpeg' => 'Gambar detail yang bisa dipakai adalah jpg, png, dan jpeg!',
+            'product_details.product_image|max:2048' => "Gambar detail maksimal adalah 2mb",
             // 'product_details.*.product_varian_id.unique' => 'Varian ini telah ada, silahkan pilih varian tanpa memembuat ulang!',
             // 'product_details.*.category_id.unique' => 'Kategori ini telah ada, silahkan pilih kategori tanpa memembuat ulang!'
         ];
     }
 
-    public function failedValidation(Validator $validator){
+    public function failedValidation(Validator $validator)
+    {
         throw new HttpResponseException(BaseResponse::Error("Kesalahan dalam input data!", $validator->errors()));
     }
 
     public function prepareForValidation()
     {
-        if(!$this->product_details) $this->merge(["product_details" => []]);
-        if(!$this->qr_code) $this->merge(["qr_code" => null]);
+        if (!$this->product_details) $this->merge(["product_details" => []]);
+        if (!$this->qr_code) $this->merge(["qr_code" => null]);
     }
 }

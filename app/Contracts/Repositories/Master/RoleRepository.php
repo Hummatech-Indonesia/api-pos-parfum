@@ -22,9 +22,9 @@ class RoleRepository extends BaseRepository implements RoleInterface
 
     public function show(mixed $id): mixed
     {
-        return $this->model->find($id);
+        return $this->model->with('users')->find($id);
     }
-
+    
     public function store(array $data): mixed
     {
         return $this->model->create($data);

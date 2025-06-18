@@ -58,7 +58,11 @@ class WarehouseRepository extends BaseRepository implements WarehouseInterface
 
     public function show(mixed $id): mixed
     {
-        return $this->model->with('store','users')->find($id);
+        return $this->model->with(['store' => function ($query) {
+                    $query->select('id', 'name');
+                } ,'users' => function ($query) {
+                    $query->select('id', 'name', 'email');
+                }])->find($id);
     }
 
     public function checkActive(mixed $id): mixed
@@ -73,7 +77,25 @@ class WarehouseRepository extends BaseRepository implements WarehouseInterface
 
     public function delete(mixed $id): mixed
     {
-        return $this->show($id)->update(["is_delete" => 1]);
+        return $this->model->select('id')->findOrFail($id)->update(["is_delete" => 1]);
+    }
+
+    public function withProductStocks($warehouseId): mixed
+    {
+        return $this->model->with([
+            'productStocks.productDetail.product',
+            'productStocks.outlet',
+            'store',
+            'users'
+        ])->findOrFail($warehouseId);
+    }
+
+    public function getProductStocksPaginated($warehouseId, $perPage, $page): mixed
+    {
+        return $this->model->findOrFail($warehouseId)
+            ->productStocks()
+            ->with(['productDetail.product', 'outlet'])
+            ->paginate($perPage, ['*'], 'page', $page);
     }
 
 }

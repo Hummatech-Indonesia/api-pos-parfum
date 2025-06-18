@@ -59,10 +59,8 @@ class WarehouseController extends Controller
         $data = $this->warehouse->customPaginate($per_page, $page, $payload)->toArray();
 
         $result = collect($data["data"])->map(function ($warehouse) {
-            $warehouseModel = $this->warehouse->show($warehouse['id']);
-            $warehouse['product_stocks'] = $warehouseModel->productStocks()
-                ->with(['productDetail.product', 'outlet'])
-                ->get();
+            $warehouseModel = $this->warehouse->withProductStocks($warehouse['id']);
+            $warehouse['product_stocks'] = $warehouseModel->productStocks;
             return $warehouse;
         });
         unset($data["data"]);
@@ -142,9 +140,15 @@ class WarehouseController extends Controller
             return BaseResponse::Notfound("Tidak dapat menemukan data warehouse!");
         }
 
-        $check_warehouse->load(['productStocks.productDetail.product', 'productStocks.outlet']);
+        $per_page = $request->per_page ?? 5;
+        $page = $request->page ?? 1;
 
-        return BaseResponse::Ok("Berhasil mengambil detail warehouse!", $check_warehouse);
+        $productStocks = $this->warehouse->getProductStocksPaginated($id, $per_page, $page);
+
+        return BaseResponse::Ok("Berhasil mengambil detail warehouse!", [
+            "warehouse" => $check_warehouse,
+            "product_stocks" => $productStocks
+        ]);
 
     }
 
@@ -265,7 +269,7 @@ class WarehouseController extends Controller
                     "warehouse_id" => auth()->user()->warehouse_id,
                     "stock" => $request->stock,
                     "product_detail_id" => $request->product_detail_id,
-                    "outlet_id" => $request->outlet_id
+                    "outlet_id" => auth()->user()->outlet_id
                 ]);
             }
             // $this->productDetail->update($request->product_detail_id, ["stock" => $request->stock]);

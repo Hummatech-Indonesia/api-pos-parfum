@@ -30,4 +30,8 @@ class AuditDetail extends Model
     {
         return $this->belongsTo(Unit::class);
     }
+    public function details()
+    {
+        return $this->belongsTo(ProductDetail::class , 'product_detail_id');
+    }
 }

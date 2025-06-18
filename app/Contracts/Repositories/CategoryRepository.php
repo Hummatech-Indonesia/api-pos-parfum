@@ -40,7 +40,7 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-        ->with('store')
+        ->with('store:id,name')
         ->withCount(['products' => function ($q) {
             $q->where('is_delete',0);
         }])
@@ -62,21 +62,21 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
 
     public function show(mixed $id): mixed
     {
-        return $this->model->with('store')->withCount('products')->find($id);
+        return $this->model->with('store:id,name')->withCount('products')->find($id);
     }
 
     public function checkActive(mixed $id): mixed
     {
-        return $this->model->with('store')->withCount('products')->where('is_delete',0)->find($id);
+        return $this->model->with('store:id,name')->withCount('products')->where('is_delete',0)->find($id);
     }
 
     public function update(mixed $id, array $data): mixed
     {
-        return $this->show($id)->update($data);
+        return $this->show($id)->select('id')->update($data);
     }
 
     public function delete(mixed $id): mixed
     {
-        return $this->show($id)->update(["is_delete" => 1]);
+        return $this->show($id)->select('id')->update(["is_delete" => 1]);
     }
 }   
