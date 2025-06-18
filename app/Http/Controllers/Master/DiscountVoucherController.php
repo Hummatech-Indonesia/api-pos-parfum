@@ -8,6 +8,7 @@ use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\DiscountVoucherRequest;
 use App\Models\ProductDetail;
+use App\Services\DiscountVoucherService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -15,10 +16,12 @@ use Illuminate\Support\Facades\Validator;
 class DiscountVoucherController extends Controller
 {
     private DiscountVoucherInterface $discountVoucher;
+    private DiscountVoucherService $discountVoucherService;
 
-    public function __construct(DiscountVoucherInterface $discountVoucher)
+    public function __construct(DiscountVoucherInterface $discountVoucher, DiscountVoucherService $discountVoucherService)
     {
         $this->discountVoucher = $discountVoucher;
+        $this->discountVoucherService = $discountVoucherService;
     }
 
     /**
@@ -98,7 +101,7 @@ class DiscountVoucherController extends Controller
      */
     public function show(string $id)
     {
-        $check_product = $this->discountVoucher->show($id);
+        $check_product = $this->discountVoucherService->showDetail($id);
         if (!$check_product) return BaseResponse::Notfound("Tidak dapat menemukan data!");
 
         return BaseResponse::Ok("Berhasil mengambil detail!", $check_product);

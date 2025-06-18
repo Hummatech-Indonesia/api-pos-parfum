@@ -111,22 +111,21 @@ class AuditController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(auditRequest $request, $id)
     {
-        $request->validate([
-            'status' => 'required|string|in:pending,approved,rejected',
-            'reason' => 'required_if:status,rejected|nullable|string',
-        ]);
-
+        
         $audit = $this->auditRepository->show($id);
-
+        
         if (!$audit) {
             return BaseResponse::Notfound("Audit tidak ditemukan");
         }
-
+        
         if ($audit->status !== 'pending') {
             return BaseResponse::Error('Audit tidak dapat diubah karena sudah ditanggapi.', null);
         }
+        $auditData = $request->validated();
+
+        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $auditData['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
         DB::beginTransaction();
         try {
@@ -135,7 +134,7 @@ class AuditController extends Controller
                 'reason' => $request->status === 'rejected' ? $request->reason : null,
             ];
 
-            $audit->update($updateData);
+            $audit->update($updateData, $auditData);
 
             // Jika approved, update stok seperti biasa
             if ($updateData['status'] === 'approved') {
