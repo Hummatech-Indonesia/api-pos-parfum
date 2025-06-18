@@ -15,7 +15,7 @@ class DiscountVoucherService
         $this->model = $model;
     }
 
-    public function showDetail(string $id): JsonResponse
+    public function showDetail(string $id): ?array
     {
         $voucher = $this->model->with([
             'store:id,name',
@@ -24,7 +24,7 @@ class DiscountVoucherService
         ])->find($id);
 
         if (!$voucher) {
-            return BaseResponse::Notfound("Data tidak ditemukan");
+            return json_decode(BaseResponse::Notfound("Data tidak ditemukan dengan ID : " . $id));
         }
 
         $data = $voucher->toArray();
@@ -40,6 +40,6 @@ class DiscountVoucherService
             unset($data['details']['product_code']);
         }
 
-        return BaseResponse::Ok("Berhasil mengambil detail!", $data);
+        return $data;
     }
 }

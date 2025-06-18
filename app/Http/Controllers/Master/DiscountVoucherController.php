@@ -101,10 +101,14 @@ class DiscountVoucherController extends Controller
      */
     public function show(string $id)
     {
-        $check_product = $this->discountVoucherService->showDetail($id);
-        if (!$check_product) return BaseResponse::Notfound("Tidak dapat menemukan data!");
+        try {
+            $check_product = $this->discountVoucherService->showDetail($id);
+            if (!$check_product) return BaseResponse::Notfound("Tidak dapat menemukan data dengan ID: " . $id);
 
-        return BaseResponse::Ok("Berhasil mengambil detail!", $check_product);
+            return BaseResponse::Ok("Berhasil mengambil detail!", $check_product);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error("Terjadi kesalahan: " . $th->getMessage(), null);
+        }
     }
 
     /**
