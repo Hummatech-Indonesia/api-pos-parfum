@@ -65,6 +65,20 @@ class OutletRepository extends BaseRepository implements OutletInterface
             ->find($id);
     }
 
+    public function getTransactionsByOutlet(string $id, int $perPage = 5, int $page = 1)
+    {
+        $outlet = $this->model->with('store')->find($id);
+        if (!$outlet || !$outlet->store) {
+            return null;
+        }
+
+        return $outlet->store->transactions()
+            ->with('transaction_details:id,transaction_id,quantity')
+            ->select('id', 'transaction_code', 'total_price', 'transaction_status', 'created_at')
+            ->latest()
+            ->paginate($perPage, ['*'], 'transaction_page', $page);
+    }
+
     public function checkActive(mixed $id): mixed
     {
         return $this->model->with('store', 'users')->where('is_delete', 0)->find($id);
