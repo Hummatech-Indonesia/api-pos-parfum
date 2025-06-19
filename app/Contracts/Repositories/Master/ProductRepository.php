@@ -27,12 +27,13 @@ class ProductRepository extends BaseRepository implements ProductInterface
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
-            ->with('store')
-            ->when(count($data) > 0, function ($query) use ($data) {
-                foreach ($data as $index => $value) {
-                    $query->where($index, $value);
-                }
-            });
+
+        ->with('store','productBundling.details')
+        ->when(count($data) > 0, function ($query) use ($data){
+            foreach ($data as $index => $value){
+                $query->where($index, $value);
+            }
+        });
     }
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
@@ -42,8 +43,10 @@ class ProductRepository extends BaseRepository implements ProductInterface
                 'store',
                 'category',
                 'details' => function ($q) {
+
                     $q->withCount('transactionDetails')->with(['category:id,name'])->withSum('productStockOutlet', 'stock')->withSum('productStockWarehouse', 'stock');
                 }
+
             ])
             ->withSum('details', 'stock'); // Menjumlahkan stok dari detail_product
 

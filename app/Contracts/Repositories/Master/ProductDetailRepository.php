@@ -28,7 +28,7 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
     {
         return $this->model->query()
             ->withCount('product')
-            ->with('varian', 'product', 'category', 'productStockOutlet', 'productStockWarehouse')
+            ->with('varian', 'product.productBundling.details', 'category', 'productStockOutlet', 'productStockWarehouse')
             ->when(count($data) > 0, function ($query) use ($data) {
                 foreach ($data as $index => $value) {
                     $query->where($index, $value);
@@ -40,7 +40,7 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
     {
         return $this->model->query()
             ->withCount('product')
-            ->with('varian', 'product', 'category', 'productStockOutlet', 'productStockWarehouse')
+            ->with('varian', 'product.productBundling.details', 'category', 'productStockOutlet', 'productStockWarehouse')
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (isset($data["search"])) {
                     $query->where(function ($query2) use ($data) {
