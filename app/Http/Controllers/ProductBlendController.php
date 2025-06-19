@@ -94,6 +94,7 @@ class ProductBlendController extends Controller
                             'outlet_id' => auth()->user()->outlet_id,
                             'warehouse_id' => auth()->user()->warehouse_id,
                             'product_detail_id' => $blendDetail['product_detail_id'],
+                            'stock' => 0,
                         ]);
                     } elseif ($stock->stock < $blendDetail['used_stock']) {
                         DB::rollBack();
