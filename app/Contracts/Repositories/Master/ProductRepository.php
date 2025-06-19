@@ -42,7 +42,7 @@ class ProductRepository extends BaseRepository implements ProductInterface
                 'store',
                 'category',
                 'details' => function ($q) {
-                    $q->with(['category:id,name'])->withSum('productStockOutlet', 'stock')->withSum('productStockWarehouse', 'stock');
+                    $q->withCount('transactionDetails')->with(['category:id,name'])->withSum('productStockOutlet', 'stock')->withSum('productStockWarehouse', 'stock');
                 }
             ])
             ->withSum('details', 'stock'); // Menjumlahkan stok dari detail_product
@@ -83,14 +83,14 @@ class ProductRepository extends BaseRepository implements ProductInterface
     public function checkActiveWithDetail(mixed $id): mixed
     {
         return $this->model->with(['store', 'details' => function ($query) {
-            $query->with('varian', 'category')->where('is_delete', 0);
+            $query->with('varian', 'category')->withCount('transactionDetails')->where('is_delete', 0);
         }])->whereRelation('details', 'is_delete', 0)->where('is_delete', 0)->find($id);
     }
 
     public function checkActiveWithDetailV2(mixed $id): mixed
     {
         return $this->model->with(['store', 'details' => function ($query) {
-            $query->with('varian', 'category')->where('is_delete', 0);
+            $query->with('varian', 'category')->withCount('transactionDetails')->where('is_delete', 0);
         }])->where('is_delete', 0)->find($id);
     }
 
