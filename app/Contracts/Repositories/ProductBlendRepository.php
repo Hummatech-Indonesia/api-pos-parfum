@@ -63,12 +63,16 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
-        $query = $this->model->query()->with([
-            'productBlendDetails.productDetail:id,product_id',
+        $query = $this->model->query()
+        ->select('id', 'product_detail_id', 'result_stock', 'description', 'date', 'created_at')
+        ->with([
+            'productDetail:id,product_id',
+            'productDetail.product:id,name',
+            'productBlendDetails:id,product_blend_id,product_detail_id,used_stock,created_at',
+            'productBlendDetails.productDetail:id,variant_name,product_id',
             'productBlendDetails.productDetail.product:id,name',
-            'warehouse:id',
         ])
-            ->withCount('productDetail as used_product_count');
+            ->withCount('productBlendDetails as used_product_count');
 
         if (isset($data["search"])) {
             $search = $data["search"];
