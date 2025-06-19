@@ -44,7 +44,7 @@ class ProductRepository extends BaseRepository implements ProductInterface
                 'category',
                 'details' => function ($q) {
 
-                    $q->withCount('transactionDetails')->with(['category:id,name'])->withSum('productStockOutlet', 'stock')->withSum('productStockWarehouse', 'stock');
+                    $q->withCount('transactionDetails')->with(['category:id,name', 'varian'])->withSum('productStockOutlet', 'stock')->withSum('productStockWarehouse', 'stock');
                 }
 
             ])
