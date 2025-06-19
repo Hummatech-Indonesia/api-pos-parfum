@@ -38,7 +38,7 @@ class OutletRepository extends BaseRepository implements OutletInterface
     public function customPaginate(int $pagination = 8, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-            ->with('store:id', 'users')
+            ->with('store:id,name' ,'users')
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (isset($data["search"])) {
                     $query->where(function ($query2) use ($data) {
