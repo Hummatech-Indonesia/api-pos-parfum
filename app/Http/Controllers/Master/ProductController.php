@@ -63,7 +63,7 @@ class ProductController extends Controller
         if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
         $data = $this->product->customPaginate($per_page, $page, $payload);
-        $data->load(['details.productStockWarehouse']);
+        $data->load(['details.productStockWarehouse', 'details.category:id,name']);
 
         $paginate = $data->toArray();
         $result = $paginate["data"];

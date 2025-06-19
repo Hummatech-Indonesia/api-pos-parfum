@@ -27,21 +27,22 @@ class ProductRepository extends BaseRepository implements ProductInterface
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
-        ->with('store')
-        ->when(count($data) > 0, function ($query) use ($data){
-            foreach ($data as $index => $value){
-                $query->where($index, $value);
-            }
-        });
+            ->with('store')
+            ->when(count($data) > 0, function ($query) use ($data) {
+                foreach ($data as $index => $value) {
+                    $query->where($index, $value);
+                }
+            });
     }
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         $query = $this->model->query()
             ->with([
-                'store', 'category', 
+                'store',
+                'category',
                 'details' => function ($q) {
-                    $q->withSum('productStockOutlet','stock')->withSum('productStockWarehouse','stock');
+                    $q->with(['category:id,name'])->withSum('productStockOutlet', 'stock')->withSum('productStockWarehouse', 'stock');
                 }
             ])
             ->withSum('details', 'stock'); // Menjumlahkan stok dari detail_product
@@ -70,27 +71,27 @@ class ProductRepository extends BaseRepository implements ProductInterface
     public function show(mixed $id): mixed
     {
         return $this->model->with(['store' => function ($query) {
-                    $query->select('id', 'name');
-                },'details'])->find($id);
+            $query->select('id', 'name');
+        }, 'details'])->find($id);
     }
 
     public function checkActive(mixed $id): mixed
     {
-        return $this->model->with(['store','details'])->where('is_delete',0)->find($id);
+        return $this->model->with(['store', 'details'])->where('is_delete', 0)->find($id);
     }
 
     public function checkActiveWithDetail(mixed $id): mixed
     {
-        return $this->model->with(['store','details' => function ($query) {
-            $query->with('varian', 'category')->where('is_delete',0);
-        }])->whereRelation('details','is_delete', 0)->where('is_delete',0)->find($id);
+        return $this->model->with(['store', 'details' => function ($query) {
+            $query->with('varian', 'category')->where('is_delete', 0);
+        }])->whereRelation('details', 'is_delete', 0)->where('is_delete', 0)->find($id);
     }
 
     public function checkActiveWithDetailV2(mixed $id): mixed
     {
-        return $this->model->with(['store','details' => function ($query) {
-            $query->with('varian', 'category')->where('is_delete',0);
-        }])->where('is_delete',0)->find($id);
+        return $this->model->with(['store', 'details' => function ($query) {
+            $query->with('varian', 'category')->where('is_delete', 0);
+        }])->where('is_delete', 0)->find($id);
     }
 
     public function update(mixed $id, array $data): mixed
@@ -102,5 +103,4 @@ class ProductRepository extends BaseRepository implements ProductInterface
     {
         return $this->model->select('id')->findOrFail($id)->update(["is_delete" => 1]);
     }
-
 }
