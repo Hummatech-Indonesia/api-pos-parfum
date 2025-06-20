@@ -30,7 +30,7 @@ class SettingRepository extends BaseRepository implements SettingInterface
     
     public function update(mixed $id, array $data): mixed
     {
-        $model = $this->model->select('id')->findOrFail($id);
+        $model = $this->model->where('id')->findOrFail($id);
         $model->update($data);
 
         return $this->show($id);
@@ -38,7 +38,7 @@ class SettingRepository extends BaseRepository implements SettingInterface
 
     public function delete(mixed $id): mixed
     {
-        return $this->model->select('id')->find($id)->delete();
+        return $this->model->where('id')->find($id)->delete();
     }
 
     public function customPaginate(int $pagination = 8, int $page = 1, ?array $data): mixed

@@ -82,7 +82,7 @@ class DiscountVoucherRepository extends BaseRepository implements DiscountVouche
 
     public function update(mixed $id, array $data): mixed
     {
-        $model = $this->model->select('id')->findOrFail($id);
+        $model = $this->model->where('id')->findOrFail($id);
         $model->update($data);
 
         return $this->show($id);
@@ -90,6 +90,6 @@ class DiscountVoucherRepository extends BaseRepository implements DiscountVouche
 
     public function delete(mixed $id): mixed
     {
-        return $this->model->select('id')->findOrFail($id)->update(["is_delete" => 1]);
+        return $this->model->where('id')->findOrFail($id)->update(["is_delete" => 1]);
     }
 }

@@ -28,12 +28,14 @@ class ProductRepository extends BaseRepository implements ProductInterface
     {
         return $this->model->query()
 
-        ->with('store','productBundling.details')
-        ->when(count($data) > 0, function ($query) use ($data){
-            foreach ($data as $index => $value){
-                $query->where($index, $value);
-            }
-        });
+            ->with(['store', 'details' => function ($query) {
+                $query->with('varian', 'category')->withCount('transactionDetails');
+            }])
+            ->when(count($data) > 0, function ($query) use ($data) {
+                foreach ($data as $index => $value) {
+                    $query->where($index, $value);
+                }
+            });
     }
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
@@ -93,7 +95,7 @@ class ProductRepository extends BaseRepository implements ProductInterface
     public function checkActiveWithDetailV2(mixed $id): mixed
     {
         return $this->model->with(['store', 'details' => function ($query) {
-            $query->with('varian', 'category')->withCount('transactionDetails')->where('is_delete', 0);
+            $query->with('varian', 'category')->withCount('transactionDetails');
         }])->where('is_delete', 0)->find($id);
     }
 
@@ -104,6 +106,6 @@ class ProductRepository extends BaseRepository implements ProductInterface
 
     public function delete(mixed $id): mixed
     {
-        return $this->model->select('id')->findOrFail($id)->update(["is_delete" => 1]);
+        return $this->model->where('id')->findOrFail($id)->update(["is_delete" => 1]);
     }
 }
