@@ -75,12 +75,12 @@ class UnitRepository extends BaseRepository implements UnitInterface
 
     public function update(mixed $id, array $data): mixed
     {
-        return $this->model->where('id')->show($id)->update($data);
+        return $this->model->find($id)->update($data);
     }
 
     public function delete(mixed $id): mixed
     {
-        return $this->model->where('id')->destroy($id);
+        return $this->model->destroy($id);
     }
 
     public function all(): mixed

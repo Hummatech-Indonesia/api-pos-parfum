@@ -26,37 +26,37 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
-        ->with('store')
-        ->withCount(['products' => function ($q) {
-            $q->where('is_delete',0);
-        }])
-        ->when(count($data) > 0, function ($query) use ($data){
-            foreach ($data as $index => $value){
-                $query->where($index, $value);
-            }
-        });
+            ->with('store')
+            ->withCount(['products' => function ($q) {
+                $q->where('is_delete', 0);
+            }])
+            ->when(count($data) > 0, function ($query) use ($data) {
+                foreach ($data as $index => $value) {
+                    $query->where($index, $value);
+                }
+            });
     }
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-        ->with('store:id,name')
-        ->withCount(['products' => function ($q) {
-            $q->where('is_delete',0);
-        }])
-        ->when(count($data) > 0, function ($query) use ($data){
-            if(isset($data["search"])){
-                $query->where(function ($query2) use ($data) {
-                    $query2->where('name', 'like', '%' . $data["search"] . '%');
-                });
-                unset($data["search"]);
-            }
+            ->with('store:id,name')
+            ->withCount(['products' => function ($q) {
+                $q->where('is_delete', 0);
+            }])
+            ->when(count($data) > 0, function ($query) use ($data) {
+                if (isset($data["search"])) {
+                    $query->where(function ($query2) use ($data) {
+                        $query2->where('name', 'like', '%' . $data["search"] . '%');
+                    });
+                    unset($data["search"]);
+                }
 
-            foreach ($data as $index => $value){
-                $query->where($index, $value);
-            }
-        })
-        ->paginate($pagination, ['*'], 'page', $page);
+                foreach ($data as $index => $value) {
+                    $query->where($index, $value);
+                }
+            })
+            ->paginate($pagination, ['*'], 'page', $page);
         // ->appends(['search' => $request->search, 'year' => $request->year]);
     }
 
@@ -67,26 +67,26 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
 
     public function checkActive(mixed $id): mixed
     {
-        return $this->model->with('store:id,name')->withCount('products')->where('is_delete',0)->find($id);
+        return $this->model->with('store:id,name')->withCount('products')->where('is_delete', 0)->find($id);
     }
 
     public function update(mixed $id, array $data): mixed
     {
-            $category = $this->model->find($id);
+        $update = $this->model->find($id);
 
-            if (!$category || $category->is_delete) return null;
+        if (!$update || $update->is_delete) return null;
 
-            $category->update($data);
-            return $category;
+        $update->update($data);
+        return $update;
     }
 
     public function delete(mixed $id): mixed
     {
-        $category = $this->model->find($id);
+        $delete = $this->model->find($id);
 
-        if (!$category || $category->is_delete) return null;
+        if (!$delete || $delete->is_delete) return null;
 
-        $category->update(["is_delete" => 1]);
-        return $category;
+        $delete->update(["is_delete" => 1]);
+        return $delete;
     }
-}   
+}

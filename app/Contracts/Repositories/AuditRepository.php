@@ -56,7 +56,7 @@ class AuditRepository extends BaseRepository implements AuditInterface
 
     public function delete(mixed $id): mixed
     {
-        $audit = $this->model->where('id')->find($id);
+        $audit = $this->model->find($id);
 
         if (!$audit) {
             return false;

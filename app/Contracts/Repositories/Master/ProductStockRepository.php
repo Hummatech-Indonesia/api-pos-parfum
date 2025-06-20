@@ -71,7 +71,12 @@ class ProductStockRepository extends BaseRepository implements ProductStockInter
 
     public function delete(mixed $id): mixed
     {
-        return $this->model->where('id')->findOrFail($id)->update(["is_delete" => 1]);
+                $delete = $this->model->find($id);
+
+        if (!$delete || $delete->is_delete) return null;
+
+        $delete->update(["is_delete" => 1]);
+        return $delete;
     }
 
     public function getFromProductDetail(mixed $product_detail_id) {
