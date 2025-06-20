@@ -46,8 +46,8 @@ class ProductRequest extends FormRequest
             "product_details.*.density" => "nullable|numeric|min:0",
             "product_details.*.price" => "required|numeric|min:0",
             "product_details.*.price_discount" => "nullable|numeric|min:0",
-            "product_details.*.product_code" => "required|string",
-            "product_details.*.product_image" => "required|image|mimes:png,jpg,jpeg|max:2048",
+            "product_details.*.product_code" => "nullable|string",
+            "product_details.*.product_image" => "nullable|image|mimes:png,jpg,jpeg|max:2048",
         ];
     }
 
