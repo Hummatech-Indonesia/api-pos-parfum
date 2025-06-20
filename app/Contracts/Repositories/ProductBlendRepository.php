@@ -37,10 +37,10 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
         }
 
         $blend = $this->model
-            ->select('id', 'product_detail_id', 'warehouse_id', 'result_stock', 'date', 'created_at')
+            ->select('id', 'product_detail_id', 'result_stock as Quantity', 'date as tanggal_pembuatan', 'created_at')
             ->with([
                 'productDetail:id,product_id',
-                'productDetail.product:id,name as blend_name',
+                'productDetail.product:id,name as nama_blending',
             ])->find($id);
 
         if (!$blend) {
@@ -48,11 +48,10 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
         }
 
         $details = $blend->productBlendDetails()
-            ->select('id', 'product_blend_id', 'product_detail_id', 'used_stock', 'created_at')
+            ->select('id', 'product_blend_id', 'product_detail_id', 'used_stock as quantity')
             ->with([
                 'productDetail:id,product_id,variant_name',
-                'productDetail.product:id,name',
-                'productStock:stock',
+                'productDetail.product:id,name as name_product',
             ])
             ->paginate($perPage, ['*'], 'transaction_page', $page);
 
