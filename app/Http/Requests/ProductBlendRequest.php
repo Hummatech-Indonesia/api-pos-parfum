@@ -32,8 +32,6 @@ class ProductBlendRequest extends FormRequest
             'product_blend.*.product_detail_id' => 'required|exists:product_details,id',
             'product_blend.*.unit_id' => 'required|exists:units,id',
             'product_blend.*.result_stock' => 'required|numeric|min:0',
-            // 'product_blend.*.unit_name' => 'required|string',
-            // 'product_blend.*.code' => 'required|string|max:255',
             'product_blend.*.image' => 'nullable|image|mimes:png,jpg,jpeg',
             'product_blend.*.unit_type' => 'required|in:weight,volume,unit',
             // 'product_blend.*.varian_name' => 'required|string|max:255',
@@ -44,17 +42,6 @@ class ProductBlendRequest extends FormRequest
             'product_blend.*.product_blend_details' => 'required|array|min:1',
             'product_blend.*.product_blend_details.*.product_detail_id' => 'required|exists:product_details,id',
             'product_blend.*.product_blend_details.*.used_stock' => 'required|numeric|min:0',
-
-            // 'result_stock' => 'required|numeric|min:0',
-            // 'unit_name' => 'sometimes|string|max:255|exists:units,name',
-            // 'code' => 'sometimes|string|max:255',
-            // 'product_blend_details.*.product_detail_id' => 'required|exists:product_details,id',
-            // 'product_blend_details.*.used_stock' => 'required|numeric|min:0',
-            // 'image' => 'nullable|image|mimes:png,jpg,jpeg',
-            // 'unit_type' => 'required|in:weight,volume,unit',
-            // 'varian_name' => 'required|string|max:255',
-            // 'category_id' => 'sometimes|exists:categories,id',
-            // 'price' => 'required|numeric|min:0',
         ];
     }
 
@@ -71,11 +58,11 @@ class ProductBlendRequest extends FormRequest
             'product_blend.required' => 'Data campuran produk wajib diisi.',
             'product_blend.array' => 'Data campuran produk harus berupa array.',
 
-            
             'product_blend.*.product_detail_id.required' => 'Produk detail wajib dipilih.',
             'product_blend.*.product_detail_id.exists' => 'Produk detail yang dipilih tidak valid.',
             'product_blend.*.unit_id.required' => 'Unit wajib dipilih.',
             'product_blend.*.unit_id.exists' => 'Unit yang dipilih tidak valid.',
+            'product_blend.*.description' => 'Deskripsi wajib diisi',
 
             'product_blend.*.result_stock.required' => 'Stok hasil wajib diisi.',
             'product_blend.*.result_stock.numeric' => 'Stok hasil harus berupa angka.',

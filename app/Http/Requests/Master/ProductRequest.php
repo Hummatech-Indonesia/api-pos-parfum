@@ -69,8 +69,6 @@ class ProductRequest extends FormRequest
             'product_details.*.product_image.required' => 'Gambar produk harus diunggah!',
             'product_details.*.category_id.required' => 'Kategori pada detail produk harus diisi!',
             'product_details.*.variant_name.required' => 'Nama varian harus diisi!',
-            'product_details.*.stock.required' => 'Stok harus diisi!',
-            'product_details.*.product_code.required' => 'Kode produk harus diisi!',
             // 'product_details.*.product_varian_id.unique' => 'Varian ini telah ada, silahkan pilih varian tanpa memembuat ulang!',
             // 'product_details.*.category_id.unique' => 'Kategori ini telah ada, silahkan pilih kategori tanpa memembuat ulang!'
         ];
