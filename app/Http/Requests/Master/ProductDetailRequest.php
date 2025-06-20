@@ -38,7 +38,7 @@ class ProductDetailRequest extends FormRequest
             "stock" => "required|numeric|min:0",
             "price_discount" => "nullable|numeric|min:0",
             "product_code" => "required|string",
-            "product_image" => "required|image|mimes:png,jpg,jpeg|max:2048",
+            "product_image" => "nullable|image|mimes:png,jpg,jpeg|max:2048",
         ];
     }
 
@@ -56,7 +56,7 @@ class ProductDetailRequest extends FormRequest
             "product_image.mimes" => "Format gambar harus jpg, jpeg, atau png.",
             "product_image.max" => "Ukuran gambar maksimal 2MB.",
 
-            'product_image.required' => 'Gambar produk harus diunggah!',
+            // 'product_image.required' => 'Gambar produk harus diunggah!',
             'category_id.required' => 'Kategori pada detail produk harus diisi!',
             'variant_name.required' => 'Nama varian harus diisi!',
             'stock.required' => 'Stok harus diisi!',
