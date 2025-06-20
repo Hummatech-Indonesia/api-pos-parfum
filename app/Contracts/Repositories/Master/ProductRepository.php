@@ -106,6 +106,11 @@ class ProductRepository extends BaseRepository implements ProductInterface
 
     public function delete(mixed $id): mixed
     {
-        return $this->model->select('id')->delete();
+        $delete = $this->model->find($id);
+
+        if (!$delete || $delete->is_delete) return null;
+        $delete->details()->update(["is_delete" => 1]);
+        $delete->update(["is_delete" => 1]);
+        return $delete;
     }
 }
