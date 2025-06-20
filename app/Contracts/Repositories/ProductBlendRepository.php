@@ -41,7 +41,9 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
             ->with([
                 'productDetail:id,product_id',
                 'productDetail.product:id,name as nama_blending',
-            ])->find($id);
+            ])
+            ->withCount('productBlendDetails as jumlah_bhn_baku')
+            ->find($id);
 
         if (!$blend) {
             return ['status' => false, 'error' => 'not_found'];
