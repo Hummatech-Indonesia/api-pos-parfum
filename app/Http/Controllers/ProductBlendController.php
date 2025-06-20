@@ -70,8 +70,8 @@ class ProductBlendController extends Controller
                     'warehouse_id' => auth()->user()->warehouse_id,
                     'result_stock' => $productBlend['result_stock'],
                     'product_detail_id' => $productBlend['product_detail_id'],
-                    'unit_id' => $productBlend['unit_id'],
-                    'date' => $data['date'] ?? now(),
+                    // 'unit_id' => $productBlend['unit_id'],
+                    'date' => now(),
                     'description' => $productBlend['description'],
                 ];
             }
@@ -84,8 +84,8 @@ class ProductBlendController extends Controller
             $product = $this->product->store([
                 'store_id' => auth()->user()->store_id,
                 'name' => $data['name'],
-                'image' => $image,
-                'unit_type' => $data['product_blend'][0]['unit_type'],
+                // 'image' => $image,
+                // 'unit_type' => $data['product_blend'][0]['unit_type'],
             ]);
             $product_id = $product->id;
 
@@ -115,7 +115,7 @@ class ProductBlendController extends Controller
                         'product_blend_id' => $data['product_blend_id'],
                         'product_detail_id' => $blendDetail['product_detail_id'],
                         'used_stock' => $blendDetail['used_stock'],
-                        'unit_id' => $productBlend['unit_id'],
+                        // 'unit_id' => $productBlend['unit_id'],
                     ]);
                 }
             }
@@ -123,8 +123,8 @@ class ProductBlendController extends Controller
             foreach ($data['product_blend'] as $productBlend) {
                 $detail = $this->productDetail->store([
                     'product_id' => $product_id,
-                    'category_id' => $productBlend['category_id'] ?? null,
-                    'price' => $productBlend['price'] ?? 0,
+                    // 'category_id' => $productBlend['category_id'] ?? null,
+                    // 'price' => $productBlend['price'] ?? 0,
                 ]);
 
                 $stock = $this->productStock->checkNewStock($productBlend['product_detail_id'], $product_id);
