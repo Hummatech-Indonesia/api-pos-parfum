@@ -20,13 +20,14 @@ class CategoryRequest extends FormRequest
     public function rules(): array
     {
         $id = $this->categories;
-        $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;        
+        $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
         return [
             'name' => [
                 'required',
                 'max:255',
                 Rule::unique('categories','name')->where(function ($query) use ($store_id) {
-                    return $query->where('store_id', $store_id);
+                    return $query->where('store_id', $store_id)
+                    ->where('is_delete', 0);
                 })->ignore($id),
             ],
         ];

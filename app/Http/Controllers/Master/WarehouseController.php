@@ -60,7 +60,8 @@ class WarehouseController extends Controller
 
         $result = collect($data["data"])->map(function ($warehouse) {
             $warehouseModel = $this->warehouse->withProductStocks($warehouse['id']);
-            $warehouse['product_stocks'] = $warehouseModel->productStocks;
+            $warehouse['product_count'] = $warehouseModel->productStocks->count();
+            unset($warehouse['product_stock']);
             return $warehouse;
         });
         unset($data["data"]);
@@ -147,6 +148,7 @@ class WarehouseController extends Controller
 
         return BaseResponse::Ok("Berhasil mengambil detail warehouse!", [
             "warehouse" => $check_warehouse,
+            "product_count" => $productStocks->total(),
             "product_stocks" => $productStocks
         ]);
 

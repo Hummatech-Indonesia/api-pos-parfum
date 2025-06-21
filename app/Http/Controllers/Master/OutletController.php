@@ -125,10 +125,12 @@ class OutletController extends Controller
         $page = request()->get('transaction_page') ?? 1;
 
         $transactions = $this->outlet->getTransactionsByOutlet($id, 5, $page);
+        $transaction_count = $check_outlet->store?->transactions()->count() ?? 0;
 
         return BaseResponse::Ok("Berhasil mengambil detail outlet!", [
             'outlet' => $check_outlet,
             'transactions' => $transactions,
+            'transaction_count' => $transaction_count
         ]);
     }
 

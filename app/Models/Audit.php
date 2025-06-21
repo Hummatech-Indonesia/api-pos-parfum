@@ -43,4 +43,9 @@ class Audit extends Model
     {
         return $this->belongsTo(Outlet::class);
     }
+
+    public function details()
+    {
+        return $this->hasMany(AuditDetail::class);
+    }
 }

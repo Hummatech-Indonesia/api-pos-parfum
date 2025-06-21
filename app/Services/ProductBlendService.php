@@ -42,8 +42,8 @@ class ProductBlendService
                 'warehouse_id' => auth()->user()->warehouse_id,
                 'result_stock' => $productBlend['result_stock'],
                 'product_detail_id' => $productBlend['product_detail_id'],
-                'unit_id' => $productBlend['unit_id'],
-                'date' => $data['date'] ?? now(),
+                // 'unit_id' => $productBlend['unit_id'],
+                'date' => now(),
                 'description' => $productBlend['description'],
             ];
         }
@@ -59,7 +59,7 @@ class ProductBlendService
                     'product_blend_id' => $data['product_blend_id'],
                     'product_detail_id' => $detail['product_detail_id'],
                     'used_stock' => $detail['used_stock'],
-                    'unit_id' => $productBlend['unit_id'],
+                    // 'unit_id' => $productBlend['unit_id'],
                 ]);
 
                 // Kurangi stok dari tabel product_stocks
@@ -88,8 +88,8 @@ class ProductBlendService
             return [
                 'store_id' => auth()->user()->store_id,
                 'name' => $data['name'],
-                'image' => $image,
-                'unit_type' => $productBlend['unit_type'],
+                // 'image' => $image,
+                // 'unit_type' => $productBlend['unit_type'],
             ];
         }
     }

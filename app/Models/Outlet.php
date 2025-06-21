@@ -27,4 +27,11 @@ class Outlet extends Model
     {
         return $this->hasMany(User::class)->where('is_delete',0);
     }
+
+    public function getTransactionCountAttribute()
+    {
+        return $this->store?->transactions()->count() ?? 0;
+    }
+
+    protected $appends = ['transaction_count'];
 }

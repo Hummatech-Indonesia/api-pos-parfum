@@ -57,5 +57,10 @@ class ProductDetail extends Model
         return $this->hasOne(ProductStock::class)->where('warehouse_id',auth()->user()->warehouse_id);
     }
 
+    public function transactionDetails()
+    {
+        return $this->hasMany(TransactionDetail::class, 'product_detail_id');
+    }
+
     
 }

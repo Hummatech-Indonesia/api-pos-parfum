@@ -51,9 +51,7 @@ class StockRequestRepository extends BaseRepository implements StockRequestInter
 
     public function show(mixed $id): mixed
     {
-        return $this->model->with(['store' => function ($query) {
-                    $query->select('id', 'name');
-                }])->find($id);
+        return $this->model->with('store')->find($id);
     }
 
     public function update(mixed $id, array $data): mixed
@@ -63,7 +61,7 @@ class StockRequestRepository extends BaseRepository implements StockRequestInter
 
     public function delete(mixed $id): mixed
     {
-        return $this->model->select('id')->findOrFail($id)->update(["is_delete" => 1]);
+        return $this->show($id)->update(["is_delete" => 1]);
     }
 
 }

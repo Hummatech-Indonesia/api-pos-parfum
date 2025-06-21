@@ -38,7 +38,7 @@ class OutletRepository extends BaseRepository implements OutletInterface
     public function customPaginate(int $pagination = 8, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-            ->with('store:id', 'users')
+            ->with('store:id,name' ,'users')
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (isset($data["search"])) {
                     $query->where(function ($query2) use ($data) {
@@ -86,14 +86,21 @@ class OutletRepository extends BaseRepository implements OutletInterface
 
     public function update(mixed $id, array $data): mixed
     {
-        $model = $this->model->select('id')->findOrFail($id);
-        $model->update($data);
+        $update = $this->model->find($id);
 
-        return $this->show($id);
+        if (!$update || $update->is_delete) return null;
+
+        $update->update($data);
+        return $update;
     }
 
     public function delete(mixed $id): mixed
     {
-        return $this->model->select('id')->findOrFail($id)->update(["is_delete" => 1]);
+                $delete = $this->model->find($id);
+
+        if (!$delete || $delete->is_delete) return null;
+
+        $delete->update(["is_delete" => 1]);
+        return $delete;
     }
 }

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Services\Master;
 
@@ -8,24 +8,23 @@ use App\Traits\UploadTrait;
 use App\Models\ProductDetail;
 use Illuminate\Support\Facades\Log;
 
-class ProductDetailService {
+class ProductDetailService
+{
 
     use UploadTrait;
-    
-    public function __construct()
-    {
-        
-    }
+
+    public function __construct() {}
 
     public function dataProductDetail(array $data)
     {
-        try{
+        try {
             $image = null;
-            try{
-                if(isset($data["image"])) {
+            try {
+                if (isset($data["product_image"])) {
                     $image = $this->upload("products/detail", $data["product_image"]);
                 }
-            }catch(\Throwable $th){ }
+            } catch (\Throwable $th) {
+            }
 
             $result = [
                 "product_id" => $data["product_id"],
@@ -40,10 +39,11 @@ class ProductDetailService {
                 "density" => $data["density"] ?? 0,
                 "price" => $data["price"] ?? 0,
                 "price_discount" => $data["price_discount"] ?? 0,
-                "product_code" => $data["product_code"] ?? null
+                "product_code" => $data["product_code"] ?? null,
+                "variant_name" => $data["variant_name"] ?? null,
             ];
             return $result;
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             Log::error($th->getMessage());
             throw new Error($th->getMessage(), 400);
         }
@@ -51,15 +51,16 @@ class ProductDetailService {
 
     public function dataProductDetailUpdate(array $data, ProductDetail $product)
     {
-        try{
+        try {
             $image = $product->image;
-            try{
-                if(isset($data["image"])) {
-                    if($image) $this->remove($product->image);
-                    
+            try {
+                if (isset($data["image"])) {
+                    if ($image) $this->remove($product->image);
+
                     $image = $this->upload("products/detail", $data["product_image"]);
                 }
-            }catch(\Throwable $th){ }
+            } catch (\Throwable $th) {
+            }
 
             return [
                 "product_id" => $data["product_id"],
@@ -76,7 +77,7 @@ class ProductDetailService {
                 "price_discount" => $data["price_discount"] ?? 0,
                 "product_code" => $data["product_code"] ?? null
             ];
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             Log::error($th->getMessage());
             throw new Error($th->getMessage(), 400);
         }
