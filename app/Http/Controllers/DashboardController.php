@@ -37,7 +37,6 @@ class DashboardController extends Controller
         return response()->json([
             'total_products' => Product::where('store_id', $storeId)->where('is_delete', 0)->count(),
             'total_orders' => Transaction::where('store_id', $storeId)->count(),
-            'total_users' => User::where('store_id', $storeId)->count(),
             'total_retail' => Outlet::where('store_id', $storeId)->where('is_delete', 0)->count(),
             'income_this_month' => Transaction::where('store_id', $storeId)
                 ->whereMonth('created_at', now()->month)
@@ -58,7 +57,7 @@ class DashboardController extends Controller
                     'transaction_code' => $order->transaction_code,
                     'total_price' => $order->total_price,
                 ]),
-                'role' => 'warehouse'
+            'role' => 'warehouse'
         ]);
     }
 
@@ -73,6 +72,9 @@ class DashboardController extends Controller
             'total_products' => Product::where('store_id', $storeId)->where('is_delete', 0)->count(),
             'total_orders' => Transaction::where('store_id', $storeId)
                 ->where('user_id', $userId)
+                ->count(),
+            'total_users' => User::where('store_id', $storeId)
+                ->where('outlet_id', auth()->user()->outlet_id)
                 ->count(),
             'income_this_month' => Transaction::where('store_id', $storeId)
                 ->where('user_id', $userId)
@@ -106,7 +108,7 @@ class DashboardController extends Controller
                     'stock' => $p->stock,
                     'unit' => $p->productDetail->unit ?? '-',
                 ]),
-                'role' => 'retail'
+            'role' => 'retail'
         ]);
     }
 
