@@ -82,6 +82,7 @@ class AuditService
                     'price' => $detail->productDetail->price ?? null,
                     'discount_price' => $detail->productDetail->price_discount ?? null,
                     'variant_name' => $detail->productDetail->variant_name ?? null,
+                    'product_code' => $detail->productDetail->product_code ?? null,
                 ]
             ];
         });
