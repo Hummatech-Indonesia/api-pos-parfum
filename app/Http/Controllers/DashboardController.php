@@ -34,9 +34,9 @@ class DashboardController extends Controller
         $year = now()->year;
 
         return response()->json([
-            'total_products' => Product::where('store_id', $storeId)->count(),
+            'total_products' => Product::where('store_id', $storeId)->where('is_delete', 0)->count(),
             'total_orders' => Transaction::where('store_id', $storeId)->count(),
-            'total_retail' => Outlet::where('store_id', $storeId)->count(),
+            'total_retail' => Outlet::where('store_id', $storeId)->where('is_delete', 0)->count(),
             'income_this_month' => Transaction::where('store_id', $storeId)
                 ->whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)
@@ -67,7 +67,7 @@ class DashboardController extends Controller
         $year = now()->year;
 
         return response()->json([
-            'total_products' => Product::where('store_id', $storeId)->count(),
+            'total_products' => Product::where('store_id', $storeId)->where('is_delete', 0)->count(),
             'total_orders' => Transaction::where('store_id', $storeId)
                 ->where('user_id', $userId)
                 ->count(),
