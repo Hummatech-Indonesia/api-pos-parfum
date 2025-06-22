@@ -16,6 +16,7 @@ use App\Contracts\Interfaces\Master\ProductInterface;
 use App\Contracts\Interfaces\Master\ProductStockInterface;
 use App\Contracts\Interfaces\Master\ProductDetailInterface;
 use App\Contracts\Interfaces\Master\ProductVarianInterface;
+use App\Models\Product;
 
 class ProductController extends Controller
 {
@@ -236,6 +237,18 @@ class ProductController extends Controller
         $check = $this->product->checkActive($id);
         if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data product !");
 
+        foreach ($check->details as $detail) {
+            if (
+                $detail->discountVouchers()->where('is_delete', 0)->exists()||
+                $detail->productBundling()->where('is_delete', 0)->exists()||
+                $detail->productBlend()->where('is_delete', 0)->exists()||
+                $detail->productBlendDetail()->where('is_delete', 0)->exists()||
+                $detail->auditDetail()->where('is_delete', 0)->exists()
+                
+            ) {
+                return BaseResponse::Error("Tidak dapat menghapus produk karena salah satu detailnya masih digunakan dalam relasi lain.", null);
+            }
+        }
         DB::beginTransaction();
         try {
             $this->product->delete($id);
