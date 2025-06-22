@@ -62,7 +62,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
         // API FOR ROLE OWNER & WAREHOUSE
-    Route::middleware('role:owner|warehouse')->group(function () {
+    Route::middleware('role:owner|warehouse|outlet')->group(function () {
         Route::Resource('/product-bundling', ProductBundlingController::class);
         Route::post('/product-bundling/{id}/restore', [ProductBundlingController::class, 'restore']);
         Route::apiResource('/product-bundling-detail', ProductBundlingDetailController::class);

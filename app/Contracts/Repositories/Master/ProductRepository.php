@@ -101,16 +101,28 @@ class ProductRepository extends BaseRepository implements ProductInterface
 
     public function update(mixed $id, array $data): mixed
     {
-        return $this->show($id)->update($data);
+        $model = $this->model->select('id', 'is_delete')->findOrFail($id);
+
+        if ($model->is_delete) {
+            return null;
+        }
+
+        $model->update($data);
+
+        return $model->fresh();
     }
 
     public function delete(mixed $id): mixed
     {
-        $delete = $this->model->find($id);
+    $model = $this->model->select('id', 'is_delete')->findOrFail($id);
 
-        if (!$delete || $delete->is_delete) return null;
-        $delete->details()->update(["is_delete" => 1]);
-        $delete->update(["is_delete" => 1]);
-        return $delete;
+    if ($model->is_delete) {
+        return null;
+    }
+
+    $model->details()->update(['is_delete' => 1]);
+    $model->update(['is_delete' => 1]);
+
+    return $model->fresh();
     }
 }

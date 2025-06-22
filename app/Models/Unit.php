@@ -30,7 +30,7 @@ class Unit extends Model
     }
     
     public function audit(){
-        return $this->hasMany(Audit::class);
+        return $this->hasMany(AuditDetail::class);
     }
 
     public function productBundlingDetail() {

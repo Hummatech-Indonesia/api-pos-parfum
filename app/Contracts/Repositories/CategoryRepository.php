@@ -72,21 +72,21 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
 
     public function update(mixed $id, array $data): mixed
     {
-        $update = $this->model->find($id);
+        $model = $this->model->select('id', 'is_delete')->findOrFail($id);
 
-        if (!$update || $update->is_delete) return null;
+        if ($model->is_delete) {
+            return null;
+        }
 
-        $update->update($data);
-        return $update;
+        $model->update($data);
+        return $model->fresh();
     }
 
     public function delete(mixed $id): mixed
     {
-        $delete = $this->model->find($id);
+        $model = $this->model->select('id')->findOrFail($id);
+        $model->update(['is_delete' => 1]);
 
-        if (!$delete || $delete->is_delete) return null;
-
-        $delete->update(["is_delete" => 1]);
-        return $delete;
+        return $model->fresh();
     }
 }
