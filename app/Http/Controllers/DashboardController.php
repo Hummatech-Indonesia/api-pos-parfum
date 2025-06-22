@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\BaseResponse;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\Outlet;
 use App\Models\ProductStock;
+use Faker\Provider\Base;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -23,7 +25,7 @@ class DashboardController extends Controller
             return $this->dashboardOutlet();
         }
 
-        return response()->json(['message' => "Role tidak dikenali"], 403);
+        return BaseResponse::Custom(false, 'Role tidak dikenali', null, 403);
     }
 
     private function dashboardWarehouse()
