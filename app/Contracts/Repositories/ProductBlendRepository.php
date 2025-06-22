@@ -37,7 +37,7 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
         }
 
         $blend = $this->model
-            ->select('id', 'product_detail_id', 'product_id', 'result_stock as Quantity', 'date as tanggal_pembuatan', 'created_at')
+            ->select('id', 'product_detail_id', 'product_id', 'result_stock as Quantity', 'description', 'date as tanggal_pembuatan', 'created_at')
             ->with([
                 'product:id,name as nama_blending',
             ])
