@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\Outlet;
 use App\Models\ProductStock;
+use App\Models\User;
 use Faker\Provider\Base;
 use Illuminate\Http\Request;
 
@@ -36,6 +37,7 @@ class DashboardController extends Controller
         return response()->json([
             'total_products' => Product::where('store_id', $storeId)->where('is_delete', 0)->count(),
             'total_orders' => Transaction::where('store_id', $storeId)->count(),
+            'total_users' => User::where('store_id', $storeId)->count(),
             'total_retail' => Outlet::where('store_id', $storeId)->where('is_delete', 0)->count(),
             'income_this_month' => Transaction::where('store_id', $storeId)
                 ->whereMonth('created_at', now()->month)
