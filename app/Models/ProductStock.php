@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ProductStock extends Model
 {
     use HasFactory, HasUuids;
-    
+
     public $incrementing = false;
     protected $keyType = "string";
     protected $primaryKey = "id";
@@ -19,7 +19,7 @@ class ProductStock extends Model
 
     public function warehouse(): BelongsTo
     {
-        return $this->belongsTo(Warehouse::class)->where('is_delete',0);
+        return $this->belongsTo(Warehouse::class)->where('is_delete', 0);
     }
 
     public function outlet(): BelongsTo
@@ -30,5 +30,10 @@ class ProductStock extends Model
     public function productDetail(): BelongsTo
     {
         return $this->belongsTo(ProductDetail::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(\App\Models\Product::class, 'product_id');
     }
 }
