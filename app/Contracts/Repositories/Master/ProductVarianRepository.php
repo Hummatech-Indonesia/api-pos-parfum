@@ -78,12 +78,28 @@ class ProductVarianRepository extends BaseRepository implements ProductVarianInt
 
     public function update(mixed $id, array $data): mixed
     {
-        return $this->show($id)->update($data);
+        $model = $this->model->select('id', 'is_delete')->findOrFail($id);
+
+        if ($model->is_delete) {
+            return null;
+        }
+
+        $model->update($data);
+
+        return $model->fresh();
     }
 
     public function delete(mixed $id): mixed
     {
-        return $this->model->select('id')->findOrFail($id)->update(["is_delete" => 1]);
+        $model = $this->model->select('id', 'is_delete')->findOrFail($id);
+
+        if ($model->is_delete) {
+            return null;
+        }
+
+        $model->update(['is_delete' => 1]);
+
+        return $model->fresh();
     }
 
     public function where(array $data): mixed

@@ -62,15 +62,19 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
         // API FOR ROLE OWNER & WAREHOUSE
-    Route::middleware('role:owner|warehouse')->group(function () {
+    Route::middleware('role:owner|warehouse|outlet')->group(function () {
         Route::Resource('/product-bundling', ProductBundlingController::class);
         Route::post('/product-bundling/{id}/restore', [ProductBundlingController::class, 'restore']);
         Route::apiResource('/product-bundling-detail', ProductBundlingDetailController::class);
         Route::post('/product-bundling-detail/{id}/restore', [ProductBundlingDetailController::class, 'restore']);
     });
 
+    Route::middleware('role:owner|warehouse')->group(function () {
+        Route::apiResource("product-blend", ProductBlendController::class);
+    });
+
     // API FOR ROLE OWNER
-    Route::middleware('role:owner')->group(function () {
+    Route::middleware('role:owner|warehouse|outlet')->group(function () {
         // API FOR DATA USER
         Route::get('users/no-paginate', [UserController::class, 'listUser'])->name('list-users-no-paginate');
         Route::get('users/v2/no-paginate', [UserController::class, 'listUserV2'])->name('list-users-no-paginate.v2');
@@ -101,6 +105,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
         Route::apiResource('roles', RoleController::class);
         Route::post('roles/{id}/restore', [RoleController::class, 'restore']);
+        Route::resource("stock-request", StockRequestController::class)->only(['index', 'show']);
     });
 
     // API FOR ROLE OUTLET & OWNER
@@ -108,17 +113,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource("stock-request", StockRequestController::class)->only(['store', 'destroy']);
     });
 
-    Route::middleware('role:outlet|admin|owner')->group(function () {
+    Route::middleware('role:outlet|admin|warehouse')->group(function () {
         Route::post('audit/{id}/restore', [AuditController::class, 'restore']);
         Route::get("audit/no-paginate", [AuditController::class, 'list']);
         Route::get("audit/alltrashed", [AuditController::class, 'trashed']);
         Route::put('/audit/{id}/detail', [AuditController::class, 'updateStatusWithProducts']);
-        Route::resource("audit", AuditController::class)->only(['update', 'destroy', 'index', 'show']);
+        Route::resource("audit", AuditController::class)->only(['destroy', 'index', 'show']);
     });
 
     Route::middleware('role:auditor|admin|owner')->group(function () {
         Route::post('audit/{id}/restore', [AuditController::class, 'restore']);
-        Route::resource("audit", AuditController::class)->only(['store', 'index', 'destroy', 'show']);
+        Route::resource("audit", AuditController::class)->only(['store', 'destroy', 'update']);
     });
 
     // API FOR ROLE ADMIN, WAREHOUSE & OWNER
@@ -165,6 +170,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get("unit/no-paginate", [UnitController::class, 'list']);
     Route::get("unit/alltrashed", [UnitController::class, 'trashed']);
     Route::resource("unit", UnitController::class)->except(['create', 'edit']);
-    //API FOR PRODUCT BLEND
-    Route::apiResource("product-blend", ProductBlendController::class);
 });

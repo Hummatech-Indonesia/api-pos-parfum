@@ -63,6 +63,7 @@ class CategoryController extends Controller
         DB::beginTransaction();
         try {
             $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id; 
+            
             $result_category = $this->category->store([
                 "name" => $request->name,
                 "store_id" => $store_id

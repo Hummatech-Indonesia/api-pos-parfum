@@ -30,8 +30,8 @@ class DiscountVoucherRepository extends BaseRepository implements DiscountVouche
     {
         return $this->model->query()
             ->with(['store', 'details', 'details.varian', 'details.product' => function ($query) {
-            $query->select('id', 'name');
-        }])
+                $query->select('id', 'name');
+            }])
             ->where('is_delete', 0)
             ->when(count($data) > 0, function ($query) use ($data) {
                 foreach ($data as $index => $value) {
@@ -82,14 +82,27 @@ class DiscountVoucherRepository extends BaseRepository implements DiscountVouche
 
     public function update(mixed $id, array $data): mixed
     {
-        $model = $this->model->select('id')->findOrFail($id);
+        $model = $this->model->select('id', 'is_delete')->findOrFail($id);
+
+        if ($model->is_delete) {
+            return null;
+        }
+
         $model->update($data);
 
-        return $this->show($id);
+        return $model->fresh();
     }
 
     public function delete(mixed $id): mixed
     {
-        return $this->model->select('id')->findOrFail($id)->update(["is_delete" => 1]);
+        $model = $this->model->select('id', 'is_delete')->findOrFail($id);
+
+        if ($model->is_delete) {
+            return null;
+        }
+
+        $model->update(['is_delete' => 1]);
+
+        return $model->fresh();
     }
 }

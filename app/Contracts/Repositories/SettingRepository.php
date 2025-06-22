@@ -27,18 +27,20 @@ class SettingRepository extends BaseRepository implements SettingInterface
     {
         return $this->model->query()->find($id);
     }
-    
+
     public function update(mixed $id, array $data): mixed
     {
-        $model = $this->model->select('id')->findOrFail($id);
-        $model->update($data);
+        $this->model->findOrFail($id)->update($data);
 
         return $this->show($id);
     }
 
     public function delete(mixed $id): mixed
     {
-        return $this->model->select('id')->find($id)->delete();
+        $model = $this->model->select('id')->findOrFail($id);
+        $model->delete();
+
+        return $model->fresh();
     }
 
     public function customPaginate(int $pagination = 8, int $page = 1, ?array $data): mixed

@@ -122,6 +122,15 @@ class UnitController extends Controller
         $check = $this->unit->show($id);
         if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data unit!");
 
+        if (
+            $check->productBlends()->exists() ||
+            $check->productBlendDetails()->exists() ||
+            $check->audit()->exists() ||
+            $check->productBundlingDetail()->exists()
+        ) {
+            return BaseResponse::Error("Unit tidak dapat dihapus karena masih digunakan dalam relasi lain.", null);
+        }
+
         DB::beginTransaction();
         try {
             $result_unit = $this->unit->delete($id);

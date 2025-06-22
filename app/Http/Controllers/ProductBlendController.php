@@ -57,30 +57,38 @@ class ProductBlendController extends Controller
         try {
             $data = $request->validated();
 
+            foreach ($data['product_blend'] as $blend) {
+                $totalUsed = collect($blend['product_blend_details'])->sum('used_stock');
+                if ($totalUsed > $blend['result_stock']) {
+                    return BaseResponse::Error("Total used stock melebihi result stock", null, 422);
+                }
+            }
+            
+            $image = null;
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                $image = $request->file('image')->store('public/product');
+            }
+            
+            $product = $this->product->store([
+                'store_id' => auth()->user()->store_id,
+                'name' => $data['name'],
+                // 'image' => $image,
+                // 'unit_type' => $data['product_blend'][0]['unit_type'],
+            ]);
+            $product_id = $product->id;
+            
             foreach ($data['product_blend'] as $productBlend) {
                 $data['store_product_blend'] = [
                     'store_id' => auth()->user()->store_id,
                     'warehouse_id' => auth()->user()->warehouse_id,
                     'result_stock' => $productBlend['result_stock'],
                     'product_detail_id' => $productBlend['product_detail_id'],
-                    'unit_id' => $productBlend['unit_id'],
-                    'date' => $data['date'] ?? now(),
+                    'product_id' => $product_id,
+                    // 'unit_id' => $productBlend['unit_id'],
+                    'date' => now(),
                     'description' => $productBlend['description'],
                 ];
             }
-
-            $image = null;
-            if ($request->hasFile('image') && $request->file('image')->isValid()) {
-                $image = $request->file('image')->store('public/product');
-            }
-
-            $product = $this->product->store([
-                'store_id' => auth()->user()->store_id,
-                'name' => $data['name'],
-                'image' => $image,
-                'unit_type' => $data['product_blend'][0]['unit_type'],
-            ]);
-            $product_id = $product->id;
 
             $blend = $this->productBlend->store($data['store_product_blend']);
             $data['product_blend_id'] = $blend->id;
@@ -94,6 +102,7 @@ class ProductBlendController extends Controller
                             'outlet_id' => auth()->user()->outlet_id,
                             'warehouse_id' => auth()->user()->warehouse_id,
                             'product_detail_id' => $blendDetail['product_detail_id'],
+                            'stock' => 0,
                         ]);
                     } elseif ($stock->stock < $blendDetail['used_stock']) {
                         DB::rollBack();
@@ -107,7 +116,7 @@ class ProductBlendController extends Controller
                         'product_blend_id' => $data['product_blend_id'],
                         'product_detail_id' => $blendDetail['product_detail_id'],
                         'used_stock' => $blendDetail['used_stock'],
-                        'unit_id' => $productBlend['unit_id'],
+                        // 'unit_id' => $productBlend['unit_id'],
                     ]);
                 }
             }
@@ -115,8 +124,8 @@ class ProductBlendController extends Controller
             foreach ($data['product_blend'] as $productBlend) {
                 $detail = $this->productDetail->store([
                     'product_id' => $product_id,
-                    'category_id' => $productBlend['category_id'] ?? null,
-                    'price' => $productBlend['price'] ?? 0,
+                    // 'category_id' => $productBlend['category_id'] ?? null,
+                    // 'price' => $productBlend['price'] ?? 0,
                 ]);
 
                 $stock = $this->productStock->checkNewStock($productBlend['product_detail_id'], $product_id);

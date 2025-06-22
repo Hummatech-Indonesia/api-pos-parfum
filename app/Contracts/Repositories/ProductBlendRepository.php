@@ -36,14 +36,25 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
             return ['status' => false, 'error' => 'invalid_uuid'];
         }
 
-        $blend = $this->model->with([])->find($id);
+        $blend = $this->model
+            ->select('id', 'product_detail_id', 'product_id', 'result_stock as Quantity', 'date as tanggal_pembuatan', 'created_at')
+            ->with([
+                'product:id,name as nama_blending',
+                'productDetail:id,product_id',
+            ])
+            ->withCount('productBlendDetails as jumlah_bhn_baku')
+            ->find($id);
 
         if (!$blend) {
             return ['status' => false, 'error' => 'not_found'];
         }
 
         $details = $blend->productBlendDetails()
-            ->with(['productDetail:id,product_id,variant_name'])
+            ->select('id', 'product_blend_id', 'product_detail_id', 'used_stock as quantity')
+            ->with([
+                'productDetail:id,product_id,variant_name',
+                'productDetail.product:id,name as name_product',
+            ])
             ->paginate($perPage, ['*'], 'transaction_page', $page);
 
         $blend->setRelation('productBlendDetails', $details);
@@ -63,12 +74,16 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
-        $query = $this->model->query()->with([
-            'productBlendDetails.productDetail:id,product_id',
-            'productBlendDetails.productDetail.product:id,name',
-            'warehouse:id',
-        ])
-            ->withCount('productDetail as used_product_count');
+        $query = $this->model->query()
+            ->select('id', 'product_detail_id', 'product_id', 'result_stock as quantity', 'description', 'date', 'created_at')
+            ->with([
+                'productDetail:id,product_id',
+                'product:id,name as blend_name',
+                'productBlendDetails:id,product_blend_id,product_detail_id,used_stock,created_at',
+                'productBlendDetails.productDetail:id,variant_name,product_id',
+                'productBlendDetails.productDetail.product:id,name',
+            ])
+            ->withCount('productBlendDetails as used_product_count');
 
         if (isset($data["search"])) {
             $search = $data["search"];
