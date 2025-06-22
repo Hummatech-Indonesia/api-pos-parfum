@@ -11,13 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if(!Schema::hasColumn('products','description', 'composition')){
         Schema::table('products', function (Blueprint $table) {
-            $table->text('description')->nullable();
-            $table->string('composition')->nullable();
+            if (!Schema::hasColumn('products', 'description')) {
+                $table->text('description')->nullable();
+            }
+
+            if (!Schema::hasColumn('products', 'composition')) {
+                $table->string('composition')->nullable();
+            }
         });
     }
-}
 
     /**
      * Reverse the migrations.
@@ -25,7 +28,13 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            //
+            if (Schema::hasColumn('products', 'description')) {
+                $table->dropColumn('description');
+            }
+
+            if (Schema::hasColumn('products', 'composition')) {
+                $table->dropColumn('composition');
+            }
         });
     }
 };
