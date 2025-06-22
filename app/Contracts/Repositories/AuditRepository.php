@@ -49,14 +49,14 @@ class AuditRepository extends BaseRepository implements AuditInterface
 
     public function update(mixed $id, array $data): mixed
     {
-        $this->model->findOrFail($id)->update($data);
+        $this->model->select('id')->findOrFail($id)->update($data);
 
         return $this->show($id);
     }
 
     public function delete(mixed $id): mixed
     {
-        $audit = $this->model->find($id);
+        $audit = $this->model->select('id')->find($id);
 
         if (!$audit) {
             return false;
