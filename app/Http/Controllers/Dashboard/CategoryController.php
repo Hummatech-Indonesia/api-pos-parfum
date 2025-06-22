@@ -63,21 +63,7 @@ class CategoryController extends Controller
         DB::beginTransaction();
         try {
             $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id; 
-
-                $existing = $this->category->customQuery([
-                    'name' => $request->name,
-                    'store_id' => $store_id,
-                    'is_delete' => 1,
-                ])->first();
-
-                if ($existing) {
-                    $existing->update([
-                        'is_delete' => 0,
-                    ]);
-
-            DB::commit();
-            return BaseResponse::Ok('Berhasil membuat category', $existing);
-        }
+            
             $result_category = $this->category->store([
                 "name" => $request->name,
                 "store_id" => $store_id
