@@ -55,7 +55,8 @@ class DashboardController extends Controller
                     'product_count' => $order->transaction_details->count(),
                     'transaction_code' => $order->transaction_code,
                     'total_price' => $order->total_price,
-                ])
+                ]),
+                'role' => 'warehouse'
         ]);
     }
 
@@ -102,7 +103,8 @@ class DashboardController extends Controller
                     'name' => $p->product->name ?? '-',
                     'stock' => $p->stock,
                     'unit' => $p->productDetail->unit ?? '-',
-                ])
+                ]),
+                'role' => 'retail'
         ]);
     }
 
