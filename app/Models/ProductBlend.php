@@ -28,6 +28,11 @@ class ProductBlend extends Model
         return $this->belongsTo(ProductDetail::class);
     }
 
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
+    }
+
     public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);

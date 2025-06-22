@@ -37,10 +37,10 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
         }
 
         $blend = $this->model
-            ->select('id', 'product_detail_id', 'result_stock as Quantity', 'date as tanggal_pembuatan', 'created_at')
+            ->select('id', 'product_detail_id', 'product_id', 'result_stock as Quantity', 'date as tanggal_pembuatan', 'created_at')
             ->with([
+                'product:id,name as nama_blending',
                 'productDetail:id,product_id',
-                'productDetail.product:id,name as nama_blending',
             ])
             ->withCount('productBlendDetails as jumlah_bhn_baku')
             ->find($id);
@@ -75,10 +75,10 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         $query = $this->model->query()
-            ->select('id', 'product_detail_id', 'result_stock as quantity', 'description', 'date', 'created_at')
+            ->select('id', 'product_detail_id', 'product_id', 'result_stock as quantity', 'description', 'date', 'created_at')
             ->with([
                 'productDetail:id,product_id',
-                'productDetail.product:id,name as blend_name',
+                'product:id,name as blend_name',
                 'productBlendDetails:id,product_blend_id,product_detail_id,used_stock,created_at',
                 'productBlendDetails.productDetail:id,variant_name,product_id',
                 'productBlendDetails.productDetail.product:id,name',

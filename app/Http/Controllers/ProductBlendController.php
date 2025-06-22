@@ -63,24 +63,12 @@ class ProductBlendController extends Controller
                     return BaseResponse::Error("Total used stock melebihi result stock", null, 422);
                 }
             }
-
-            foreach ($data['product_blend'] as $productBlend) {
-                $data['store_product_blend'] = [
-                    'store_id' => auth()->user()->store_id,
-                    'warehouse_id' => auth()->user()->warehouse_id,
-                    'result_stock' => $productBlend['result_stock'],
-                    'product_detail_id' => $productBlend['product_detail_id'],
-                    // 'unit_id' => $productBlend['unit_id'],
-                    'date' => now(),
-                    'description' => $productBlend['description'],
-                ];
-            }
-
+            
             $image = null;
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
                 $image = $request->file('image')->store('public/product');
             }
-
+            
             $product = $this->product->store([
                 'store_id' => auth()->user()->store_id,
                 'name' => $data['name'],
@@ -88,6 +76,19 @@ class ProductBlendController extends Controller
                 // 'unit_type' => $data['product_blend'][0]['unit_type'],
             ]);
             $product_id = $product->id;
+            
+            foreach ($data['product_blend'] as $productBlend) {
+                $data['store_product_blend'] = [
+                    'store_id' => auth()->user()->store_id,
+                    'warehouse_id' => auth()->user()->warehouse_id,
+                    'result_stock' => $productBlend['result_stock'],
+                    'product_detail_id' => $productBlend['product_detail_id'],
+                    'product_id' => $product_id,
+                    // 'unit_id' => $productBlend['unit_id'],
+                    'date' => now(),
+                    'description' => $productBlend['description'],
+                ];
+            }
 
             $blend = $this->productBlend->store($data['store_product_blend']);
             $data['product_blend_id'] = $blend->id;
