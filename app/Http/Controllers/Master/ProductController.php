@@ -256,7 +256,11 @@ class ProductController extends Controller
             if ($request->has('is_delete')) $payload["is_delete"] = $request->is_delete;
 
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
-            $data = $this->product->customQuery($payload)->get();
+            $data = $this->product->customQuery($payload)
+                ->with(['details' => function ($q) {
+                    $q->where('is_delete', 0); // Optional filter
+                }])
+                ->get();
 
             return BaseResponse::Ok("Berhasil mengambil data product ", $data);
         } catch (\Throwable $th) {
