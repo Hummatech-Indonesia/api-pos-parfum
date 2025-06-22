@@ -211,7 +211,7 @@ class UserRepository extends BaseRepository implements UserInterface
 
     public function show(mixed $id): mixed
     {
-        return $this->model->with('store','related_store','roles')->find($id);
+        return $this->model->with('store','related_store','roles', 'outlet', 'warehouse')->find($id);
     }
     
     public function checkUserActive(mixed $id): mixed
