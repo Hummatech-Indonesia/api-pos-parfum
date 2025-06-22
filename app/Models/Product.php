@@ -17,6 +17,11 @@ class Product extends Model
     protected $keyType = "string";
     protected $primaryKey = "id";
 
+    protected $casts = [
+        'composition' => 'array',
+    ];
+
+
     protected $guarded = [];
 
     /**
