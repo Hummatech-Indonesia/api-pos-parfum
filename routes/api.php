@@ -123,7 +123,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('role:auditor|admin|owner')->group(function () {
         Route::post('audit/{id}/restore', [AuditController::class, 'restore']);
-        Route::resource("audit", AuditController::class)->only(['store', 'index', 'destroy', 'show', 'update']);
+        Route::resource("audit", AuditController::class)->only(['store', 'destroy', 'update']);
     });
 
     // API FOR ROLE ADMIN, WAREHOUSE & OWNER
