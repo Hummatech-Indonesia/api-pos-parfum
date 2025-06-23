@@ -13,6 +13,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Laravel\Sanctum\PersonalAccessToken;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -103,5 +104,11 @@ class User extends Authenticatable implements HasArticles
     public function roles()
     {
         return $this->morphToMany(Role::class, 'model', 'model_has_roles');
+    }
+
+    public function tokens()
+    {
+        return $this->hasMany(PersonalAccessToken::class, 'tokenable_id')
+            ->where('tokenable_type', self::class);
     }
 }

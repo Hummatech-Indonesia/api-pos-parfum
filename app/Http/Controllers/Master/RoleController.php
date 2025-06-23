@@ -60,8 +60,16 @@ class RoleController extends Controller
         $role = $this->role->show($id);
         if (!$role) return BaseResponse::Notfound("Role tidak ditemukan!");
 
+        // Mapping last login untuk setiap user
+        $role->users->map(function ($user) {
+            $user->last_login = optional($user->tokens->first())->created_at;
+            unset($user->tokens); // hapus properti tokens biar tidak panjang
+            return $user;
+        });
+
         return BaseResponse::Ok("Detail role berhasil diambil!", $role);
     }
+
 
     /**
      * Update the specified role.
