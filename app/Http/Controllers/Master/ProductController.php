@@ -264,12 +264,15 @@ class ProductController extends Controller
         try {
             $payload = [];
 
-            if ($request->has('is_delete')) $payload["is_delete"] = $request->is_delete;
+            $payload["is_delete"] = $request->get('is_delete', 0); // default ke 0 jika tidak dikirim
 
-            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
+                $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+            }
+
             $data = $this->product->customQuery($payload)
                 ->with(['details' => function ($q) {
-                    $q->where('is_delete', 0); // Optional filter
+                    $q->where('is_delete', 0);
                 }])
                 ->get();
 
