@@ -265,7 +265,7 @@ class ProductController extends Controller
         try {
             $payload = [];
 
-            if ($request->has('is_delete')) $payload["is_delete"] = $request->is_delete;
+            $payload["is_delete"] = $request->has('is_delete') ? $request->is_delete : 0;
 
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             $data = $this->product->customQuery($payload)
