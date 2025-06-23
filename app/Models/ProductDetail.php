@@ -66,9 +66,9 @@ class ProductDetail extends Model
     {
         return $this->hasMany(DiscountVoucher::class, 'product_detail_id');
     }
-    public function productBundling()
+    public function productBundlingDetail()
     {
-        return $this->hasMany(ProductBundling::class, 'product_detail_id');
+        return $this->hasMany(ProductBundlingDetail::class, 'product_detail_id');
     }
     public function productBlend()
     {

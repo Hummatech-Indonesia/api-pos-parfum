@@ -240,7 +240,7 @@ class ProductController extends Controller
         foreach ($check->details as $detail) {
             if (
                 $detail->discountVouchers()->where('is_delete', 0)->exists()||
-                $detail->productBundling()->where('is_delete', 0)->exists()||
+                $detail->productBundlingDetail()->where('is_delete', 0)->exists()||
                 $detail->productBlend()->where('is_delete', 0)->exists()||
                 $detail->productBlendDetail()->where('is_delete', 0)->exists()||
                 $detail->auditDetail()->where('is_delete', 0)->exists()
