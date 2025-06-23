@@ -106,9 +106,9 @@ class User extends Authenticatable implements HasArticles
         return $this->morphToMany(Role::class, 'model', 'model_has_roles');
     }
 
-    public function tokens()
-    {
-        return $this->hasMany(PersonalAccessToken::class, 'tokenable_id')
-            ->where('tokenable_type', self::class);
-    }
+    // public function tokens()
+    // {
+    //     return $this->hasMany(PersonalAccessToken::class, 'tokenable_id')
+    //         ->where('tokenable_type', self::class);
+    // }
 }
