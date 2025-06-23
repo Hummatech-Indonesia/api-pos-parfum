@@ -110,7 +110,9 @@ class AuditRepository extends BaseRepository implements AuditInterface
                 foreach ($data as $index => $value) {
                     $query->where($index, $value);
                 }
-            });
+            })->with(['auditDetails', 'auditDetails.details.product' => function ($query) {
+                $query->select('id', 'name');
+            }]);
     }
 
     public function allDataTrashed(array $filter = []): mixed // Untuk mencari data yang dihapus

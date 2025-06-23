@@ -27,7 +27,7 @@ class OutletService{
             }catch(\Throwable $th){ }
 
             $result = [
-                "store_id" => auth()?->user()?->store?->id,
+                "store_id" => auth()?->user()?->store?->id ?? auth()?->user()?->store_id,
                 "name" => $data["name"],
                 "image" => $image,
                 "address" => $data["address"] ?? null,
@@ -53,7 +53,7 @@ class OutletService{
             }catch(\Throwable $th){ }
 
             return [
-                "store_id" => auth()?->user()?->store?->id,
+                "store_id" => auth()?->user()?->store?->id ?? auth()?->user()?->store_id,
                 "name" => $data["name"],
                 "image" => $image,
                 "address" => $data["address"] ?? $outlet->address,

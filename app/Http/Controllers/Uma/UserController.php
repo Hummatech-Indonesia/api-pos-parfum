@@ -74,7 +74,7 @@ class UserController extends Controller
         DB::beginTransaction();
         try {
             $user = $this->userService->mappingDataUser($data);
-            $user["store_id"] = auth()?->user()?->store?->id;
+            $user["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             $user["outlet_id"] = auth()?->user()?->outlet?->id; // menambahkan outlet_id ke user yang ditambahkan berdasarkan user yang login
             $user["warehouse_id"] = auth()?->user()?->warehouse?->id;
             $result_user = $this->user->store($user);
@@ -199,7 +199,7 @@ class UserController extends Controller
                 try {
                     $user["email"] = str_replace(" ", "", explode(" ", $user["name"])[0]) . date("ymdhms") . "@gmail.com";
                     $user["password"] = bcrypt("password");
-                    $user["store_id"] = auth()?->user()?->store?->id;
+                    $user["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
                     $result_user = $this->user->store($user);
     
                     $result_user->syncRoles(["member"]);

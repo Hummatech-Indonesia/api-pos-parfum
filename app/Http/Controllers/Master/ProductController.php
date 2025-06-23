@@ -16,6 +16,7 @@ use App\Contracts\Interfaces\Master\ProductInterface;
 use App\Contracts\Interfaces\Master\ProductStockInterface;
 use App\Contracts\Interfaces\Master\ProductDetailInterface;
 use App\Contracts\Interfaces\Master\ProductVarianInterface;
+use App\Models\Product;
 
 class ProductController extends Controller
 {
@@ -236,6 +237,16 @@ class ProductController extends Controller
         $check = $this->product->checkActive($id);
         if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data product !");
 
+        foreach ($check->details as $detail) {
+            if (
+                $detail->discountVouchers()->where('is_delete', 0)->exists()||
+                $detail->productBundlingDetail()->where('deleted_at', null)->exists()||
+                $detail->auditDetail()->where('deleted_at', null)->exists()
+                
+            ) {
+                return BaseResponse::Error("Tidak dapat menghapus produk karena salah satu detailnya masih digunakan dalam relasi lain.", null);
+            }
+        }
         DB::beginTransaction();
         try {
             $this->product->delete($id);
@@ -256,7 +267,11 @@ class ProductController extends Controller
             if ($request->has('is_delete')) $payload["is_delete"] = $request->is_delete;
 
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
-            $data = $this->product->customQuery($payload)->get();
+            $data = $this->product->customQuery($payload)
+                ->with(['details' => function ($q) {
+                    $q->where('is_delete', 0); // Optional filter
+                }])
+                ->get();
 
             return BaseResponse::Ok("Berhasil mengambil data product ", $data);
         } catch (\Throwable $th) {

@@ -32,7 +32,10 @@ class ProductService{
                 "image" => $image,
                 "unit_type" => $data["unit_type"],
                 "qr_code" => $data["qr_code"],
-                "category_id" => $data["category_id"]
+                "category_id" => $data["category_id"],
+                "description" => $data["description"] ?? null,
+                "composition" => $data["composition"] ?? null,
+
             ];
             return $result;
         }catch(\Throwable $th){
@@ -59,7 +62,9 @@ class ProductService{
                 "image" => $image,
                 "unit_type" => $data["unit_type"],
                 "qr_code" => $data["qr_code"],
-                "category_id" => $data["category_id"]
+                "category_id" => $data["category_id"],
+                "description" => $data["description"] ?? null,
+                "composition" => $data["composition"] ?? null,
             ];
         }catch(\Throwable $th){
             Log::error($th->getMessage());

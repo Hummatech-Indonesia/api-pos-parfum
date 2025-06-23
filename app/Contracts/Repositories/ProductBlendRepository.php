@@ -37,10 +37,9 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
         }
 
         $blend = $this->model
-            ->select('id', 'product_detail_id', 'product_id', 'result_stock as Quantity', 'date as tanggal_pembuatan', 'created_at')
+            ->select('id', 'product_detail_id', 'product_id', 'result_stock as Quantity', 'description', 'date as tanggal_pembuatan', 'created_at')
             ->with([
                 'product:id,name as nama_blending',
-                'productDetail:id,product_id',
             ])
             ->withCount('productBlendDetails as jumlah_bhn_baku')
             ->find($id);
@@ -53,7 +52,7 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
             ->select('id', 'product_blend_id', 'product_detail_id', 'used_stock as quantity')
             ->with([
                 'productDetail:id,product_id,variant_name',
-                'productDetail.product:id,name as name_product',
+                'productDetail.product:id,name',
             ])
             ->paginate($perPage, ['*'], 'transaction_page', $page);
 

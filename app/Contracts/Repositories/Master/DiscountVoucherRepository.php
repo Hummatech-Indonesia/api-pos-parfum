@@ -43,23 +43,61 @@ class DiscountVoucherRepository extends BaseRepository implements DiscountVouche
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-            ->with(['store', 'details', 'details.varian',  'details.product' => function ($query) {
+            ->with(['store', 'details', 'details.varian', 'details.product' => function ($query) {
                 $query->select('id', 'name');
             }])
-            ->when(count($data) > 0, function ($query) use ($data) {
-                if (isset($data["search"])) {
-                    $query->where(function ($query2) use ($data) {
-                        $query2->where('name', 'like', '%' . $data["search"] . '%');
+            ->where('is_delete', 0)
+            ->when($data, function ($query) use ($data) {
+                if (!empty($data["search"])) {
+                    $query->where(function ($q) use ($data) {
+                        $q->where('name', 'like', '%' . $data["search"] . '%');
                     });
-                    unset($data["search"]);
                 }
 
-                foreach ($data as $index => $value) {
-                    $query->where($index, $value);
+                if (!empty($data["name"])) {
+                    $query->where('name', 'like', '%' . $data["name"] . '%');
+                }
+
+                if (!empty($data["variant"])) {
+                    $query->whereHas('details.varian', function ($q) use ($data) {
+                        $q->where('name', 'like', '%' . $data["variant"] . '%');
+                    });
+                }
+
+                if (isset($data["active"])) {
+                    $query->where('active', $data["active"]);
+                }
+
+                if (!empty($data["type"])) {
+                    $query->where('type', $data["type"]);
+                }
+
+                if (!empty($data["discount"])) {
+                    $query->where('discount', $data["discount"]);
+                }
+
+                if (!empty($data["min_discount"]) && !empty($data["max_discount"])) {
+                    $query->whereBetween('discount', [$data["min_discount"], $data["max_discount"]]);
+                } elseif (!empty($data["min_discount"])) {
+                    $query->where('discount', '>=', $data["min_discount"]);
+                } elseif (!empty($data["max_discount"])) {
+                    $query->where('discount', '<=', $data["max_discount"]);
+                }
+
+                if (!empty($data["start_date"]) && !empty($data["end_date"])) {
+                    $query->whereDate('start_date', '>=', $data["start_date"])
+                    ->whereDate('expired', '<=', $data["end_date"]);
+                } elseif (!empty($data["start_date"])) {
+                    $query->whereDate('start_date', '>=', $data["start_date"]);
+                } elseif (!empty($data["end_date"])) {
+                    $query->whereDate('expired', '<=', $data["end_date"]);
+                }
+
+                if (!empty($data["store_id"])) {
+                    $query->where('store_id', $data["store_id"]);
                 }
             })
             ->paginate($pagination, ['*'], 'page', $page);
-        // ->appends(['search' => $request->search, 'year' => $request->year]);
     }
 
     public function show(mixed $id): mixed

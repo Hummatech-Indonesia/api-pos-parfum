@@ -14,6 +14,7 @@ use App\Http\Controllers\Master\OutletController;
 use App\Http\Controllers\Master\ProductController;
 use App\Http\Controllers\Master\WarehouseController;
 use App\Http\Controllers\Dashboard\CategoryController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Master\StockRequestController;
 use App\Http\Controllers\Master\ProductDetailController;
 use App\Http\Controllers\Master\ProductVarianController;
@@ -134,6 +135,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get("audit/no-paginate", [AuditController::class, 'list']);
         Route::get("audit/alltrashed", [AuditController::class, 'trashed']);
         Route::resource("setting", SettingController::class);
+        // Route::get('/dashboard', [DashbordController::class, 'index']);
     });
 
     // API FOR DATA USER
@@ -170,4 +172,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get("unit/no-paginate", [UnitController::class, 'list']);
     Route::get("unit/alltrashed", [UnitController::class, 'trashed']);
     Route::resource("unit", UnitController::class)->except(['create', 'edit']);
+
+    Route::middleware(['role:warehouse|outlet|admin'])->get('/dashboard', [DashboardController::class, 'index']);
 });

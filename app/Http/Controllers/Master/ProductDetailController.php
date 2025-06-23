@@ -23,9 +23,13 @@ class ProductDetailController extends Controller
     private ProductStockInterface $productStock;
     private ProductDetailService $productDetailService;
 
-    public function __construct(ProductInterface $product, ProductDetailInterface $productDetail, ProductService $productService,
-    ProductStockInterface $productStock, ProductDetailService $productDetailService)
-    {
+    public function __construct(
+        ProductInterface $product,
+        ProductDetailInterface $productDetail,
+        ProductService $productService,
+        ProductStockInterface $productStock,
+        ProductDetailService $productDetailService
+    ) {
         $this->product = $product;
         $this->productDetail = $productDetail;
         $this->productService = $productService;
@@ -45,8 +49,8 @@ class ProductDetailController extends Controller
         ];
 
         // check query filter
-        if($request->search) $payload["search"] = $request->search;
-        if($request->is_delete) $payload["is_delete"] = $request->is_delete;
+        if ($request->search) $payload["search"] = $request->search;
+        if ($request->is_delete) $payload["is_delete"] = $request->is_delete;
 
         $data = $this->productDetail->customPaginate($per_page, $page, $payload)->toArray();
 
@@ -59,10 +63,7 @@ class ProductDetailController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
@@ -79,7 +80,7 @@ class ProductDetailController extends Controller
 
             DB::commit();
             return BaseResponse::Ok('Berhasil membuat product ', $result_product);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -91,7 +92,7 @@ class ProductDetailController extends Controller
     public function show(string $id)
     {
         $check_product = $this->productDetail->show($id);
-        if(!$check_product) return BaseResponse::Notfound("Tidak dapat menemukan data product !");
+        if (!$check_product) return BaseResponse::Notfound("Tidak dapat menemukan data product !");
 
         return BaseResponse::Ok("Berhasil mengambil detail product !", $check_product);
     }
@@ -109,7 +110,7 @@ class ProductDetailController extends Controller
      */
     public function update(ProductDetailRequest $request, string $id)
     {
-        
+
         $data = $request->validated();
 
         DB::beginTransaction();
@@ -120,7 +121,7 @@ class ProductDetailController extends Controller
 
             DB::commit();
             return BaseResponse::Ok('Berhasil update product', $result_product);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -132,7 +133,15 @@ class ProductDetailController extends Controller
     public function destroy(string $id)
     {
         $check = $this->productDetail->checkActive($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data product detail!");
+        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data product detail!");
+
+        if (
+            $check->discountVouchers()->exists() ||
+            $check->auditDetails()->exists() ||
+            $check->productBlendDetail()->exists()
+        ) {
+            return BaseResponse::Error("Produk tidak dapat dihapus karena masih digunakan dalam relasi lain.", null);
+        }
 
         DB::beginTransaction();
         try {
@@ -140,7 +149,7 @@ class ProductDetailController extends Controller
 
             DB::commit();
             return BaseResponse::Ok('Berhasil menghapus data', null);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -148,30 +157,31 @@ class ProductDetailController extends Controller
 
     public function listProduct(Request $request)
     {
-        try{
+        try {
             $payload = [];
 
-            if($request->product_id) $payload['product_id'] = $request->product_id;  
+            if ($request->product_id) $payload['product_id'] = $request->product_id;
             $data = $this->productDetail->customQuery($payload)->get();
 
             return BaseResponse::Ok("Berhasil mengambil data product ", $data);
-        }catch(\Throwable $th) {
-          return BaseResponse::Error($th->getMessage(), null);  
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
         }
     }
 
-    public function stockProduct(Request $request) {
+    public function stockProduct(Request $request)
+    {
         $payload = [];
         try {
-            if($request->warehouse_id) $payload["warehouse_id"] = $request->warehouse_id;
-            if($request->product_detail_id) $payload["product_detail_id"] = $request->product_detail_id;
-            if($request->outlet_id) $payload["outlet_id"] = $request->outlet_id;
-            
-            if($request->page && $request->per_page) $data = $this->productStock->customPaginate($request->per_page, $request->page, $payload); 
+            if ($request->warehouse_id) $payload["warehouse_id"] = $request->warehouse_id;
+            if ($request->product_detail_id) $payload["product_detail_id"] = $request->product_detail_id;
+            if ($request->outlet_id) $payload["outlet_id"] = $request->outlet_id;
+
+            if ($request->page && $request->per_page) $data = $this->productStock->customPaginate($request->per_page, $request->page, $payload);
             else $data = $this->productStock->customQuery($payload);
 
             return BaseResponse::Ok("Berhasil mengambil data product ", $data);
-        }catch(\Throwable $th) {
+        } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
     }

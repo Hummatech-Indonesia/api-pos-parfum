@@ -114,15 +114,20 @@ class ProductRepository extends BaseRepository implements ProductInterface
 
     public function delete(mixed $id): mixed
     {
-    $model = $this->model->select('id', 'is_delete')->findOrFail($id);
+        $model = $this->model->select('id', 'is_delete')->findOrFail($id);
 
-    if ($model->is_delete) {
-        return null;
+        if ($model->is_delete) {
+            return null;
+        }
+
+        $model->details()->update(['is_delete' => 1]);
+        $model->update(['is_delete' => 1]);
+
+        return $model->fresh();
     }
 
-    $model->details()->update(['is_delete' => 1]);
-    $model->update(['is_delete' => 1]);
-
-    return $model->fresh();
+    public function countByStore(string $storeId): int
+    {
+        return Product::where('store_id', $storeId)->where('is_delete', 0)->count();
     }
 }
