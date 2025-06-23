@@ -240,10 +240,8 @@ class ProductController extends Controller
         foreach ($check->details as $detail) {
             if (
                 $detail->discountVouchers()->where('is_delete', 0)->exists()||
-                $detail->productBundlingDetail()->where('is_delete', 0)->exists()||
-                $detail->productBlend()->where('is_delete', 0)->exists()||
-                $detail->productBlendDetail()->where('is_delete', 0)->exists()||
-                $detail->auditDetail()->where('is_delete', 0)->exists()
+                $detail->productBundlingDetail()->where('deleted_at', null)->exists()||
+                $detail->auditDetail()->where('deleted_at', null)->exists()
                 
             ) {
                 return BaseResponse::Error("Tidak dapat menghapus produk karena salah satu detailnya masih digunakan dalam relasi lain.", null);
