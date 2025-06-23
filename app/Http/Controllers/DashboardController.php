@@ -19,7 +19,16 @@ class DashboardController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $year = (int) $request->query('year', now()->year);
+            $yearParam = $request->query('year', now()->year);
+
+            
+            if (!is_numeric($yearParam) || $yearParam < 2000 || $yearParam > 2100) {
+                return BaseResponse::Error('Parameter tahun tidak valid.', [
+                    'year' => $yearParam
+                ]);
+            }
+
+            $year = (int) $yearParam;
 
             $dashboard = $this->dashboardService->getDashboardByRole(auth()->user(), $year);
             return BaseResponse::OK('Dashboard berhasil dimuat', $dashboard);
