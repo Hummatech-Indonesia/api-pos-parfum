@@ -110,7 +110,7 @@ class ProductStockRepository extends BaseRepository implements ProductStockInter
             ->take(5)
             ->get()
             ->map(fn($p) => [
-                'id' => $p->productDetail->id ?? '-',
+                'id' => $p->product->id ?? '-',
                 'name' => $p->product->name ?? '-',
                 'stock' => $p->stock,
                 'unit' => $p->productDetail->unit ?? '-',
