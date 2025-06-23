@@ -138,7 +138,7 @@ class ProductDetailController extends Controller
         if (
             $check->discountVouchers()->exists() ||
             $check->auditDetails()->exists() ||
-            $check->productBundling()->exists()||
+            $check->productBundlingDetail()->exists()||
             $check->productBlend()->exists()||
             $check->productBlendDetail()->exists()
         ) {
