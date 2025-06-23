@@ -99,4 +99,9 @@ class User extends Authenticatable implements HasArticles
     {
         return $this->belongsTo(Warehouse::class)->where('is_delete',0);
     }
+
+    public function roles()
+    {
+        return $this->morphToMany(Role::class, 'model', 'model_has_roles');
+    }
 }

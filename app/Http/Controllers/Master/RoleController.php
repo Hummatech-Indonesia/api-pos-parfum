@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\Master\RoleRequest;
 use App\Models\Role;
+use App\Models\User;
 
 class RoleController extends Controller
 {
@@ -26,7 +27,7 @@ class RoleController extends Controller
     {
         try {
             $perPage = $request->query('per_page');
-            $query = Role::withCount('users');
+            $query = Role::withTrashed()->withCount('users');
 
             $roles = $perPage ? $query->paginate($perPage) : $query->get();
             return BaseResponse::Ok('Berhasil mengambil list role!', $roles);
@@ -106,6 +107,24 @@ class RoleController extends Controller
             if (!$restored) return BaseResponse::Notfound("Role tidak ditemukan atau tidak perlu direstore!");
 
             return BaseResponse::Ok("Role berhasil direstore!", $restored);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+        public function detachUser(string $roleId, string $userId)
+    {
+        try {
+            $role = Role::find($roleId);
+            if (!$role) return BaseResponse::Notfound("Role tidak ditemukan!");
+
+            $user = User::find($userId);
+            if (!$user) return BaseResponse::Notfound("User tidak ditemukan!");
+
+            // Menghapus relasi user-role
+            $user->roles()->detach($roleId);
+
+            return BaseResponse::Ok("Role berhasil dihapus dari user!", null);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
