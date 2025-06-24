@@ -16,6 +16,7 @@ use App\Contracts\Interfaces\Master\ProductInterface;
 use App\Contracts\Interfaces\Master\ProductStockInterface;
 use App\Contracts\Interfaces\Master\ProductDetailInterface;
 use App\Contracts\Interfaces\Master\ProductVarianInterface;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 
 class ProductController extends Controller
@@ -70,10 +71,11 @@ class ProductController extends Controller
         $payload["sort_order"] = in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'asc';
 
         $paginated = $this->product->customPaginate($perPage, $page, $payload);
-        $formatted = $this->productService->formatProductListResponse($paginated->getCollection());
-        $paginated->setCollection($formatted);
+        $paginated->load('details.category', 'category');
 
-        return BaseResponse::Paginate('Berhasil mengambil list data product !', $formatted, $paginated->toArray());
+        $resource = ProductResource::collection($paginated);
+
+        return BaseResponse::Paginate('Berhasil mengambil list data product !', $resource->collection, $paginated->toArray());
     }
 
 
@@ -152,12 +154,11 @@ class ProductController extends Controller
             return BaseResponse::Notfound("Tidak dapat menemukan data product !");
         }
 
-        $product->loadMissing(['details.productStockWarehouse', 'details.productStockOutlet']);
+        $product->loadMissing(['details.productStockWarehouse', 'details.productStockOutlet', 'details.category', 'details.category']);
 
-        $formatted = $this->productService->formatProductDetailResponse($product);
-
-        return BaseResponse::Ok("Berhasil mengambil detail product !", $formatted);
+        return BaseResponse::Ok("Berhasil mengambil detail product !", new ProductResource($product));
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -261,7 +262,6 @@ class ProductController extends Controller
     {
         try {
             $payload = [];
-
             $payload["is_delete"] = $request->has('is_delete') ? $request->is_delete : 0;
 
             if ($request->filled('search')) {
@@ -283,6 +283,7 @@ class ProductController extends Controller
                         ->withSum('productStockOutlet', 'stock')
                         ->withSum('productStockWarehouse', 'stock');
                 }])
+                ->with('category')
                 ->withSum('details', 'stock');
 
             if (!empty($payload["search"])) {
@@ -292,17 +293,16 @@ class ProductController extends Controller
             if (!empty($payload["sort_by"])) {
                 $query->orderBy($payload["sort_by"], $payload["sort_order"] ?? 'desc');
             } else {
-                $query->orderBy('created_at', 'desc'); // default
+                $query->orderBy('created_at', 'desc');
             }
 
             $products = $query->get();
 
-            $formatted = $this->productService->formatProductListResponse($products);
-
-            return BaseResponse::Ok("Berhasil mengambil data product", $formatted);
+            return BaseResponse::Ok("Berhasil mengambil data product", ProductResource::collection($products));
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
+
 
 }
