@@ -66,7 +66,7 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
-        $sorting = $data['sorting'];
+        $sorting = $data['sorting']?? [];
         unset($data['sorting']);
 
         return $this->model->query()
