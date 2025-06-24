@@ -45,8 +45,10 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
 
     public function customQuery(array $data): mixed
     {
-        $sorting = $data['sorting'];
-        unset($data['sorting']);
+        $sorting = $data['sorting'] ?? [];
+        if (isset($data['sorting'])) {
+            unset($data['sorting']);
+        }
 
         return $this->model->query()
             // ->with('store')
