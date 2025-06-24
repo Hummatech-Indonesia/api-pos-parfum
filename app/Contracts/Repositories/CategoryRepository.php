@@ -24,7 +24,8 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
         return $this->model->create($data);
     }
 
-    public function sorted($column, $order) {
+    public function sorted($column, $order)
+    {
         $data = [
             "column" => "created_at",
             "order" => "ASC",
@@ -66,8 +67,10 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
-        $sorting = $data['sorting']?? [];
-        unset($data['sorting']);
+        $sorting = $data['sorting'] ?? [];
+        if (isset($data['sorting'])) {
+            unset($data['sorting']);
+        }
 
         return $this->model->query()
             // ->with('store:id,name')
