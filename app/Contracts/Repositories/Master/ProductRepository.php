@@ -29,10 +29,11 @@ class ProductRepository extends BaseRepository implements ProductInterface
         return $this->model->query()
 
             ->with(['store', 'details' => function ($query) {
-                $query->with('varian', 'category')->withCount('transactionDetails');
+                $query->with('category')->withCount('transactionDetails');
             }])
             ->when(count($data) > 0, function ($query) use ($data) {
                 foreach ($data as $index => $value) {
+                    if (in_array($index, ['search', 'sort_by', 'sort_order', 'orderby_total_stock'])) continue; // <-- abaikan
                     $query->where($index, $value);
                 }
             });
@@ -45,33 +46,41 @@ class ProductRepository extends BaseRepository implements ProductInterface
                 'store',
                 'category',
                 'details' => function ($q) {
-
-                    $q->withCount('transactionDetails')->with(['category:id,name', 'varian'])->withSum('productStockOutlet', 'stock')->withSum('productStockWarehouse', 'stock');
+                    $q->withCount('transactionDetails')
+                    ->with(['category:id,name'])
+                    ->withSum('productStockOutlet', 'stock')
+                    ->withSum('productStockWarehouse', 'stock');
                 }
-
             ])
-            ->withSum('details', 'stock'); // Menjumlahkan stok dari detail_product
+            ->withSum('details', 'stock');
 
-        // Filtering berdasarkan search
         if (!empty($data["search"])) {
             $query->where('name', 'like', '%' . $data["search"] . '%');
             unset($data["search"]);
         }
 
-        // OrderBy total stock jika param valid
         if (!empty($data["orderby_total_stock"]) && in_array($data["orderby_total_stock"], ['asc', 'desc'])) {
             $query->orderBy('details_sum_stock', $data["orderby_total_stock"]);
             unset($data["orderby_total_stock"]);
         }
 
-        // Filtering berdasarkan parameter lainnya
+        if (!empty($data["sort_by"]) && in_array($data["sort_by"], ['name', 'created_at'])) {
+            $query->orderBy($data["sort_by"], $data["sort_order"] ?? 'asc');
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+
         $filteredData = array_filter($data, fn($value) => !is_null($value) && $value !== '');
         foreach ($filteredData as $index => $value) {
-            $query->where($index, $value);
+            if (!in_array($index, ['sort_by', 'sort_order'])) {
+                $query->where($index, $value);
+            }
         }
 
         return $query->paginate($pagination, ['*'], 'page', $page);
     }
+
 
     public function show(mixed $id): mixed
     {
