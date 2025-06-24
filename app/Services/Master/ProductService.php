@@ -23,8 +23,12 @@ class ProductService{
             try{
                 if(isset($data["image"])) {
                     $image = $this->upload("products", $data["image"]);
+                } else {
+                    $image = "default/Default.jpeg";
                 }
-            }catch(\Throwable $th){ }
+            }catch(\Throwable $th){
+                $image = "default/Default.jpeg";
+            }
 
             $result = [
                 "store_id" => $data["store_id"],
@@ -34,7 +38,6 @@ class ProductService{
                 "qr_code" => $data["qr_code"],
                 "category_id" => $data["category_id"],
                 "description" => $data["description"] ?? null,
-                "composition" => $data["composition"] ?? null,
 
             ];
             return $result;
@@ -64,11 +67,11 @@ class ProductService{
                 "qr_code" => $data["qr_code"],
                 "category_id" => $data["category_id"],
                 "description" => $data["description"] ?? null,
-                "composition" => $data["composition"] ?? null,
             ];
         }catch(\Throwable $th){
             Log::error($th->getMessage());
             throw new Error($th->getMessage(), 400);
         }
     }
+
 }

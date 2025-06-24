@@ -16,6 +16,7 @@ use App\Contracts\Interfaces\Master\ProductInterface;
 use App\Contracts\Interfaces\Master\ProductStockInterface;
 use App\Contracts\Interfaces\Master\ProductDetailInterface;
 use App\Contracts\Interfaces\Master\ProductVarianInterface;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 
 class ProductController extends Controller
@@ -51,29 +52,33 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $per_page = $request->per_page ?? 10;
+        $perPage = $request->per_page ?? 10;
         $page = $request->page ?? 1;
+
         $payload = [
-            "is_delete" => 0
+            "is_delete" => $request->get('is_delete', 0),
         ];
 
-        // check query filter
-        if ($request->search) $payload["search"] = $request->search;
-        if ($request->is_delete) $payload["is_delete"] = $request->is_delete;
-        if ($request->orderby_total_stock) $payload["orderby_total_stock"] = $request->orderby_total_stock;
-        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+        if ($request->search) {
+            $payload["search"] = $request->search;
+        }
 
-        $data = $this->product->customPaginate($per_page, $page, $payload);
-        $data->loadMissing(['details.productStockWarehouse', 'details.category:id,name']);
+        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
+            $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+        }
 
-        $paginate = $data->toArray();
-        $result = $paginate["data"];
-        unset($data["data"]);
+        $payload["sort_by"] = in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null;
+        $payload["sort_order"] = in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'asc';
 
+        $paginated = $this->product->customPaginate($perPage, $page, $payload);
+        $paginated->load('details.category', 'category');
 
+        $resource = ProductResource::collection($paginated);
 
-        return BaseResponse::Paginate('Berhasil mengambil list data product !', $result, $paginate);
+        return BaseResponse::Paginate('Berhasil mengambil list data product !', $resource->collection, $paginated->toArray());
     }
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -123,6 +128,7 @@ class ProductController extends Controller
 
                 $this->productStock->store([
                     'warehouse_id' => auth()->user()->warehouse_id,
+                    'outlet_id' => auth()->user()->outlet_id ?? null,
                     'product_id' => $result_product->id,
                     'product_detail_id' => $storedDetail->id,
                     'stock' => $storedDetail->stock ?? 0,
@@ -142,13 +148,17 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        $check_product = $this->product->checkActiveWithDetailV2($id);
-        if (!$check_product) return BaseResponse::Notfound("Tidak dapat menemukan data product !");
+        $product = $this->product->checkActiveWithDetailV2($id);
 
-        $check_product->loadMissing(['details.productStockWarehouse', 'details.productStockOutlet']);
+        if (!$product) {
+            return BaseResponse::Notfound("Tidak dapat menemukan data product !");
+        }
 
-        return BaseResponse::Ok("Berhasil mengambil detail product !", $check_product);
+        $product->loadMissing(['details.productStockWarehouse', 'details.productStockOutlet', 'details.category', 'details.category']);
+
+        return BaseResponse::Ok("Berhasil mengambil detail product !", new ProductResource($product));
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -233,20 +243,9 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-
         $check = $this->product->checkActive($id);
         if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data product !");
 
-        foreach ($check->details as $detail) {
-            if (
-                $detail->discountVouchers()->where('is_delete', 0)->exists()||
-                $detail->productBundlingDetail()->where('deleted_at', null)->exists()||
-                $detail->auditDetail()->where('deleted_at', null)->exists()
-                
-            ) {
-                return BaseResponse::Error("Tidak dapat menghapus produk karena salah satu detailnya masih digunakan dalam relasi lain.", null);
-            }
-        }
         DB::beginTransaction();
         try {
             $this->product->delete($id);
@@ -262,20 +261,25 @@ class ProductController extends Controller
     public function listProduct(Request $request)
     {
         try {
-            $payload = [];
+            $payload = [
+                'is_delete' => $request->get('is_delete', 0),
+                'search' => $request->get('search'),
+                'sort_by' => in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null,
+                'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
+            ];
 
-            if ($request->has('is_delete')) $payload["is_delete"] = $request->is_delete;
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
+                $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+            }
 
-            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
-            $data = $this->product->customQuery($payload)
-                ->with(['details' => function ($q) {
-                    $q->where('is_delete', 0); // Optional filter
-                }])
-                ->get();
+            $products = $this->product->getListProduct($payload);
 
-            return BaseResponse::Ok("Berhasil mengambil data product ", $data);
+            return BaseResponse::Ok("Berhasil mengambil data product", ProductResource::collection($products));
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
+
+
+
 }

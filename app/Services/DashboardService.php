@@ -22,10 +22,9 @@ class DashboardService
         protected UserRepository $userRepo,
     ) {}
 
-    public function getDashboardByRole(User $user)
+    public function getDashboardByRole(User $user, int $year)
     {
         $roles = $user->roles->pluck('name')->map(fn($r) => strtolower($r))->toArray();
-        $year = now()->year;
 
         if (array_intersect($roles, ['warehouse', 'owner'])) {
             return $this->getWarehouseDashboard($user, $year);

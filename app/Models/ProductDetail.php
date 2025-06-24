@@ -36,10 +36,6 @@ class ProductDetail extends Model
     /**
      * Get data relation belongs to with varian
      */
-    public function varian(): BelongsTo
-    {
-        return $this->belongsTo(ProductVarian::class, 'product_varian_id')->where('is_delete', 0);
-    }
 
     /**
      * Get data stock in outlet

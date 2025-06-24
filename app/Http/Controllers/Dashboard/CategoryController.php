@@ -30,13 +30,20 @@ class CategoryController extends Controller
     {
         $per_page = $request->per_page ?? 10;
         $page = $request->page ?? 1;
+        $sort = $request->sort ?? 'created_at';
+        $order = $request->order ?? 'ASC';
         $payload = [
-            "is_delete" => 0
+            "is_delete" => 0,
         ];
 
         // check query filter
         if($request->search) $payload["search"] = $request->search;
         if($request->is_delete) $payload["is_delete"] = $request->is_delete;
+
+        // add sorting
+        $sorting = $this->category->sorted($sort, $order);
+        $payload['sorting'] = $sorting;
+        
         if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
 
         $data = $this->category->customPaginate($per_page, $page, $payload)->toArray();
@@ -140,10 +147,16 @@ class CategoryController extends Controller
 
     public function listCategory(Request $request)
     {
+        $sort = $request->sort ?? 'created_at';
+        $order = $request->order ?? 'ASC';
+
         try{
             $payload = [
                 "is_delete" => 0
             ];
+
+            $sorting = $this->category->sorted($sort, $order);
+            $payload['sorting'] = $sorting;
 
             if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
             $data = $this->category->customQuery($payload)->get();

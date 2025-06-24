@@ -29,7 +29,7 @@ class DiscountVoucherRepository extends BaseRepository implements DiscountVouche
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
-            ->with(['store', 'details', 'details.varian', 'details.product' => function ($query) {
+            ->with(['store', 'details',  'details.product' => function ($query) {
                 $query->select('id', 'name');
             }])
             ->where('is_delete', 0)
@@ -43,8 +43,8 @@ class DiscountVoucherRepository extends BaseRepository implements DiscountVouche
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-            ->with(['store', 'details', 'details.varian', 'details.product' => function ($query) {
-                $query->select('id', 'name');
+            ->with(['store:id,name', 'details:id,variant_name,product_code,product_id', 'details.product' => function ($query) {
+                $query->select('id', 'name','image');
             }])
             ->where('is_delete', 0)
             ->when($data, function ($query) use ($data) {
@@ -58,11 +58,11 @@ class DiscountVoucherRepository extends BaseRepository implements DiscountVouche
                     $query->where('name', 'like', '%' . $data["name"] . '%');
                 }
 
-                if (!empty($data["variant"])) {
-                    $query->whereHas('details.varian', function ($q) use ($data) {
-                        $q->where('name', 'like', '%' . $data["variant"] . '%');
-                    });
-                }
+                // if (!empty($data["variant"])) {
+                //     $query->whereHas('details.varian', function ($q) use ($data) {
+                //         $q->where('name', 'like', '%' . $data["variant"] . '%');
+                //     });
+                // }
 
                 if (isset($data["active"])) {
                     $query->where('active', $data["active"]);
@@ -86,7 +86,7 @@ class DiscountVoucherRepository extends BaseRepository implements DiscountVouche
 
                 if (!empty($data["start_date"]) && !empty($data["end_date"])) {
                     $query->whereDate('start_date', '>=', $data["start_date"])
-                    ->whereDate('expired', '<=', $data["end_date"]);
+                        ->whereDate('expired', '<=', $data["end_date"]);
                 } elseif (!empty($data["start_date"])) {
                     $query->whereDate('start_date', '>=', $data["start_date"]);
                 } elseif (!empty($data["end_date"])) {
@@ -96,24 +96,40 @@ class DiscountVoucherRepository extends BaseRepository implements DiscountVouche
                 if (!empty($data["store_id"])) {
                     $query->where('store_id', $data["store_id"]);
                 }
+
+                if (!empty($data['sort_by']) && !empty($data['sort_direction'])) {
+                    $allowedSorts = ['name', 'discount', 'start_date', 'expired', 'created_at'];
+                    $allowedDirections = ['asc', 'desc'];
+
+                    $sortBy = in_array($data['sort_by'], $allowedSorts) ? $data['sort_by'] : 'created_at';
+                    $sortDirection = in_array(strtolower($data['sort_direction']), $allowedDirections)
+                        ? strtolower($data['sort_direction'])
+                        : 'desc';
+
+                    $query->orderBy($sortBy, $sortDirection);
+                } else {
+                    $query->orderBy('created_at', 'desc');
+                }
             })
             ->paginate($pagination, ['*'], 'page', $page);
     }
 
     public function show(mixed $id): mixed
     {
-        return $this->model->with(['store' => function ($query) {
-            $query->select('id', 'name');
-        }, 'details', 'details.varian' => function ($query) {
-            $query->select('id', 'name');
-        }, 'details.product' => function ($query) {
-            $query->select('id', 'name');
-        }])->find($id);
+        return $this->model->with([
+            'store' => function ($query) {
+                $query->select('id', 'name');
+            },
+            'details',
+            'details.product' => function ($query) {
+                $query->select('id', 'name');
+            }
+        ])->find($id);
     }
 
     public function checkActive(mixed $id): mixed
     {
-        return $this->model->with(['store', 'details', 'details.varian', 'details.product' => function ($query) {
+        return $this->model->with(['store', 'details', 'details.product' => function ($query) {
             $query->select('id', 'name');
         }])->where('is_delete', 0)->find($id);
     }

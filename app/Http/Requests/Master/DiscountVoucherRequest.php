@@ -31,14 +31,17 @@ class DiscountVoucherRequest extends FormRequest
             'outlet_id' => 'nullable',
             'name' => 'required',
             'desc' => 'sometimes',
-            'max_used' => 'nullable',
             'minimum_purchase' => 'sometimes',
-            'discount' => 'required|integer|min:0',
+            'discount' => 'nullable|integer|min:0',
             'end_date' => 'sometimes|date',
             'start_date' => 'sometimes|date',
             // 'expired' => 'sometimes|after:today',
-            'active' => 'nullable',
-            'category' => 'sometimes'
+            'type' => 'sometimes|in:percentage,nominal',
+            'percentage' => 'nullable|numeric|required_if:type,percentage|prohibited_if:type,nominal',
+            'nominal' => 'nullable|numeric|required_if:type,nominal|prohibited_if:type,percentage',
+            'is_member' => 'nullable|boolean',
+            'active' => 'nullable|boolean',
+
         ];
     }
 
@@ -47,7 +50,14 @@ class DiscountVoucherRequest extends FormRequest
         return [
             'name.required' => 'Nama discount / voucher harus diisi!',
             'discount.required' => 'Jumlah discount harus diisi!',
-            'expired.after' => 'Tenggat discount / voucher harus melebihi dari hari ini!'
+            'expired.after' => 'Tenggat discount / voucher harus melebihi dari hari ini!',
+            'type.in' => 'Tipe diskon harus berupa percentage atau nominal.',
+
+            'percentage.required_if' => 'Field percentage wajib diisi jika tipe diskon adalah percentage.',
+            'percentage.prohibited_if' => 'Field percentage tidak boleh diisi jika tipe diskon adalah nominal.',
+
+            'nominal.required_if' => 'Field nominal wajib diisi jika tipe diskon adalah nominal.',
+            'nominal.prohibited_if' => 'Field nominal tidak boleh diisi jika tipe diskon adalah percentage.',
         ];
     }
 
@@ -60,5 +70,23 @@ class DiscountVoucherRequest extends FormRequest
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(BaseResponse::error("Kesalahan dalam validasi!", $validator->errors()));
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $hasNominal = $this->filled('nominal');
+            $hasPercentage = $this->filled('percentage');
+
+            if (!$hasNominal && !$hasPercentage) {
+                $validator->errors()->add('nominal', 'Isi salah satu: nominal atau percentage.');
+                $validator->errors()->add('percentage', 'Isi salah satu: nominal atau percentage.');
+            }
+
+            if ($hasNominal && $hasPercentage) {
+                $validator->errors()->add('nominal', 'Hanya salah satu yang boleh diisi: nominal atau percentage.');
+                $validator->errors()->add('percentage', 'Hanya salah satu yang boleh diisi: nominal atau percentage.');
+            }
+        });
     }
 }

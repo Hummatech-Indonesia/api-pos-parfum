@@ -36,8 +36,6 @@ class ProductRequest extends FormRequest
             "product_details" => "sometimes|array",
             "product_details.*.product_id" => "nullable|uuid|exists:products,id",
             "product_details.*.category_id" => "required|exists:categories,id",
-            "product_details.*.product_varian_id" => "nullable|uuid|exists:product_varians,id",
-            "product_details.*.variant_name" => "required|string",
             "product_details.*.material" => "nullable|string",
             "product_details.*.unit" => "nullable|string",
             "product_details.*.stock" => "required|numeric|min:0",
@@ -49,8 +47,6 @@ class ProductRequest extends FormRequest
             "product_details.*.product_code" => "required|string",
             "product_details.*.product_image" => "nullable|image|mimes:png,jpg,jpeg|max:2048",
             'description' => 'nullable|string',
-            'composition' => 'nullable|array',
-            'composition.*' => 'string|max:255',
         ];
     }
 
@@ -59,7 +55,7 @@ class ProductRequest extends FormRequest
         return [
             'name.required' => 'Nama produk harus di isi!',
             'image.image' => 'Format gambar tidak valid!',
-            'image.mimes' => 'Gambar yang bisa dipakai adalah jpg, png, dan jpe          g!',
+            'image.mimes' => 'Gambar yang bisa dipakai adalah jpg, png, dan jpeg!',
             'image.max' => "Gambar maksimal adalah 2mb",
             'category_id.required' => 'Kategori harus diisi!',
             'category_id.exists' => 'Kategori tidak ada!',
@@ -71,12 +67,8 @@ class ProductRequest extends FormRequest
             'product_details.product_image|max:2048' => "Gambar detail maksimal adalah 2mb",
             'product_details.*.product_image.required' => 'Gambar produk harus diunggah!',
             'product_details.*.category_id.required' => 'Kategori pada detail produk harus diisi!',
-            'product_details.*.variant_name.required' => 'Nama varian harus diisi!',
             'product_details.*.product_code' => 'Kode produk harus diisi!',
             'description.string' => 'Deskripsi produk harus berupa teks!',
-            'composition.array' => 'Komposisi harus berupa array!',
-            'composition.*.string' => 'Setiap komposisi harus berupa teks!',
-            'composition.*.max' => 'Setiap item komposisi maksimal 255 karakter!',
             // 'product_details.*.product_varian_id.unique' => 'Varian ini telah ada, silahkan pilih varian tanpa memembuat ulang!',
             // 'product_details.*.category_id.unique' => 'Kategori ini telah ada, silahkan pilih kategori tanpa memembuat ulang!'
         ];
