@@ -59,7 +59,7 @@ class ProductRequest extends FormRequest
         return [
             'name.required' => 'Nama produk harus di isi!',
             'image.image' => 'Format gambar tidak valid!',
-            'image.mimes' => 'Gambar yang bisa dipakai adalah jpg, png, dan jpe          g!',
+            'image.mimes' => 'Gambar yang bisa dipakai adalah jpg, png, dan jpeg!',
             'image.max' => "Gambar maksimal adalah 2mb",
             'category_id.required' => 'Kategori harus diisi!',
             'category_id.exists' => 'Kategori tidak ada!',

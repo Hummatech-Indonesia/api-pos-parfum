@@ -2,9 +2,10 @@
 
 namespace App\Contracts\Repositories;
 
-use App\Contracts\Interfaces\CategoryInterface;
 use App\Models\Category;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\QueryException;
+use App\Contracts\Interfaces\CategoryInterface;
 
 class CategoryRepository extends BaseRepository implements CategoryInterface
 {
@@ -23,10 +24,31 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
         return $this->model->create($data);
     }
 
+    public function sorted($column, $order) {
+        $data = [
+            "column" => "created_at",
+            "order" => "ASC",
+        ];
+
+        $validColumns = Schema::getColumnListing($this->model->getTable());
+        if (in_array($column, $validColumns)) {
+            $data['column'] = $column;
+        }
+
+        if (in_array($order, ["ASC", "DESC"])) {
+            $data['order'] = $order;
+        }
+
+        return $data;
+    }
+
     public function customQuery(array $data): mixed
     {
+        $sorting = $data['sorting'];
+        unset($data['sorting']);
+
         return $this->model->query()
-            ->with('store')
+            // ->with('store')
             ->withCount(['products' => function ($q) {
                 $q->where('is_delete', 0);
             }])
@@ -34,16 +56,24 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
                 foreach ($data as $index => $value) {
                     $query->where($index, $value);
                 }
-            });
+            })
+            ->select('name', 'created_at')
+            ->addSelect(\DB::raw("(select count(*) from products where products.category_id = categories.id and is_delete = 0) as products_count"))
+            ->orderBy($sorting['column'] ?? "created_at", $sorting['order'] ?? "ASC");
     }
+
+
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
+        $sorting = $data['sorting'];
+        unset($data['sorting']);
+
         return $this->model->query()
-            ->with('store:id,name')
-            ->withCount(['products' => function ($q) {
-                $q->where('is_delete', 0);
-            }])
+            // ->with('store:id,name')
+            // ->withCount(['products' => function ($q) {
+            //     $q->where('is_delete', 0);
+            // }])
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (isset($data["search"])) {
                     $query->where(function ($query2) use ($data) {
@@ -56,6 +86,9 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
                     $query->where($index, $value);
                 }
             })
+            ->select('name', 'created_at')
+            ->addSelect(\DB::raw("(select count(*) from products where products.category_id = categories.id and is_delete = 0) as products_count"))
+            ->orderBy($sorting['column'] ?? "created_at", $sorting['order'] ?? "ASC")
             ->paginate($pagination, ['*'], 'page', $page);
         // ->appends(['search' => $request->search, 'year' => $request->year]);
     }

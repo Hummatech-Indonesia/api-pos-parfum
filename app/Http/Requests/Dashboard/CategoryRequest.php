@@ -19,7 +19,7 @@ class CategoryRequest extends FormRequest
 
     public function rules(): array
     {
-        $id = $this->categories;
+        $id = $this->route('category') ?? null;
         $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
         return [
             'name' => [
