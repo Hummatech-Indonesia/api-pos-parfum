@@ -261,48 +261,25 @@ class ProductController extends Controller
     public function listProduct(Request $request)
     {
         try {
-            $payload = [];
-            $payload["is_delete"] = $request->has('is_delete') ? $request->is_delete : 0;
-
-            if ($request->filled('search')) {
-                $payload["search"] = $request->search;
-            }
+            $payload = [
+                'is_delete' => $request->get('is_delete', 0),
+                'search' => $request->get('search'),
+                'sort_by' => in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null,
+                'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
+            ];
 
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
                 $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             }
 
-            $payload["sort_by"] = in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null;
-            $payload["sort_order"] = in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc';
-
-            $query = $this->product->customQuery($payload)
-                ->with(['details' => function ($q) {
-                    $q->where('is_delete', 0)
-                        ->withCount('transactionDetails')
-                        ->with(['category'])
-                        ->withSum('productStockOutlet', 'stock')
-                        ->withSum('productStockWarehouse', 'stock');
-                }])
-                ->with('category')
-                ->withSum('details', 'stock');
-
-            if (!empty($payload["search"])) {
-                $query->where('name', 'like', '%' . $payload["search"] . '%');
-            }
-
-            if (!empty($payload["sort_by"])) {
-                $query->orderBy($payload["sort_by"], $payload["sort_order"] ?? 'desc');
-            } else {
-                $query->orderBy('created_at', 'desc');
-            }
-
-            $products = $query->get();
+            $products = $this->product->getListProduct($payload);
 
             return BaseResponse::Ok("Berhasil mengambil data product", ProductResource::collection($products));
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
+
 
 
 }
