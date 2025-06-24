@@ -27,9 +27,12 @@ class ProductRepository extends BaseRepository implements ProductInterface
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
-
             ->with(['store', 'details' => function ($query) {
                 $query->with('category')->withCount('transactionDetails');
+            ->with([
+                'store', 'productBundling.details',
+                'details' => function ($query) {
+                $query->with('varian', 'category')->withCount('transactionDetails');
             }])
             ->when(count($data) > 0, function ($query) use ($data) {
                 foreach ($data as $index => $value) {
