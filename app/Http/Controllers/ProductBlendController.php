@@ -6,6 +6,8 @@ use App\Contracts\Interfaces\Master\{ProductDetailInterface, ProductInterface, P
 use App\Contracts\Interfaces\{ProductBlendInterface, ProductBlendDetailInterface};
 use App\Helpers\BaseResponse;
 use App\Http\Requests\ProductBlendRequest;
+use App\Http\Resources\ProductBlendResource;
+use App\Http\Resources\ProductBlendWithDetailResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -41,10 +43,18 @@ class ProductBlendController extends Controller
         if ($request->search) $payload["search"] = $request->search;
 
         try {
-            $data = $this->productBlend->customPaginate($per_page, $page, $payload)->toArray();
-            $result = $data['data'];
-            unset($data['data']);
-            return BaseResponse::Paginate('Berhasil mengambil list data product blend!', $result, $data);
+            $paginate = $this->productBlend->customPaginate($per_page, $page, $payload);
+
+            $resource = ProductBlendResource::collection($paginate);
+
+            $result = $resource->collection->values();
+            $meta = [
+                'current_page' => $paginate->currentPage(),
+                'last_page' => $paginate->lastPage(),
+                'per_page' => $paginate->perPage(),
+                'total' => $paginate->total(),
+            ];
+            return BaseResponse::Paginate('Berhasil mengambil list data product blend!', $result, $meta);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -61,7 +71,7 @@ class ProductBlendController extends Controller
             foreach ($data['product_blend'] as $blend) {
                 $totalUsed = collect($blend['product_blend_details'])->sum('used_stock');
                 if ($totalUsed > $blend['result_stock']) {
-                    return BaseResponse::Error("Total used stock melebihi result stock", null, 422);
+                    return BaseResponse::Custom(false, "Total used stock melebihi result stock", null, 422);
                 }
             }
 
@@ -82,7 +92,6 @@ class ProductBlendController extends Controller
             $product_id = $product->id;
 
             foreach ($data['product_blend'] as $productBlend) {
-                // Simpan product_blend (hasil blending)
                 $storeBlend = [
                     'store_id' => auth()->user()->store_id,
                     'warehouse_id' => auth()->user()->warehouse_id,
@@ -111,8 +120,11 @@ class ProductBlendController extends Controller
                     }
 
                     if ($stock->stock < $blendDetail['used_stock']) {
+                        $productDetail = $this->productDetail->find($blendDetail['product_detail_id']);
+                        $productName = $productDetail?->product?->name ?? 'Produk tidak ditemukan';
+                        $remainingStock = $stock->stock;
                         DB::rollBack();
-                        return BaseResponse::Error("Stok bahan tidak cukup untuk produk detail ID {$blendDetail['product_detail_id']}", null);
+                        return BaseResponse::Custom(false, "Stok bahan tidak cukup untuk produk {$productName}, sisa stock {$remainingStock}", null, 422);
                     }
 
                     // Kurangi stok bahan baku
@@ -173,7 +185,9 @@ class ProductBlendController extends Controller
             return BaseResponse::Notfound("Tidak dapat menemukan data produk blend!");
         }
 
-        return BaseResponse::Ok("Berhasil mengambil detail produk blend!", $result['data']);
+        $resource = new ProductBlendWithDetailResource($result['data']);
+
+        return BaseResponse::Ok("Berhasil mengambil detail produk blend!", $resource);
     }
 
     public function update(Request $request, string $id)

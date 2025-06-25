@@ -37,9 +37,8 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
         }
 
         $blend = $this->model
-            ->select('id', 'product_detail_id', 'product_id', 'result_stock as Quantity', 'description', 'date as tanggal_pembuatan', 'created_at')
             ->with([
-                'product:id,name as nama_blending',
+                'product',
             ])
             ->withCount('productBlendDetails as jumlah_bhn_baku')
             ->find($id);
@@ -49,10 +48,9 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
         }
 
         $details = $blend->productBlendDetails()
-            ->select('id', 'product_blend_id', 'product_detail_id', 'used_stock as quantity')
             ->with([
-                'productDetail:id,product_id,variant_name',
-                'productDetail.product:id,name',
+                'productDetail',
+                'productDetail.product',
             ])
             ->paginate($perPage, ['*'], 'transaction_page', $page);
 
@@ -74,13 +72,12 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         $query = $this->model->query()
-            ->select('id', 'product_detail_id', 'product_id', 'result_stock as quantity', 'description', 'date', 'created_at')
             ->with([
-                'productDetail:id,product_id',
-                'product:id,name as blend_name',
-                'productBlendDetails:id,product_blend_id,product_detail_id,used_stock,created_at',
-                'productBlendDetails.productDetail:id,variant_name,product_id',
-                'productBlendDetails.productDetail.product:id,name',
+                'productDetail',
+                'product',
+                'productBlendDetails',
+                'productBlendDetails.productDetail',
+                'productBlendDetails.productDetail.product',
             ])
             ->withCount('productBlendDetails as used_product_count');
 
