@@ -20,3 +20,4 @@ yarn-error.log
 /storage/framework
 composer.lock
 /storage/logs/laravel.log
+/.github/**
