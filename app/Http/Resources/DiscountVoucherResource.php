@@ -26,14 +26,17 @@ class DiscountVoucherResource extends JsonResource
             'active' => $this->active,
             'start_date' => $this->start_date,
             'end_date' => $this->expired,
+            'user_used' => $this->used,
             'created_at' => $this->created_at,
 
             'product_detail' => $this->whenLoaded('details', function () {
                 return [
                     'id' => $this->details->id,
                     'variant_name' => $this->details->variant_name,
-                    'product_code' => $this->details->product_code,
+                    'variant_code' => $this->details->product_code,
                     'product_image' => $this->details->product->image,
+                    'product_name' => $this->details->product->name,
+                    'product_category' => $this->details->product->category->name ?? null,
                 ];
             }),
         ];
