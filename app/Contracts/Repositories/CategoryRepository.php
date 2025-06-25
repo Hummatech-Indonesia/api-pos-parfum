@@ -93,7 +93,7 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
                 }
             })
             ->select('name', 'created_at')
-            ->addSelect(\DB::raw("(select count(*) from products where products.category_id = categories.id and is_delete = 0) as products_count"))
+            ->addSelect(DB::raw("(select count(*) from products where products.category_id = categories.id and is_delete = 0) as products_count"))
             ->orderBy($sorting['column'] ?? "created_at", $sorting['order'] ?? "ASC")
             ->paginate($pagination, ['*'], 'page', $page);
         // ->appends(['search' => $request->search, 'year' => $request->year]);
