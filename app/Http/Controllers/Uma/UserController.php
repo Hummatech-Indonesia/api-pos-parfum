@@ -76,12 +76,8 @@ class UserController extends Controller
 
         DB::beginTransaction();
         try {
-            $user = $this->userService->mappingDataUser($data);
-            $user["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
-            $user["outlet_id"] = auth()?->user()?->outlet?->id; // menambahkan outlet_id ke user yang ditambahkan berdasarkan user yang login
-            $user["warehouse_id"] = auth()?->user()?->warehouse?->id;
-            $result_user = $this->user->store($user);
-
+            $userData = $this->userService->prepareUserCreationData($data, $request->role);
+            $result_user = $this->user->store($userData);
             $result_user->syncRoles($request->role);
             DB::commit();
             return BaseResponse::Ok('Berhasil membuat user', $result_user);
