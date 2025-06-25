@@ -102,27 +102,8 @@ class ProductController extends Controller
             foreach ($data["product_details"] as $detail) {
                 $detail["product_id"] = $result_product->id;
                 $detail["category_id"] = $data["category_id"];
-
-                /**
-                 * Pengecekan apakah data varian yang dikirim sudah ada atau belum
-                 */
-                if (isset($detail["product_varian_id"])) {
-                    $check_varian = $this->productVarian->customQuery(["id" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
-                    if (!$check_varian) {
-                        /**
-                         * Check varian name has owned in this store
-                         */
-                        $checkVarianName = $this->productVarian->customQuery(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
-                        if (!$checkVarianName) {
-                            $this->productVarian->store(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]]);
-                            $store_varian = $this->productVarian->customQuery(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
-                            $detail["product_varian_id"] = $store_varian->id;
-                        } else {
-                            $detail["product_varian_id"] = $checkVarianName?->id;
-                        }
-                    }
-                }
-
+                $detail["variant"] = $detail["variant"] ?? null;
+                $detail["opsi"] = $detail["opsi"] ?? null;
                 $mappingDetail = $this->productDetailService->dataProductDetail($detail);
                 $storedDetail = $this->productDetail->store($mappingDetail);
 
@@ -220,7 +201,7 @@ class ProductController extends Controller
                     $this->productDetail->update($idDetail, $mappingDetailUpdate);
                 } else {
                     $mappingDetail = $this->productDetailService->dataProductDetail($detail);
-                    $this->productDetail->store($detail);
+                    $this->productDetail->store($mappingDetail);
                 }
             }
 

@@ -11,7 +11,7 @@ class ProductDetailResource extends JsonResource
         return [
             'stock' => $this->stock,
             'price' => $this->price,
-            'variant_name' => null,
+            'variant_name' => $this->variant_name,
             'product_code' => $this->product_code,
             'product_image' => $this->image,
             'transaction_details_count' => $this->transaction_details_count ?? 0,
