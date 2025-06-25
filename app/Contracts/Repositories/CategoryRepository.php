@@ -3,6 +3,7 @@
 namespace App\Contracts\Repositories;
 
 use App\Models\Category;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\QueryException;
 use App\Contracts\Interfaces\CategoryInterface;
@@ -61,7 +62,7 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
                 }
             })
             ->select('name', 'created_at')
-            ->addSelect(\DB::raw("(select count(*) from products where products.category_id = categories.id and is_delete = 0) as products_count"))
+            ->addSelect(DB::raw("(select count(*) from products where products.category_id = categories.id and is_delete = 0) as products_count"))
             ->orderBy($sorting['column'] ?? "created_at", $sorting['order'] ?? "ASC");
     }
 
