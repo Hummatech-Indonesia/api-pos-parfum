@@ -72,7 +72,7 @@ class AuditRepository extends BaseRepository implements AuditInterface
         return $this->model->query()
             ->with(['auditDetails', 'auditDetails.details.product' => function ($query) {
                 $query->select('id', 'name');
-            }])
+            },'user'])
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (isset($data["search"])) {
                     $query->where(function ($query2) use ($data) {

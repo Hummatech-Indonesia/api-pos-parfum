@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Contracts\Repositories\AuditRepository;
 use App\Helpers\BaseResponse;
+use App\Helpers\PaginationHelper;
 use App\Http\Requests\AuditRequest;
+use App\Http\Resources\AuditResource;
 use App\Models\Audit;
 use App\Models\AuditDetail;
 use App\Services\AuditService;
@@ -30,19 +32,20 @@ class AuditController extends Controller
         $page = $request->page ?? 1;
         $payload = $request->only(['search', 'name', 'status', 'date']);
 
-        $data['user_id'] = auth()?->user()?->id;
+        $payload['user_id'] = auth()?->user()?->id;
 
-        // check query filter
         if ($request->search) $payload["search"] = $request->search;
 
-        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
+            $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+        }
 
         try {
-            $data =  $this->auditRepository->customPaginate($per_page, $page, $payload)->toArray();
+            $collection = $this->auditRepository->customPaginate($per_page, $page, $payload);
+            $resources = AuditResource::collection($collection);
+            $meta = PaginationHelper::meta($collection);
 
-            $result = $data["data"];
-            unset($data["data"]);
-            return BaseResponse::Paginate("Berhasil mengambil semua audit", $result, $data);
+            return BaseResponse::Paginate("Berhasil mengambil semua audit", $resources, $meta);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), data: null);
         }
@@ -100,9 +103,9 @@ class AuditController extends Controller
                 return BaseResponse::Notfound("audit tidak ditemukan");
             }
 
-            $transformedAudit = $this->service->transformAudit($audit);
+            $resources = new AuditResource($audit);
 
-            return BaseResponse::Ok("Berhasil mengambil detail audit", $transformedAudit);
+            return BaseResponse::Ok("Berhasil mengambil detail audit", $resources);
         } catch (\Throwable $th) {
             return BaseResponse::Error("Terjadi kesalahan: " . $th->getMessage(), null);
         }
@@ -113,13 +116,13 @@ class AuditController extends Controller
      */
     public function update(auditRequest $request, $id)
     {
-        
+
         $audit = $this->auditRepository->show($id);
-        
+
         if (!$audit) {
             return BaseResponse::Notfound("Audit tidak ditemukan");
         }
-        
+
         if ($audit->status !== 'pending') {
             return BaseResponse::Error('Audit tidak dapat diubah karena sudah ditanggapi.', null);
         }
@@ -135,7 +138,7 @@ class AuditController extends Controller
             ];
 
             $audit->update($updateData, $auditData);
-
+            $resources = AuditResource::collection($audit);
             // Jika approved, update stok seperti biasa
             if ($updateData['status'] === 'approved') {
                 $outlet = $audit->outlet;
@@ -170,7 +173,7 @@ class AuditController extends Controller
             }
 
             DB::commit();
-            return BaseResponse::Ok('Status audit berhasil diperbarui', $audit);
+            return BaseResponse::Ok('Status audit berhasil diperbarui', $resources);
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error('Gagal memperbarui status audit. ' . $th->getMessage(), null);
@@ -230,8 +233,9 @@ class AuditController extends Controller
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
             $data = $this->auditRepository->customQuery($payload)->get();
+            $resources = AuditResource::collection($data);
 
-            return BaseResponse::Ok("Berhasil mengambil data audit", $data);
+            return BaseResponse::Ok("Berhasil mengambil data audit", $resources);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }

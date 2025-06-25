@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Master;
 use App\Contracts\Interfaces\Master\DiscountVoucherInterface;
 use App\Enums\UploadDiskEnum;
 use App\Helpers\BaseResponse;
+use App\Helpers\PaginationHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\DiscountVoucherRequest;
 use App\Http\Resources\DiscountVoucherResource;
@@ -52,14 +53,7 @@ class DiscountVoucherController extends Controller
         $collection = $this->discountVoucher->customPaginate($per_page, $page, $payload);
 
         $data = DiscountVoucherResource::collection($collection->items());
-        $meta = [
-            'total' => $collection->total(),
-            'per_page' => $collection->perPage(),
-            'current_page' => $collection->currentPage(),
-            'last_page' => $collection->lastPage(),
-            'from' => $collection->firstItem(),
-            'to' => $collection->lastItem(),
-        ];
+        $meta = PaginationHelper::meta($collection);
 
         return BaseResponse::Paginate('Berhasil mengambil list data!', $data, $meta);
     }
@@ -190,7 +184,9 @@ class DiscountVoucherController extends Controller
             $payload = [];
 
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
-            $data = $this->discountVoucher->customQuery($payload)->get();
+            $collection = $this->discountVoucher->customQuery($payload)->get();
+
+            $data = DiscountVoucherResource::collection($collection);
 
             return BaseResponse::Ok("Berhasil mengambil data", $data);
         } catch (\Throwable $th) {
