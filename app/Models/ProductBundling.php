@@ -12,7 +12,14 @@ class ProductBundling extends Model
     use HasFactory,SoftDeletes, HasUuids;
 
     protected $fillable = [
-        'id', 'product_id', 'name', 'description', 'category_id'
+        'id',
+        'product_id',
+        'name',
+        'description',
+        'category_id',
+        'stock',          // ✅ Tambahkan ini
+        'price',          // ✅ Tambahkan ini
+        'bundling_code',  // ✅ Tambahkan ini
     ];
 
     public $incrementing = false;
