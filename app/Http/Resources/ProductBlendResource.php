@@ -15,6 +15,7 @@ class ProductBlendResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id' => $this->id,
             'blend_name' => $this->product->blend_name ?? $this->product->name ?? null,
             'quantity' => $this->result_stock,
             'description' => $this->description,
