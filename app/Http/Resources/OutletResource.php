@@ -20,8 +20,8 @@ class OutletResource extends JsonResource
             'address' => $this->address,
             'telp' => $this->telp,
             'image' => $this->image,
-            'transaction_count' => $this->store?->transactions()->count() ?? 0,
-            'pemilik_outlet' => $this->users->first()?->name ?? 'owner',
+            'transaction_count' => $this->store?->transactions()?->count() ?? 0,
+            'pemilik_outlet' => $this->users?->first()?->name,
         ];
     }
 }
