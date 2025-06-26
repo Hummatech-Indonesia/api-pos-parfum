@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Services\Master;
 
@@ -7,24 +7,26 @@ use App\Traits\UploadTrait;
 use Error;
 use Illuminate\Support\Facades\Log;
 
-class OutletService{
+class OutletService
+{
 
     use UploadTrait;
-    
-    public function __construct()
-    {
-        
-    }
+
+    public function __construct() {}
 
     public function dataOutlet(array $data)
     {
-        try{
+        try {
             $image = null;
-            try{
-                if(isset($data["image"])) {
+            try {
+                if (isset($data["image"])) {
                     $image = $this->upload("outlets", $data["image"]);
+                } else {
+                    $image = "default/Default.jpeg";
                 }
-            }catch(\Throwable $th){ }
+            } catch (\Throwable $th) {
+                $image = "default/Default.jpeg";
+            }
 
             $result = [
                 "store_id" => auth()?->user()?->store?->id ?? auth()?->user()?->store_id,
@@ -34,7 +36,7 @@ class OutletService{
                 "telp" => $data["telp"] ?? null,
             ];
             return $result;
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             Log::error($th->getMessage());
             throw new Error($th->getMessage(), 400);
         }
@@ -42,15 +44,16 @@ class OutletService{
 
     public function dataOutletUpdate(array $data, Outlet $outlet)
     {
-        try{
+        try {
             $image = $outlet->image;
-            try{
-                if(isset($data["image"])) {
-                    if($image) $this->remove($outlet->image);
-                    
+            try {
+                if (isset($data["image"])) {
+                    if ($image) $this->remove($outlet->image);
+
                     $image = $this->upload("outlets", $data["image"]);
                 }
-            }catch(\Throwable $th){ }
+            } catch (\Throwable $th) {
+            }
 
             return [
                 "store_id" => auth()?->user()?->store?->id ?? auth()?->user()?->store_id,
@@ -59,10 +62,9 @@ class OutletService{
                 "address" => $data["address"] ?? $outlet->address,
                 "telp" => $data["telp"] ?? $outlet->telp,
             ];
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             Log::error($th->getMessage());
             throw new Error($th->getMessage(), 400);
         }
     }
-
 }

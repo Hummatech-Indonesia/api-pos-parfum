@@ -11,6 +11,9 @@ use App\Services\Master\OutletService;
 use App\Http\Requests\Master\OutletRequest;
 use App\Contracts\Repositories\Auth\UserRepository;
 use App\Contracts\Repositories\Master\OutletRepository;
+use App\Http\Resources\OutletDetailResource;
+use App\Http\Resources\OutletDetailWithTransactionResource;
+use App\Http\Resources\OutletResource;
 
 class OutletController extends Controller
 {
@@ -44,12 +47,14 @@ class OutletController extends Controller
         if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
         try {
-            $data = $this->outlet->customPaginate($per_page, $page, $payload)->toArray();
+            $paginate = $this->outlet->customPaginate($per_page, $page, $payload);
 
-            $result = $data["data"];
-            unset($data["data"]);
+            $resource = OutletResource::collection($paginate);
+            $dataArray = $resource->toArray(request());
+            $result = $paginate['data'];
+            unset($paginate['data']);
 
-            return BaseResponse::Paginate('Berhasil mengambil list data outlet!', $result, $data);
+            return BaseResponse::Paginate('Berhasil mengambil list data outlet!', $result, $dataArray);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -125,12 +130,10 @@ class OutletController extends Controller
         $page = request()->get('transaction_page') ?? 1;
 
         $transactions = $this->outlet->getTransactionsByOutlet($id, 5, $page);
-        $transaction_count = $check_outlet->store?->transactions()->count() ?? 0;
 
         return BaseResponse::Ok("Berhasil mengambil detail outlet!", [
-            'outlet' => $check_outlet,
-            'transactions' => $transactions,
-            'transaction_count' => $transaction_count
+            'outlet' => new OutletDetailResource($check_outlet),
+            'transactions' => OutletDetailWithTransactionResource::collection($transactions),
         ]);
     }
 
@@ -205,7 +208,7 @@ class OutletController extends Controller
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             $data = $this->outlet->customQuery($payload)->get();
 
-            return BaseResponse::Ok("Berhasil mengambil data outlet", $data);
+            return BaseResponse::Ok("Berhasil mengambil data outlet", OutletResource::collection($data));
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
