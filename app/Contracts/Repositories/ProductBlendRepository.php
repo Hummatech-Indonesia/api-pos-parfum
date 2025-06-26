@@ -69,6 +69,23 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
         return $this->model->query()->findOrFail($id)->delete();
     }
 
+    public function customQuery(array $data): mixed
+    {
+        return $this->model->query()
+            ->when(count($data) > 0, function ($query) use ($data) {
+                foreach ($data as $index => $value) {
+                    $query->where($index, $value);
+                }
+            })->with([
+                'productDetail',
+                'product',
+                'productBlendDetails',
+                'productBlendDetails.productDetail',
+                'productBlendDetails.productDetail.product',
+            ])
+            ->withCount('productBlendDetails as used_product_count');
+    }
+
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         $query = $this->model->query()

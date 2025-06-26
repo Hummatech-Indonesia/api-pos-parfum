@@ -25,7 +25,7 @@ class ProductBlendRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
+            // 'name' => 'required|string|max:255',
             // 'date' => 'required|date',
 
             'product_blend' => 'required|array',
@@ -48,9 +48,9 @@ class ProductBlendRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Nama produk wajib diisi.',
-            'name.string' => 'Nama produk harus berupa teks.',
-            'name.max' => 'Nama produk maksimal 255 karakter.',
+            // 'name.required' => 'Nama produk wajib diisi.',
+            // 'name.string' => 'Nama produk harus berupa teks.',
+            // 'name.max' => 'Nama produk maksimal 255 karakter.',
 
             // 'date.required' => 'Tanggal wajib diisi.',
             // 'date.date' => 'Format tanggal tidak valid.',

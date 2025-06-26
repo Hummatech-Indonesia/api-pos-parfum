@@ -93,11 +93,6 @@ class ProductStockRepository extends BaseRepository implements ProductStockInter
 
     public function checkNewStock(mixed $product_detail_id, mixed $product_id)
     {
-        // return $this->model->firstOrNew([
-        //                 'warehouse_id' => auth()->user()->warehouse_id,
-        //                 'product_detail_id' => $product_detail_id,
-        //                 'product_id' => $product_id,
-        //             ]);
         return $this->model->where('warehouse_id', auth()->user()->warehouse_id)->where('product_detail_id', $product_detail_id)->where('product_id', $product_id)->first();
     }
 
