@@ -84,7 +84,7 @@ class AuditController extends Controller
             }
 
             DB::commit();
-            return BaseResponse::Ok('Berhasil membuat audit', $audit->load('auditDetails'));
+            return BaseResponse::Ok('Berhasil membuat audit', new AuditResource($audit->load('auditDetails')));
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error('Gagal membuat audit: ' . $th->getMessage(), null);
@@ -173,7 +173,7 @@ class AuditController extends Controller
             }
 
             DB::commit();
-            return BaseResponse::Ok('Status audit berhasil diperbarui', $resources);
+            return BaseResponse::Ok('Status audit berhasil diperbarui', new AuditResource($resources));
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error('Gagal memperbarui status audit. ' . $th->getMessage(), null);
