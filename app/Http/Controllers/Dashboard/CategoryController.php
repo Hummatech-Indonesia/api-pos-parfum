@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Contracts\Interfaces\CategoryInterface;
 use App\Enums\UploadDiskEnum;
 use App\Helpers\BaseResponse;
+use App\Helpers\PaginationHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Dashboard\CategoryRequest;
 use App\Services\CategoryService;
@@ -46,12 +47,12 @@ class CategoryController extends Controller
         
         if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
 
-        $data = $this->category->customPaginate($per_page, $page, $payload)->toArray();
+        $data = $this->category->customPaginate($per_page, $page, $payload);
+            $meta = PaginationHelper::meta($data);
 
-        $result = $data["data"];
-        unset($data["data"]);
+        $result = $data->items();
 
-        return BaseResponse::Paginate('Berhasil mengambil list data category!', $result, $data);
+        return BaseResponse::Paginate('Berhasil mengambil list data category!', $result, $meta);
     }
 
     /**
