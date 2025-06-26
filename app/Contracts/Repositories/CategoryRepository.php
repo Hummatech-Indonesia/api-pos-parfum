@@ -61,7 +61,7 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
                     $query->where($index, $value);
                 }
             })
-            ->select('name', 'created_at')
+            ->select('id','name', 'created_at')
             ->addSelect(DB::raw("(select count(*) from products where products.category_id = categories.id and is_delete = 0) as products_count"))
             ->orderBy($sorting['column'] ?? "created_at", $sorting['order'] ?? "ASC");
     }
@@ -92,7 +92,7 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
                     $query->where($index, $value);
                 }
             })
-            ->select('name', 'created_at')
+            ->select('id', 'name', 'created_at')
             ->addSelect(DB::raw("(select count(*) from products where products.category_id = categories.id and is_delete = 0) as products_count"))
             ->orderBy($sorting['column'] ?? "created_at", $sorting['order'] ?? "ASC")
             ->paginate($pagination, ['*'], 'page', $page);
