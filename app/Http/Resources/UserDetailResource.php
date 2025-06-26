@@ -24,18 +24,18 @@ class UserDetailResource extends JsonResource
             'roles' => $this->roles->pluck('name'),
 
             'store' => $this->store ? [
-                'name'    => $this->store->name,
-                'address' => $this->store->address,
+                'name'    => $this->store?->name,
+                'address' => $this->store?->address,
             ] : null,
 
             'related_store' => $this->related_store ? [
-                'name'    => $this->related_store->name,
-                'address' => $this->related_store->address,
+                'name'    => $this->related_store?->name,
+                'address' => $this->related_store?->address,
             ] : null,
 
             'warehouse' => $this->warehouse ? [
-                'name'    => $this->warehouse->name,
-                'address' => $this->warehouse->address,
+                'name'    => $this->warehouse?->name,
+                'address' => $this->warehouse?->address,
             ] : null,
         ];
     }
