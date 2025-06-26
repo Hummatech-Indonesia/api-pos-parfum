@@ -30,12 +30,26 @@ class DiscountVoucherRepository extends BaseRepository implements DiscountVouche
     {
         return $this->model->query()
             ->with(['store', 'details',  'details.product' => function ($query) {
-                $query->select('id', 'name');
-            }])
+                $query->select('id', 'name','category_id','image');
+            },'details.product.category'])
             ->where('is_delete', 0)
             ->when(count($data) > 0, function ($query) use ($data) {
                 foreach ($data as $index => $value) {
                     $query->where($index, $value);
+                }
+
+                if (!empty($data['sort_by']) && !empty($data['sort_direction'])) {
+                    $allowedSorts = ['name', 'discount', 'start_date', 'expired', 'created_at'];
+                    $allowedDirections = ['asc', 'desc'];
+
+                    $sortBy = in_array($data['sort_by'], $allowedSorts) ? $data['sort_by'] : 'created_at';
+                    $sortDirection = in_array(strtolower($data['sort_direction']), $allowedDirections)
+                        ? strtolower($data['sort_direction'])
+                        : 'desc';
+
+                    $query->orderBy($sortBy, $sortDirection);
+                } else {
+                    $query->orderBy('created_at', 'desc');
                 }
             });
     }
@@ -44,8 +58,8 @@ class DiscountVoucherRepository extends BaseRepository implements DiscountVouche
     {
         return $this->model->query()
             ->with(['store:id,name', 'details:id,variant_name,product_code,product_id', 'details.product' => function ($query) {
-                $query->select('id', 'name','image');
-            }])
+                $query->select('id', 'name', 'image','category_id');
+            },'details.product.category'])
             ->where('is_delete', 0)
             ->when($data, function ($query) use ($data) {
                 if (!empty($data["search"])) {
@@ -122,15 +136,15 @@ class DiscountVoucherRepository extends BaseRepository implements DiscountVouche
             },
             'details',
             'details.product' => function ($query) {
-                $query->select('id', 'name');
-            }
+                $query->select('id', 'name','category_id','image');
+            },'details.product.category'
         ])->find($id);
     }
 
     public function checkActive(mixed $id): mixed
     {
         return $this->model->with(['store', 'details', 'details.product' => function ($query) {
-            $query->select('id', 'name');
+            $query->select('id', 'name', 'category_id');
         }])->where('is_delete', 0)->find($id);
     }
 

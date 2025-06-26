@@ -40,7 +40,9 @@ class ProductDetailService
                 "price" => $data["price"] ?? 0,
                 "price_discount" => $data["price_discount"] ?? 0,
                 "product_code" => $data["product_code"] ?? null,
-                "variant_name" => $data["variant_name"] ?? null,
+                "variant_name" => isset($data["variant"], $data["opsi"]) && $data["variant"] !== '' && $data["opsi"] !== ''
+                    ? $data["variant"] . '-' . $data["opsi"]
+                    : null,
             ];
             return $result;
         } catch (\Throwable $th) {

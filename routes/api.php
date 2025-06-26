@@ -72,6 +72,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('role:owner|warehouse')->group(function () {
         Route::apiResource("product-blend", ProductBlendController::class);
+        Route::get('product-blends/no-paginate', [ProductBlendController::class, 'listProductBlend'])->name('product-blend-no-paginate');
     });
 
     // API FOR ROLE OWNER

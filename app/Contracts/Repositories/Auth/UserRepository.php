@@ -42,8 +42,16 @@ class UserRepository extends BaseRepository implements UserInterface
             $role = [];
         }
 
+        $orderBy = $data['order_by'] ?? 'created_at';
+        $orderDirection = $data['order_direction'] ?? 'desc';
+
+        unset($data['order_by'], $data['order_direction']);
+
         return $this->model->query()
-            ->with('store', 'related_store', 'roles', 'warehouse', 'outlet')
+            ->select('id', 'name', 'email', 'created_at')
+            ->with([
+                'roles:name',
+            ])
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (isset($data["warehouse"])) {
                     if ($data["warehouse"] == "false") {
@@ -88,7 +96,8 @@ class UserRepository extends BaseRepository implements UserInterface
             })
             ->when($role, function ($query) use ($role) {
                 $query->role($role);
-            });
+            })
+            ->orderBy($orderBy, $orderDirection);
     }
 
     public function customQueryV2(array $data): mixed
@@ -190,8 +199,15 @@ class UserRepository extends BaseRepository implements UserInterface
         } catch (\Throwable $th) {
         }
 
+        $orderBy = $data['order_by'] ?? 'created_at';
+        $orderDirection = $data['order_direction'] ?? 'desc';
+
+        unset($data['order_by'], $data['order_direction']);
+
         return $this->model->query()
-            ->with('store', 'related_store', 'roles', 'warehouse', 'outlet')
+            ->with([
+                'roles',
+            ])
             ->when(count($data) > 0, function ($query) use ($data, $search) {
                 if ($search && $search != '') {
                     $query->where(function ($query2) use ($search) {
@@ -208,13 +224,20 @@ class UserRepository extends BaseRepository implements UserInterface
             ->when($role, function ($query) use ($role) {
                 $query->role($role);
             })
+            ->orderBy($orderBy, $orderDirection)
             ->paginate($pagination, ['*'], 'page', $page)
             ->withQueryString();
     }
 
     public function show(mixed $id): mixed
     {
-        return $this->model->with('store', 'related_store', 'roles', 'outlet', 'warehouse')->find($id);
+        return $this->model
+            ->with([
+                'store',
+                'related_store',
+                'warehouse',
+            ])
+            ->find($id);
     }
 
     public function checkUserActive(mixed $id): mixed

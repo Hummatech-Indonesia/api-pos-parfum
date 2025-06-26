@@ -10,6 +10,8 @@ use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\ProductBundlingRequest;
 use App\Http\Requests\Master\ProductBundlingUpdateRequest;
+use App\Http\Resources\ProductBundlingDetailResource;
+use App\Http\Resources\ProductBundlingResource;
 use App\Services\Master\ProductBundlingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -42,11 +44,14 @@ class ProductBundlingController extends Controller
             $payload['created_from'] = $payload['mulai_tanggal'] ?? null;
             $payload['created_to'] = $payload['sampai_tanggal'] ?? null;
 
-            $data = $this->repository->customPaginate($perPage, $page, $payload)->toArray();
-            $result = $data["data"];
-            unset($data["data"]);
+            $data = $this->repository->customPaginate($perPage, $page, $payload);
 
-            return BaseResponse::Paginate("Berhasil mengambil data bundling", $result, $data);
+            $bundlings = ProductBundlingResource::collection($data->getCollection());
+            $pagination = $data->toArray();
+
+            unset($pagination['data']);
+
+            return BaseResponse::Paginate("Berhasil mengambil data bundling", $bundlings, $pagination);
         } catch (\Throwable $e) {
             return BaseResponse::Error($e->getMessage(), null);
         }
@@ -58,32 +63,49 @@ class ProductBundlingController extends Controller
         try {
             $validated = $request->validated();
 
-            $productData = $this->service->mapProductData($validated['product']);
-            $bundlingData = $this->service->mapBundlingData($validated);
-            $detailsData = $this->service->mapDetailData($validated['details']);
-
+            $productData = $this->service->mapProductData($validated);
             $product = $this->productRepo->store($productData);
 
-            $bundlingData['product_id'] = $product->id;
-            $bundlingData['category_id'] = $product->category_id;
+            $productDetail = $this->productDetailRepo->store([
+                'id' => uuid_create(),
+                'product_id' => $product->id,
+                'product_code' => $validated['kode_Blend'], 
+                'stock' => $validated['quantity'],
+                'unit' => 'pcs',
+                'price' => $validated['harga'],
+                'product_image' => $product->image,
+                'is_delete' => 0
+            ]);
+
+            $bundlingData = $this->service->mapBundlingData($validated, $product->id, $validated['category_id']);
             $bundling = $this->repository->store($bundlingData);
 
-            foreach ($detailsData as $detail) {
-                $productDetail = $this->productDetailRepo->store([
-                    'id' => uuid_create(),
-                    'product_id' => $product->id,
-                    'category_id' => $product->category_id,
-                    ...$detail['product_detail'],
-                ]);
+            $details = collect($validated['details'][0]['product_bundling_material'])
+                ->map(function ($item) use ($validated, $productDetail) {
+                    return [
+                        'product_detail_id' => $item['product_detail_id'] ?? $productDetail->id,
+                        'unit' => $item['unit'] ?? 'pcs',
+                        'unit_id' => $item['unit_id'] ?? null,
+                        'quantity' => $item['quantity'] ?? $validated['quantity'],
+                    ];
+                })->toArray();
 
+
+            foreach ($details as $detail) {
                 $this->bundlingDetailRepo->store([
                     'product_bundling_id' => $bundling->id,
-                    'product_detail_id' => $productDetail->id,
+                    'product_detail_id' => $detail['product_detail_id'],
                     'unit' => $detail['unit'],
                     'unit_id' => $detail['unit_id'],
                     'quantity' => $detail['quantity'],
                 ]);
             }
+
+             $productDetail = $this->productDetailRepo->show($detail['product_detail_id']);
+                if ($productDetail) {
+                    $newStock = max(0, $productDetail->stock - $validated['quantity']); // kurangi sesuai stock bundling
+                    $this->productDetailRepo->update($productDetail->id, ['stock' => $newStock]);
+                }
 
             DB::commit();
             return BaseResponse::Ok("Berhasil membuat bundling", $this->repository->show($bundling->id)->load('details'));
@@ -102,9 +124,10 @@ class ProductBundlingController extends Controller
                 return BaseResponse::Notfound("Bundling dengan ID $id tidak ditemukan");
             }
 
-            $bundling->load('details');
+            $bundling = $this->repository->show($id);
+            $bundling->load('details.productDetail');
+            return BaseResponse::Ok("Detail bundling ditemukan", new ProductBundlingDetailResource($bundling));
 
-            return BaseResponse::Ok("Detail bundling ditemukan", $bundling);
         } catch (\Throwable $e) {
             return BaseResponse::Error("Terjadi kesalahan: " . $e->getMessage(), null);
         }

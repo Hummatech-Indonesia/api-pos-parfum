@@ -28,7 +28,7 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
     {
         return $this->model->query()
             ->withCount('product')
-            ->with('varian', 'product.productBundling.details', 'category', 'productStockOutlet', 'productStockWarehouse')
+            ->with('product.productBundling.details', 'category', 'productStockOutlet', 'productStockWarehouse')
             ->when(count($data) > 0, function ($query) use ($data) {
                 foreach ($data as $index => $value) {
                     $query->where($index, $value);
@@ -40,7 +40,7 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
     {
         return $this->model->query()
             ->withCount('product')
-            ->with('varian', 'product.productBundling.details', 'category', 'productStockOutlet', 'productStockWarehouse')
+            ->with('product.productBundling.details', 'category', 'productStockOutlet', 'productStockWarehouse', 'product')
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (isset($data["search"])) {
                     $query->where(function ($query2) use ($data) {
@@ -48,23 +48,38 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
                     });
                     unset($data["search"]);
                 }
+                if (!empty($data['sort_by']) && !empty($data['sort_direction'])) {
+                    $allowedSorts = ['name', 'category', 'created_at'];
+                    $allowedDirections = ['asc', 'desc'];
+
+                    $sortBy = in_array($data['sort_by'], $allowedSorts) ? $data['sort_by'] : 'created_at';
+                    $sortDirection = in_array(strtolower($data['sort_direction']), $allowedDirections)
+                        ? strtolower($data['sort_direction'])
+                        : 'desc';
+
+                    $query->orderBy($sortBy, $sortDirection);
+                } else {
+                    $query->orderBy('created_at', 'desc');
+                }
 
                 foreach ($data as $index => $value) {
                     $query->where($index, $value);
                 }
             })
+
+
             ->paginate($pagination, ['*'], 'page', $page);
         // ->appends(['search' => $request->search, 'year' => $request->year]);
     }
 
     public function show(mixed $id): mixed
     {
-        return $this->model->with('varian', 'product', 'category')->find($id);
+        return $this->model->with('product', 'category')->find($id);
     }
 
     public function checkActive(mixed $id): mixed
     {
-        return $this->model->with('varian', 'product', 'category')->where('is_delete', 0)->find($id);
+        return $this->model->with('product', 'category')->where('is_delete', 0)->find($id);
     }
 
     public function update(mixed $id, array $data): mixed
