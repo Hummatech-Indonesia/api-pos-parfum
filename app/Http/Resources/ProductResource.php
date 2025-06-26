@@ -15,6 +15,7 @@ class ProductResource extends JsonResource
             'image' => $this->image,
             'details_sum_stock' => $this->details_sum_stock,
             'category' => $this->category?->name,
+            'description' => $this->description,
             'product_detail' => $this->whenLoaded('details', function () {
                 return $this->details->map(function ($detail) {
                     return [
