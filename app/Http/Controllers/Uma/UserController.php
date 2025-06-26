@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Uma;
 
 use App\Contracts\Interfaces\Auth\UserInterface;
 use App\Helpers\BaseResponse;
+use App\Helpers\PaginationHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\UserSyncRequest;
 use App\Http\Requests\UserRequest;
@@ -45,17 +46,11 @@ class UserController extends Controller
 
         try {
             $paginate = $this->user->customPaginate($per_page, $page, $request->all());
+            $resource = UserResource::collection($paginate);
+            $result = $resource->collection->values();
+            $meta = PaginationHelper::meta($paginate);
 
-            return BaseResponse::Paginate(
-                'Berhasil mengambil list data user!',
-                UserResource::collection($paginate)->collection->values(),
-                [
-                    'current_page' => $paginate->currentPage(),
-                    'last_page' => $paginate->lastPage(),
-                    'per_page' => $paginate->perPage(),
-                    'total' => $paginate->total(),
-                ]
-            );
+            return BaseResponse::Paginate('Berhasil mengambil list data user!', $result, $meta);
         } catch (\Throwable $th) {
             Log::error("Gagal dalam mengambil list paginate user => ", $th->getMessage());
             return BaseResponse::Error("Gagal dalam mengambil list paginate user!", null);
