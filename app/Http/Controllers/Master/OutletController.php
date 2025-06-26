@@ -11,6 +11,7 @@ use App\Services\Master\OutletService;
 use App\Http\Requests\Master\OutletRequest;
 use App\Contracts\Repositories\Auth\UserRepository;
 use App\Contracts\Repositories\Master\OutletRepository;
+use App\Helpers\PaginationHelper;
 use App\Http\Resources\OutletDetailResource;
 use App\Http\Resources\OutletDetailWithTransactionResource;
 use App\Http\Resources\OutletResource;
@@ -50,11 +51,10 @@ class OutletController extends Controller
             $paginate = $this->outlet->customPaginate($per_page, $page, $payload);
 
             $resource = OutletResource::collection($paginate);
-            $dataArray = $resource->toArray(request());
-            $result = $paginate['data'];
-            unset($paginate['data']);
+            $result = $resource->collection->values();
+            $meta = PaginationHelper::meta($paginate);
 
-            return BaseResponse::Paginate('Berhasil mengambil list data outlet!', $result, $dataArray);
+            return BaseResponse::Paginate('Berhasil mengambil list data outlet!', $result, $meta);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -130,10 +130,14 @@ class OutletController extends Controller
         $page = request()->get('transaction_page') ?? 1;
 
         $transactions = $this->outlet->getTransactionsByOutlet($id, 5, $page);
+        $meta = PaginationHelper::meta($transactions);
 
         return BaseResponse::Ok("Berhasil mengambil detail outlet!", [
             'outlet' => new OutletDetailResource($check_outlet),
-            'transactions' => OutletDetailWithTransactionResource::collection($transactions),
+            'transactions' => [
+                'data' => OutletDetailWithTransactionResource::collection($transactions),
+                'pagination' => $meta,
+            ],
         ]);
     }
 
