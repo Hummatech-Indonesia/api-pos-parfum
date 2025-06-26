@@ -10,8 +10,8 @@ class ProductBundlingService
         return [
             'id' => uuid_create(),
             'store_id' => $data['store_id'] ?? auth()->user()->store_id,
-            'name' => $data['name'], // Ini "product name"
-            'unit_type' => 'unit', // Sesuaikan jika ada
+            'name' => $data['name'],
+            'unit_type' => 'unit',
             'image' => $data['image'] ?? 'default/Default.jpeg',
             // 'qr_code' => $data['kode_Blend'] ?? null,
             'description' => $data['deskripsi'] ?? null,
@@ -26,7 +26,7 @@ class ProductBundlingService
         return [
             'id' => $data['id'] ?? uuid_create(),
             'product_id' => $productId,
-            'name' => $data['name'], // Redundant, simpan juga di bundling
+            'name' => $data['name'],
             // 'description' => $data['deskripsi'] ?? null,
             'category_id' => $categoryId,
             'stock' => $data['quantity'] ?? 0,

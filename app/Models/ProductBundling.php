@@ -17,9 +17,9 @@ class ProductBundling extends Model
         'name',
         'description',
         'category_id',
-        'stock',          // ✅ Tambahkan ini
-        'price',          // ✅ Tambahkan ini
-        'bundling_code',  // ✅ Tambahkan ini
+        'stock',
+        'price',
+        'bundling_code',
     ];
 
     public $incrementing = false;
