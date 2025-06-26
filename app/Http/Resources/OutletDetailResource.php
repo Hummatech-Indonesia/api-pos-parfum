@@ -21,7 +21,7 @@ class OutletDetailResource extends JsonResource
             'telp'              => $this->telp,
             'created_at'        => $this->created_at,
             'image'             => $this->image,
-            'transaction_count' => $this->store?->transactions()?->count() ?? 0,
+            'transaction_count' => $this->store?->transactions?->count() ?? 0,
             'worker_count'      => $this->users?->count() ?? 0,
             'owner'             => $this->users?->first()?->name ?? null,
             'status'            => $this->is_delete == 0 ? 'Active' : 'Unactive',
