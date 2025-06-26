@@ -14,10 +14,20 @@ class ProductResource extends JsonResource
             'name' => $this->name,
             'image' => $this->image,
             'details_sum_stock' => $this->details_sum_stock,
-            'category' => [
-                'name' => optional($this->category)->name,
-            ],
-            'details' => ProductDetailResource::collection($this->whenLoaded('details'))
+            'category' => $this->category?->name,
+            'product_detail' => $this->whenLoaded('details', function () {
+                return $this->details->map(function ($detail) {
+                    return [
+                        'id' => $detail->id,
+                        'category' => $detail->category?->name,
+                        'stock' => $detail->stock,
+                        'price' => $detail->price,
+                        'variant_name' => $detail->variant_name,
+                        'product_code' => $detail->product_code,
+                        'product_image' => $detail->image,
+                    ];
+                });
+            }),
         ];
     }
 }

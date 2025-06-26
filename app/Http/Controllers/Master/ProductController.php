@@ -16,6 +16,7 @@ use App\Contracts\Interfaces\Master\ProductInterface;
 use App\Contracts\Interfaces\Master\ProductStockInterface;
 use App\Contracts\Interfaces\Master\ProductDetailInterface;
 use App\Contracts\Interfaces\Master\ProductVarianInterface;
+use App\Helpers\PaginationHelper;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 
@@ -74,8 +75,10 @@ class ProductController extends Controller
         $paginated->load('details.category', 'category');
 
         $resource = ProductResource::collection($paginated);
+        $meta = PaginationHelper::meta($paginated);
 
-        return BaseResponse::Paginate('Berhasil mengambil list data product !', $resource->collection, $paginated->toArray());
+
+        return BaseResponse::Paginate('Berhasil mengambil list data product !', $resource->collection, $meta);
     }
 
 
@@ -117,7 +120,7 @@ class ProductController extends Controller
             }
 
             DB::commit();
-            return BaseResponse::Ok('Berhasil membuat product ', $result_product->load(['details']));
+            return BaseResponse::Create('Berhasil membuat product ', new ProductResource($result_product->load(['details'])));
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
@@ -161,6 +164,11 @@ class ProductController extends Controller
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $data["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             $select_product = $this->product->show($id);
 
+            if (!$select_product) {
+                DB::rollBack();
+                return BaseResponse::Notfound("Produk dengan ID {$id} tidak ditemukan");
+            }
+
             $mapProduct = $this->productService->dataProductUpdate($data, $select_product);
             $this->product->update($id, $mapProduct);
             $products = $select_product->details->where('is_delete', 0);
@@ -172,22 +180,6 @@ class ProductController extends Controller
                 /**
                  * Pengecekan apakah data varian yang dikirim sudah ada atau belum
                  */
-                if (isset($detail["product_varian_id"])) {
-                    $check_varian = $this->productVarian->customQuery(["id" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
-                    if (!$check_varian) {
-                        /**
-                         * Check varian name has owned in this store
-                         */
-                        $checkVarianName = $this->productVarian->customQuery(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
-                        if (!$checkVarianName) {
-                            $this->productVarian->store(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]]);
-                            $store_varian = $this->productVarian->customQuery(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
-                            $detail["product_varian_id"] = $store_varian->id;
-                        } else {
-                            $detail["product_varian_id"] = $checkVarianName?->id;
-                        }
-                    }
-                }
 
                 if (isset($detail["product_detail_id"])) {
                     $idDetail = $detail["product_detail_id"];
@@ -212,7 +204,7 @@ class ProductController extends Controller
 
             $result_product = $this->product->checkActiveWithDetail($id);
             DB::commit();
-            return BaseResponse::Ok('Berhasil update product', $result_product);
+            return BaseResponse::Ok('Berhasil update product', new ProductResource($result_product));
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
@@ -260,7 +252,4 @@ class ProductController extends Controller
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
-
-
-
 }

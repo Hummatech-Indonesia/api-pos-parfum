@@ -14,6 +14,9 @@ use App\Http\Requests\Master\ProductDetailRequest;
 use App\Contracts\Interfaces\Master\ProductInterface;
 use App\Contracts\Interfaces\Master\ProductStockInterface;
 use App\Contracts\Interfaces\Master\ProductDetailInterface;
+use App\Helpers\PaginationHelper;
+use App\Http\Resources\ProductDetailResource;
+use App\Models\ProductDetail;
 
 class ProductDetailController extends Controller
 {
@@ -52,12 +55,12 @@ class ProductDetailController extends Controller
         if ($request->search) $payload["search"] = $request->search;
         if ($request->is_delete) $payload["is_delete"] = $request->is_delete;
 
-        $data = $this->productDetail->customPaginate($per_page, $page, $payload)->toArray();
+        $data = $this->productDetail->customPaginate($per_page, $page, $payload);
 
-        $result = $data["data"];
-        unset($data["data"]);
+        $resource = ProductDetailResource::collection($data);
+        $meta = PaginationHelper::meta($data);
 
-        return BaseResponse::Paginate('Berhasil mengambil list data product !', $result, $data);
+        return BaseResponse::Paginate('Berhasil mengambil list data product !', $resource, $meta);
     }
 
     /**
@@ -79,7 +82,7 @@ class ProductDetailController extends Controller
             $result_product = $this->productDetail->store($mapping);
 
             DB::commit();
-            return BaseResponse::Ok('Berhasil membuat product ', $result_product);
+            return BaseResponse::Create('Berhasil membuat product ', new ProductDetailResource($result_product));
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
@@ -92,9 +95,10 @@ class ProductDetailController extends Controller
     public function show(string $id)
     {
         $check_product = $this->productDetail->show($id);
-        if (!$check_product) return BaseResponse::Notfound("Tidak dapat menemukan data product !");
 
-        return BaseResponse::Ok("Berhasil mengambil detail product !", $check_product);
+        if (!$check_product) return BaseResponse::Notfound("Tidak dapat menemukan data product !");
+        $resource = new ProductDetailResource($check_product);
+        return BaseResponse::Ok("Berhasil mengambil detail product !", $resource);
     }
 
     /**
@@ -120,7 +124,7 @@ class ProductDetailController extends Controller
             $result_product = $this->productDetail->update($id, $mapping);
 
             DB::commit();
-            return BaseResponse::Ok('Berhasil update product', $result_product);
+            return BaseResponse::Ok('Berhasil update product', new ProductDetailResource($result_product));
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
@@ -162,8 +166,9 @@ class ProductDetailController extends Controller
 
             if ($request->product_id) $payload['product_id'] = $request->product_id;
             $data = $this->productDetail->customQuery($payload)->get();
+            $resource = ProductDetailResource::collection($data);
 
-            return BaseResponse::Ok("Berhasil mengambil data product ", $data);
+            return BaseResponse::Ok("Berhasil mengambil data product ", $resource);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -178,8 +183,7 @@ class ProductDetailController extends Controller
             if ($request->outlet_id) $payload["outlet_id"] = $request->outlet_id;
 
             if ($request->page && $request->per_page) $data = $this->productStock->customPaginate($request->per_page, $request->page, $payload);
-            else $data = $this->productStock->customQuery($payload);
-
+            else $data = $this->productStock->customQuery($payload)->get();
             return BaseResponse::Ok("Berhasil mengambil data product ", $data);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
