@@ -10,6 +10,8 @@ use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\ProductBundlingRequest;
 use App\Http\Requests\Master\ProductBundlingUpdateRequest;
+use App\Http\Resources\ProductBundlingDetailResource;
+use App\Http\Resources\ProductBundlingResource;
 use App\Services\Master\ProductBundlingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -42,11 +44,14 @@ class ProductBundlingController extends Controller
             $payload['created_from'] = $payload['mulai_tanggal'] ?? null;
             $payload['created_to'] = $payload['sampai_tanggal'] ?? null;
 
-            $data = $this->repository->customPaginate($perPage, $page, $payload)->toArray();
-            $result = $data["data"];
-            unset($data["data"]);
+            $data = $this->repository->customPaginate($perPage, $page, $payload);
 
-            return BaseResponse::Paginate("Berhasil mengambil data bundling", $result, $data);
+            $bundlings = ProductBundlingResource::collection($data->getCollection());
+            $pagination = $data->toArray();
+
+            unset($pagination['data']);
+
+            return BaseResponse::Paginate("Berhasil mengambil data bundling", $bundlings, $pagination);
         } catch (\Throwable $e) {
             return BaseResponse::Error($e->getMessage(), null);
         }
@@ -64,10 +69,11 @@ class ProductBundlingController extends Controller
             $productDetail = $this->productDetailRepo->store([
                 'id' => uuid_create(),
                 'product_id' => $product->id,
-                'product_code' => $validated['kode_Blend'], // Gunakan kode_Blend di sini
+                'product_code' => $validated['kode_Blend'], 
                 'stock' => $validated['quantity'],
                 'unit' => 'pcs',
                 'price' => $validated['harga'],
+                'product_image' => $product->image,
                 'is_delete' => 0
             ]);
 
@@ -118,9 +124,10 @@ class ProductBundlingController extends Controller
                 return BaseResponse::Notfound("Bundling dengan ID $id tidak ditemukan");
             }
 
-            $bundling->load('details');
+            $bundling = $this->repository->show($id);
+            $bundling->load('details.productDetail');
+            return BaseResponse::Ok("Detail bundling ditemukan", new ProductBundlingDetailResource($bundling));
 
-            return BaseResponse::Ok("Detail bundling ditemukan", $bundling);
         } catch (\Throwable $e) {
             return BaseResponse::Error("Terjadi kesalahan: " . $e->getMessage(), null);
         }

@@ -18,7 +18,7 @@ class ProductBundlingDetail extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
-    public function product_detail()
+    public function ProductDetail()
     {
         return $this->belongsTo(ProductDetail::class);
     }

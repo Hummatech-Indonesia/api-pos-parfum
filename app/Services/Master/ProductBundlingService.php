@@ -12,7 +12,7 @@ class ProductBundlingService
             'store_id' => $data['store_id'] ?? auth()->user()->store_id,
             'name' => $data['name'], // Ini "product name"
             'unit_type' => 'unit', // Sesuaikan jika ada
-            'image' => $data['image'] ?? null,
+            'image' => $data['image'] ?? 'default/Default.jpeg',
             // 'qr_code' => $data['kode_Blend'] ?? null,
             'description' => $data['deskripsi'] ?? null,
             'is_delete' => 0,
