@@ -15,9 +15,9 @@ class ProductBlendDetailResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'variant_name' => $this->productDetail->variant_name ?? null,
+            'variant_name' => $this->productDetail?->variant_name ?? null,
             'quantity' => $this->used_stock,
-            'product_name' => $this->productDetail->product->name ?? null,
+            'product_name' => $this->productDetail?->product->name ?? null,
         ];
     }
 }
