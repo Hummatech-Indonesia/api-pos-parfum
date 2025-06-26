@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Contracts\Interfaces\Master\{ProductDetailInterface, ProductInterface, ProductStockInterface};
 use App\Contracts\Interfaces\{ProductBlendInterface, ProductBlendDetailInterface};
 use App\Helpers\BaseResponse;
+use App\Helpers\PaginationHelper;
 use App\Http\Requests\ProductBlendRequest;
 use App\Http\Resources\ProductBlendResource;
 use App\Http\Resources\ProductBlendWithDetailResource;
@@ -39,7 +40,7 @@ class ProductBlendController extends Controller
         $per_page = $request->per_page ?? 10;
         $page = $request->page ?? 1;
         $payload = [];
-        
+
         if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
         if ($request->search) $payload["search"] = $request->search;
@@ -48,14 +49,9 @@ class ProductBlendController extends Controller
             $paginate = $this->productBlend->customPaginate($per_page, $page, $payload);
 
             $resource = ProductBlendResource::collection($paginate);
-
             $result = $resource->collection->values();
-            $meta = [
-                'current_page' => $paginate->currentPage(),
-                'last_page' => $paginate->lastPage(),
-                'per_page' => $paginate->perPage(),
-                'total' => $paginate->total(),
-            ];
+            $meta = PaginationHelper::meta($paginate);
+
             return BaseResponse::Paginate('Berhasil mengambil list data product blend!', $result, $meta);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
