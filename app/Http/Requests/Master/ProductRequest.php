@@ -29,7 +29,7 @@ class ProductRequest extends FormRequest
         return [
             "name" => "required|string",
             "image" => "nullable|image|mimes:png,jpg,jpeg|max:2048",
-            "unit_type" => "required|in:weight,volume,unit",
+            "unit_type" => "nullable|in:weight,volume,unit",
             "qr_code" => "nullable|string",
             "category_id" => "required|exists:categories,id",
 
