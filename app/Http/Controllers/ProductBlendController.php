@@ -83,6 +83,7 @@ class ProductBlendController extends Controller
             ]);
 
             $product_id = $product->id;
+            $productBlends = [];
 
             foreach ($data['product_blend'] as $productBlend) {
                 $storeBlend = [
@@ -97,6 +98,7 @@ class ProductBlendController extends Controller
 
                 $blend = $this->productBlend->store($storeBlend);
                 $product_blend_id = $blend->id;
+                $productBlends[] = $product_blend_id;
 
                 foreach ($productBlend['product_blend_details'] as $blendDetail) {
                     $stock = $this->productStock->checkStock($blendDetail['product_detail_id']);
@@ -147,7 +149,9 @@ class ProductBlendController extends Controller
             }
 
             DB::commit();
-            return BaseResponse::Ok("Berhasil melakukan pencampuran produk", ['product_blend_id' => $product_blend_id]);
+            $blends = $this->productBlend->getByIds($productBlends);
+
+            return BaseResponse::Ok("Berhasil melakukan pencampuran produk", ProductBlendResource::collection($blends));
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error("Gagal mencampur produk: " . $th->getMessage(), null);

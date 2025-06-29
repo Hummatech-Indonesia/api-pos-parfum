@@ -86,6 +86,21 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
             ->withCount('productBlendDetails as used_product_count');
     }
 
+    public function getByIds(array $ids)
+    {
+        return $this->model
+            ->whereIn('id', $ids)
+            ->with([
+                'productDetail:id,product_id,variant_name',
+                'product:id,name',
+                'productBlendDetails:id,product_blend_id,product_detail_id,used_stock',
+                'productBlendDetails.productDetail:id,variant_name,product_id',
+                'productBlendDetails.productDetail.product:id,name',
+            ])
+            ->withCount('productBlendDetails as used_product_count')
+            ->get();
+    }
+
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         $query = $this->model->query()
