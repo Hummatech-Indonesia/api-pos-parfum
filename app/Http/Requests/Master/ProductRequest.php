@@ -29,7 +29,7 @@ class ProductRequest extends FormRequest
         return [
             "name" => "required|string",
             "image" => "nullable|image|mimes:png,jpg,jpeg|max:2048",
-            "unit_type" => "required|in:weight,volume,unit",
+            "unit_type" => "nullable|in:weight,volume,unit",
             "qr_code" => "nullable|string",
             "category_id" => "required|exists:categories,id",
 
@@ -61,7 +61,7 @@ class ProductRequest extends FormRequest
             'image.max' => "Gambar maksimal adalah 2mb",
             'category_id.required' => 'Kategori harus diisi!',
             'category_id.exists' => 'Kategori tidak ada!',
-            'unit_type.required' => 'Tipe unit harus diisi!',
+            // 'unit_type.required' => 'Tipe unit harus diisi!',
             'unit_type.in' => 'Tipe unit yang bidsa dipakai adalah weight, volume, atau unit!',
             'product_details.array' => 'Data produk varian tidak valid!',
             'product_details.product_image' => 'Format detail gambar tidak valid!',
@@ -87,5 +87,6 @@ class ProductRequest extends FormRequest
     {
         if (!$this->product_details) $this->merge(["product_details" => []]);
         if (!$this->qr_code) $this->merge(["qr_code" => null]);
+        if (!$this->unit_type) $this->merge(["unit_type" => 'unit']);
     }
 }

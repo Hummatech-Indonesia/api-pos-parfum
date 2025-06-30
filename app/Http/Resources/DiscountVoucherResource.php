@@ -36,7 +36,7 @@ class DiscountVoucherResource extends JsonResource
                     'variant_code' => $this->details->product_code,
                     'product_image' => $this->details->product->image,
                     'product_name' => $this->details->product->name,
-                    'product_category' => $this->details->product->category->name ?? null,
+                    'product_category' => $this->details->first()?->category?->name,
                 ];
             }),
         ];

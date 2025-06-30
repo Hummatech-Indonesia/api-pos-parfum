@@ -33,7 +33,7 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
                 foreach ($data as $index => $value) {
                     $query->where($index, $value);
                 }
-            });
+            })->where('is_delete', 0);
     }
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed

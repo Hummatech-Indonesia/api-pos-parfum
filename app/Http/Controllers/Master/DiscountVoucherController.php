@@ -14,6 +14,7 @@ use App\Services\DiscountVoucherService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use SebastianBergmann\CodeCoverage\Util\Percentage;
 
 class DiscountVoucherController extends Controller
 {
@@ -47,6 +48,14 @@ class DiscountVoucherController extends Controller
         if ($request->max_discount) $payload["max_discount"] = $request->max_discount;
         if ($request->start_date) $payload["start_date"] = $request->start_date;
         if ($request->end_date) $payload["end_date"] = $request->end_date;
+        if ($request->amount) $payload["amount"] = $request->amount;
+        if ($request->type) $payload["type"] = $request->type;
+        if ($request->active !== null) {
+            $payload["active"] = $request->active;
+        }
+        if ($request->is_member !== null) {
+            $payload["is_member"] = $request->is_member;
+        }
 
         if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
@@ -140,12 +149,17 @@ class DiscountVoucherController extends Controller
         $validator['min'] = $request->minimum_purchase;
         unset($validator['end_date'], $validator['minimum_purchase']);
 
+        if (isset($validator['type']) && $validator['type'] === 'percentage') {
+            $validator['nominal'] = null;
+        } elseif (isset($validator['type']) && $validator['type'] === 'nominal') {
+            $validator['percentage'] = null;
+        }
+
         $check = $this->discountVoucher->checkActive($id);
         if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data!");
 
         DB::beginTransaction();
         try {
-
             $result_product = $this->discountVoucher->update($id, $validator);
 
             DB::commit();

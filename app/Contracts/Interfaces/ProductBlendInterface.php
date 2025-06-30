@@ -14,4 +14,5 @@ interface ProductBlendInterface extends GetInterface, StoreInterface, UpdateInte
     public function show(mixed $id): mixed;
     public function getDetailWithPagination(string $id, int $page = 1, int $perPage = 5);
     public function customQuery(array $data): mixed;
+    public function getByIds(array $ids);
 }
