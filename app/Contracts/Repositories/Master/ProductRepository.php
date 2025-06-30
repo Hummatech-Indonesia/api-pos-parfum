@@ -30,7 +30,7 @@ class ProductRepository extends BaseRepository implements ProductInterface
             ->with([
                 'store', 'productBundling.details',
                 'details' => function ($query) {
-                $query->with('varian', 'category')->withCount('transactionDetails');
+                $query->with('category')->withCount('transactionDetails');
             }])
             ->when(count($data) > 0, function ($query) use ($data) {
                 foreach ($data as $index => $value) {
