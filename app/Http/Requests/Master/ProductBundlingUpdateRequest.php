@@ -24,17 +24,22 @@ class ProductBundlingUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // 'name' => 'required|string|max:255',
-            // 'description' => 'required|string',
-            // 'category_id' => 'required|exists:categories,id',
+            'name' => 'sometimes|required|string|max:255',
+            'harga' => 'sometimes|required|numeric',
+            'kode_Blend' => 'sometimes|required|string',
+            'category_id' => 'sometimes|required|exists:categories,id',
+            'quantity' => 'sometimes|required|numeric|min:0',
 
             'details' => 'required|array|min:1',
-            'details.*.unit' => 'required|string',
-            'details.*.unit_id' => 'required|uuid|exists:units,id',
-            'details.*.quantity' => 'required|numeric|min:0.01',
             'details.*.product_detail_id' => 'required|uuid|exists:product_details,id',
+
+            'details.*.unit' => 'nullable|string',
+            'details.*.unit_id' => 'nullable|uuid|exists:units,id',
+            'details.*.quantity' => 'nullable|numeric|min:0.01',
         ];
     }
+
+
 
     /**
      * Get custom messages for validator errors.
