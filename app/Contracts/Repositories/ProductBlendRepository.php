@@ -103,7 +103,7 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
-        $query = $this->model->query()
+        return $this->model->query()
             ->with([
                 'productDetail',
                 'product',
@@ -111,30 +111,46 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
                 'productBlendDetails.productDetail',
                 'productBlendDetails.productDetail.product',
             ])
-            ->withCount('productBlendDetails as used_product_count');
-
-        if (isset($data["search"])) {
-            $search = $data["search"];
-            $query->where(function ($q) use ($search) {
-                $q->where('date', 'like', '%' . $search . '%')
-                    ->orWhereHas('productDetail', function ($q2) use ($search) {
-                        $q2->where('material', 'like', '%' . $search . '%')
-                            ->orWhere('price', 'like', '%' . $search . '%');
-                    })
-                    ->orWhereHas('warehouse', function ($q3) use ($search) {
-                        $q3->where('name', 'like', '%' . $search . '%');
+            ->withCount('productBlendDetails as used_product_count')
+            ->when($data, function ($query) use ($data) {
+                // dd($query->toSql(), $query->getBindings());
+                if (!empty($data["search"])) {
+                    $query->where(function ($q) use ($data) {
+                        $q->where('date', 'like', '%' . $data["search"] . '%');
                     });
-            });
+                }
 
-            unset($data["search"]);
-        }
+                if (!empty($data["date"])) {
+                    $query->where('date', 'like', '%' . $data["date"] . '%');
+                }
 
-        if (!empty($data)) {
-            foreach ($data as $field => $value) {
-                $query->where($field, $value);
-            }
-        }
+                if (!empty($data["description"])) {
+                    $query->where('description', 'like', '%' . $data["description"] . '%');
+                }
 
-        return $query->paginate($pagination, ['*'], 'page', $page);
+                if (!empty($data["productDetail"])) {
+                    $query->whereHas('productDetail', function ($q) use ($data) {
+                        $q->where('variant_name', 'like', '%' . $data["productDetail"] . '%');
+                    });
+                }
+
+                if (!empty($data['start_date'])) {
+                    $query->whereDate('date', '>=', $data['start_date']);
+                }
+
+                if (!empty($data['end_date'])) {
+                    $query->whereDate('date', '<=', $data['end_date']);
+                }
+
+                // Filter quantity (hasil blend)
+                if (!empty($data['min_quantity'])) {
+                    $query->where('result_stock', '>=', $data['min_quantity']);
+                }
+
+                if (!empty($data['max_quantity'])) {
+                    $query->where('result_stock', '<=', $data['max_quantity']);
+                }
+            })
+            ->paginate($pagination, ['*'], 'page', $page);
     }
 }

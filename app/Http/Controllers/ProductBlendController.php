@@ -41,9 +41,17 @@ class ProductBlendController extends Controller
         $page = $request->page ?? 1;
         $payload = [];
 
-        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
-
+        
         if ($request->search) $payload["search"] = $request->search;
+        if ($request->date) $payload["date"] = $request->date;
+        if ($request->description) $payload["description"] = $request->description;
+        if ($request->productDetail) $payload["productDetail"] = $request->productDetail;
+        if ($request->start_date) $payload["start_date"] = $request->start_date;
+        if ($request->end_date) $payload["end_date"] = $request->end_date;
+        if ($request->min_quantity) $payload["min_quantity"] = $request->min_quantity;
+        if ($request->max_quantity) $payload["max_quantity"] = $request->max_quantity;
+        
+        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
         try {
             $paginate = $this->productBlend->customPaginate($per_page, $page, $payload);
