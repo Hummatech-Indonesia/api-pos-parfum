@@ -26,15 +26,22 @@ class RoleController extends Controller
     public function index(Request $request)
     {
         try {
-            $perPage = $request->query('per_page');
-            $query = Role::withTrashed()->withCount('users');
+            $per_page = $request->per_page ?? 5;
+            $page = $request->page ?? 1;
 
-            $roles = $perPage ? $query->paginate($perPage) : $query->get();
-            return BaseResponse::Ok('Berhasil mengambil list role!', $roles);
+            $payload = [];
+            if ($request->search) $payload["search"] = $request->search;
+
+            $data = $this->role->customPaginate($per_page, $page, $payload);
+            $meta = \App\Helpers\PaginationHelper::meta($data);
+            $result = $data->items();
+
+            return BaseResponse::Paginate('Berhasil mengambil list role!', $result, $meta);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
+
 
 
     /**
@@ -101,7 +108,7 @@ class RoleController extends Controller
         try {
             $this->role->delete($id);
             DB::commit();
-            return BaseResponse::Ok("Role berhasil dihapus!", $role);
+            return BaseResponse::Ok("Role berhasil dihapus!", true);
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
