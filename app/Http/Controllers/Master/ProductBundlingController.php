@@ -69,7 +69,7 @@ class ProductBundlingController extends Controller
             $productDetail = $this->productDetailRepo->store([
                 'id' => uuid_create(),
                 'product_id' => $product->id,
-                'product_code' => $validated['kode_Blend'], 
+                'product_code' => $validated['kode_Blend'],
                 'stock' => $validated['quantity'],
                 'unit' => 'pcs',
                 'price' => $validated['harga'],
@@ -90,6 +90,20 @@ class ProductBundlingController extends Controller
                     ];
                 })->toArray();
 
+            foreach ($details as $detail) {
+                $productDetailItem = $this->productDetailRepo->show($detail['product_detail_id']);
+
+                if (!$productDetailItem) {
+                    DB::rollBack();
+                    return BaseResponse::Error("Product detail dengan ID {$detail['product_detail_id']} tidak ditemukan.", null);
+                }
+
+                if ($productDetailItem->stock < $detail['quantity']) {
+                    DB::rollBack();
+                    $productName = $productDetailItem->product->name ?? 'Tidak diketahui';
+                    return BaseResponse::Error("Stok produk '{$productName}' tidak cukup. Sisa: {$productDetailItem->stock}, Dibutuhkan: {$detail['quantity']}", null);
+                }
+            }
 
             foreach ($details as $detail) {
                 $this->bundlingDetailRepo->store([
@@ -99,21 +113,21 @@ class ProductBundlingController extends Controller
                     'unit_id' => $detail['unit_id'],
                     'quantity' => $detail['quantity'],
                 ]);
-            }
 
-             $productDetail = $this->productDetailRepo->show($detail['product_detail_id']);
-                if ($productDetail) {
-                    $newStock = max(0, $productDetail->stock - $validated['quantity']); // kurangi sesuai stock bundling
-                    $this->productDetailRepo->update($productDetail->id, ['stock' => $newStock]);
-                }
+                $productDetailItem = $this->productDetailRepo->show($detail['product_detail_id']);
+                $newStock = max(0, $productDetailItem->stock - $detail['quantity']);
+                $this->productDetailRepo->update($productDetailItem->id, ['stock' => $newStock]);
+            }
 
             DB::commit();
             return BaseResponse::Ok("Berhasil membuat bundling", $this->repository->show($bundling->id)->load('details'));
+
         } catch (\Throwable $e) {
             DB::rollBack();
             return BaseResponse::Error($e->getMessage(), null);
         }
     }
+
 
     public function show(string $id)
     {
