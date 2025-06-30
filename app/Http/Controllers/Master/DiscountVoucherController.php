@@ -40,7 +40,6 @@ class DiscountVoucherController extends Controller
             "sort_direction" => $request->sort_direction
         ];
 
-
         if ($request->search) $payload["search"] = $request->search;
         if ($request->name) $payload["name"] = $request->name;
         if ($request->active !== null) $payload["active"] = $request->active;
@@ -195,8 +194,27 @@ class DiscountVoucherController extends Controller
     public function listDiscountVoucher(Request $request)
     {
         try {
-            $payload = [];
+            $payload = [
+                "is_delete" => 0,
+                "sort_by" => $request->sort_by,
+                "sort_direction" => $request->sort_direction
+            ];
 
+            if ($request->search) $payload["search"] = $request->search;
+            if ($request->name) $payload["name"] = $request->name;
+            if ($request->active !== null) $payload["active"] = $request->active;
+            if ($request->min_discount) $payload["min_discount"] = $request->min_discount;
+            if ($request->max_discount) $payload["max_discount"] = $request->max_discount;
+            if ($request->start_date) $payload["start_date"] = $request->start_date;
+            if ($request->end_date) $payload["end_date"] = $request->end_date;
+            if ($request->amount) $payload["amount"] = $request->amount;
+            if ($request->type) $payload["type"] = $request->type;
+            if ($request->active !== null) {
+                $payload["active"] = $request->active;
+            }
+            if ($request->is_member !== null) {
+                $payload["is_member"] = $request->is_member;
+            }
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             $collection = $this->discountVoucher->customQuery($payload)->get();
 
