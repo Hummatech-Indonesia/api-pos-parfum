@@ -13,7 +13,6 @@ use App\Http\Resources\UserResource;
 use App\Services\Auth\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -52,8 +51,7 @@ class UserController extends Controller
 
             return BaseResponse::Paginate('Berhasil mengambil list data user!', $result, $meta);
         } catch (\Throwable $th) {
-            Log::error("Gagal dalam mengambil list paginate user => ", $th->getMessage());
-            return BaseResponse::Error("Gagal dalam mengambil list paginate user!", null);
+            return BaseResponse::Error("Gagal dalam mengambil list paginate user!", $th);
         }
     }
 
@@ -125,7 +123,7 @@ class UserController extends Controller
             return BaseResponse::Ok('Berhasil update user', null);
         } catch (\Throwable $th) {
             DB::rollBack();
-            return BaseResponse::Error($th->getMessage(), null);
+            return BaseResponse::Error('Gagal Update User',$th->getMessage());
         }
     }
 
@@ -198,7 +196,7 @@ class UserController extends Controller
 
                     $result_user->syncRoles(["member"]);
                 } catch (\Throwable $th) {
-                    Log::error("Error sync user => " . $th->getMessage());
+                    return BaseResponse::Error($th->getMessage(), null);
                 }
             }
             DB::commit();
