@@ -18,15 +18,16 @@ class ProductResource extends JsonResource
             'description' => $this->description,
             'product_detail' => $this->whenLoaded('details', function () {
                 return $this->details->map(function ($detail) {
-                    return [
-                        'id' => $detail->id,
-                        'category' => $detail->category?->name,
-                        'stock' => auth()->user()->hasRole("warehouse") ? $detail->product_stock_warehouse : $detail->product_stock_outlet,
-                        'price' => $detail->price,
-                        'variant_name' => $detail->variant_name,
-                        'product_code' => $detail->product_code,
-                        'product_image' => $detail->image,
-                    ];
+                    // return [
+                    //     'id' => $detail->id,
+                    //     'category' => $detail->category?->name,
+                    //     'stock' => auth()->user()->hasRole("warehouse") ? $detail->product_stock_warehouse : $detail->product_stock_outlet,
+                    //     'price' => $detail->price,
+                    //     'variant_name' => $detail->variant_name,
+                    //     'product_code' => $detail->product_code,
+                    //     'product_image' => $detail->image,
+                    // ];
+                    return $detail;
                 });
             }),
         ];
