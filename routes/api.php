@@ -93,6 +93,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource("products", ProductController::class)->only(['store', 'destroy', 'update']);
         // API FOR DATA PRODUCT DETAIL
         Route::get('product-details/no-paginate', [ProductDetailController::class, 'listProduct'])->name('list-product-details-no-paginate');
+        Route::get('product-details/v2/no-paginate', [ProductDetailController::class, 'listProductV2'])->name('v2.list-product-details-no-paginate');
         Route::resource("product-details", ProductDetailController::class)->only(['store', 'destroy', 'update']);
         // API FOR DATA CATEGORY
         Route::get('categories/no-paginate', [CategoryController::class, 'listCategory'])->name('list-categories-no-paginate');

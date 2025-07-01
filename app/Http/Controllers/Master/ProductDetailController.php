@@ -174,6 +174,20 @@ class ProductDetailController extends Controller
         }
     }
 
+    public function listProductV2(Request $request)
+    {
+        try {
+            $payload = [];
+
+            if ($request->product_id) $payload['product_id'] = $request->product_id;
+            $data = $this->productDetail->customQuery($payload)->get();
+
+            return BaseResponse::Ok("Berhasil mengambil data product ", $data);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
     public function stockProduct(Request $request)
     {
         $payload = [];
