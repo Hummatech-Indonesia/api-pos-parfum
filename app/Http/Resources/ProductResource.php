@@ -21,7 +21,7 @@ class ProductResource extends JsonResource
                     return [
                         'id' => $detail->id,
                         'category' => $detail->category?->name,
-                        'stock' => $detail->stock,
+                        'stock' => auth()->user()->hasRole("warehouse") ? $detail->product_stock_warehouse : $detail->product_stock_outlet,
                         'price' => $detail->price,
                         'variant_name' => $detail->variant_name,
                         'product_code' => $detail->product_code,
