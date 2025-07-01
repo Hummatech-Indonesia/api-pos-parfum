@@ -70,10 +70,13 @@ class AuditRepository extends BaseRepository implements AuditInterface
     public function customPaginate(int $pagination = 8, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
+            ->withCount('auditDetails')
             ->with(['auditDetails', 'auditDetails.details.product' => function ($query) {
                 $query->select('id', 'name');
-            },'user'])
+            }, 'user'])
             ->when(count($data) > 0, function ($query) use ($data) {
+
+
                 if (isset($data["search"])) {
                     $query->where(function ($query2) use ($data) {
                         $query2->where('name', 'like', '%' . $data["search"] . '%');
@@ -85,19 +88,39 @@ class AuditRepository extends BaseRepository implements AuditInterface
                     $query->where('name', 'like', '%' . $data['name'] . '%');
                 }
 
-                // Filter berdasarkan status
                 if (!empty($data['status'])) {
                     $query->where('status', $data['status']);
                 }
 
-                // Filter berdasarkan rentang tanggal
-                if (!empty($data['date'])) {
-                    $query->where('date', $data['date']);
+                if (!empty($data["from_date"])) {
+                    $query->where('date', '>=', $data["from_date"]);
                 }
 
-                // foreach ($data as $index => $value) {
-                //     $query->where($index, $value);
-                // }
+                if (!empty($data["until_date"])) {
+                    $query->where('date', '<=', $data["until_date"]);
+                }
+
+                if (!empty($data["min_variant"])) {
+                    $query->having('audit_details_count', '>=', $data["min_variant"]);
+                }
+
+                if (!empty($data["max_variant"])) {
+                    $query->having('audit_details_count', '<=', $data["max_variant"]);
+                }
+
+                if (!empty($data['sort_by']) && !empty($data['sort_direction'])) {
+                    $allowedSorts = ['name', 'category','status', 'created_at'];
+                    $allowedDirections = ['asc', 'desc'];
+
+                    $sortBy = in_array($data['sort_by'], $allowedSorts) ? $data['sort_by'] : 'created_at';
+                    $sortDirection = in_array(strtolower($data['sort_direction']), $allowedDirections)
+                        ? strtolower($data['sort_direction'])
+                        : 'desc';
+
+                    $query->orderBy($sortBy, $sortDirection);
+                } else {
+                    $query->orderBy('created_at', 'desc');
+                }
             })
             ->paginate($pagination, ['*'], 'page', $page);
         // ->appends(['search' => $request->search, 'year' => $request->year]);
@@ -106,9 +129,53 @@ class AuditRepository extends BaseRepository implements AuditInterface
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
+            ->withCount('auditDetails')
             ->when(count($data) > 0, function ($query) use ($data) {
-                foreach ($data as $index => $value) {
-                    $query->where($index, $value);
+
+
+                if (isset($data["search"])) {
+                    $query->where(function ($query2) use ($data) {
+                        $query2->where('name', 'like', '%' . $data["search"] . '%');
+                    });
+                    unset($data["search"]);
+                }
+
+                if (!empty($data['name'])) {
+                    $query->where('name', 'like', '%' . $data['name'] . '%');
+                }
+
+                if (!empty($data['status'])) {
+                    $query->where('status', $data['status']);
+                }
+
+                if (!empty($data["from_date"])) {
+                    $query->where('date', '>=', $data["from_date"]);
+                }
+
+                if (!empty($data["until_date"])) {
+                    $query->where('date', '<=', $data["until_date"]);
+                }
+
+                if (!empty($data["min_variant"])) {
+                    $query->having('audit_details_count', '>=', $data["min_variant"]);
+                }
+
+                if (!empty($data["max_variant"])) {
+                    $query->having('audit_details_count', '<=', $data["max_variant"]);
+                }
+
+                if (!empty($data['sort_by']) && !empty($data['sort_direction'])) {
+                    $allowedSorts = ['name', 'status', 'created_at'];
+                    $allowedDirections = ['asc', 'desc'];
+
+                    $sortBy = in_array($data['sort_by'], $allowedSorts) ? $data['sort_by'] : 'created_at';
+                    $sortDirection = in_array(strtolower($data['sort_direction']), $allowedDirections)
+                        ? strtolower($data['sort_direction'])
+                        : 'desc';
+
+                    $query->orderBy($sortBy, $sortDirection);
+                } else {
+                    $query->orderBy('created_at', 'desc');
                 }
             })->with(['auditDetails', 'auditDetails.details.product' => function ($query) {
                 $query->select('id', 'name');

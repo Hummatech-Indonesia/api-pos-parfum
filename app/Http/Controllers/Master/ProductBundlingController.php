@@ -69,7 +69,7 @@ class ProductBundlingController extends Controller
             $productDetail = $this->productDetailRepo->store([
                 'id' => uuid_create(),
                 'product_id' => $product->id,
-                'product_code' => $validated['kode_Blend'], 
+                'product_code' => $validated['kode_Blend'],
                 'stock' => $validated['quantity'],
                 'unit' => 'pcs',
                 'price' => $validated['harga'],
@@ -90,6 +90,20 @@ class ProductBundlingController extends Controller
                     ];
                 })->toArray();
 
+            foreach ($details as $detail) {
+                $productDetailItem = $this->productDetailRepo->show($detail['product_detail_id']);
+
+                if (!$productDetailItem) {
+                    DB::rollBack();
+                    return BaseResponse::Error("Product detail dengan ID {$detail['product_detail_id']} tidak ditemukan.", null);
+                }
+
+                if ($productDetailItem->stock < $detail['quantity']) {
+                    DB::rollBack();
+                    $productName = $productDetailItem->product->name ?? 'Tidak diketahui';
+                    return BaseResponse::Error("Stok produk '{$productName}' tidak cukup. Sisa: {$productDetailItem->stock}, Dibutuhkan: {$detail['quantity']}", null);
+                }
+            }
 
             foreach ($details as $detail) {
                 $this->bundlingDetailRepo->store([
@@ -99,21 +113,21 @@ class ProductBundlingController extends Controller
                     'unit_id' => $detail['unit_id'],
                     'quantity' => $detail['quantity'],
                 ]);
-            }
 
-             $productDetail = $this->productDetailRepo->show($detail['product_detail_id']);
-                if ($productDetail) {
-                    $newStock = max(0, $productDetail->stock - $validated['quantity']); // kurangi sesuai stock bundling
-                    $this->productDetailRepo->update($productDetail->id, ['stock' => $newStock]);
-                }
+                $productDetailItem = $this->productDetailRepo->show($detail['product_detail_id']);
+                $newStock = max(0, $productDetailItem->stock - $detail['quantity']);
+                $this->productDetailRepo->update($productDetailItem->id, ['stock' => $newStock]);
+            }
 
             DB::commit();
             return BaseResponse::Ok("Berhasil membuat bundling", $this->repository->show($bundling->id)->load('details'));
+
         } catch (\Throwable $e) {
             DB::rollBack();
             return BaseResponse::Error($e->getMessage(), null);
         }
     }
+
 
     public function show(string $id)
     {
@@ -140,23 +154,41 @@ class ProductBundlingController extends Controller
             $bundling = $this->repository->show($id);
             if (!$bundling) return BaseResponse::Notfound("Bundling tidak ditemukan");
 
-            $data = $request->validated();
-            $detailsData = $this->service->mapDetailData($data['details']);
+            $validated = $request->validated();
 
-            // Delete existing details
-            foreach ($bundling->details as $detail) {
-                $this->bundlingDetailRepo->delete($detail->id);
-            }
+            // Update data bundling
+            $bundlingData = [
+                'name' => $validated['name'] ?? $bundling->name,
+                'category_id' => $validated['category_id'] ?? $bundling->category_id,
+                'stock' => $validated['quantity'] ?? $bundling->stock,
+                'price' => $validated['harga'] ?? $bundling->price,
+                'bundling_code' => $validated['kode_Blend'] ?? $bundling->bundling_code,
+            ];
+            $this->repository->update($bundling->id, $bundlingData);
 
-            // Re-create details
-            foreach ($detailsData as $detail) {
-                $this->bundlingDetailRepo->store([
-                    'product_bundling_id' => $bundling->id,
-                    'product_detail_id' => $detail['product_detail_id'],
-                    'unit' => $detail['unit'],
-                    'unit_id' => $detail['unit_id'],
-                    'quantity' => $detail['quantity'],
-                ]);
+            // Update detail
+            foreach ($validated['details'] as $inputDetail) {
+                $existingDetail = $bundling->details
+                    ->where('product_detail_id', $inputDetail['product_detail_id'])
+                    ->first();
+
+                if ($existingDetail) {
+                    $this->bundlingDetailRepo->update($existingDetail->id, [
+                        'unit' => $inputDetail['unit'] ?? $existingDetail->unit,
+                        'unit_id' => $inputDetail['unit_id'] ?? $existingDetail->unit_id,
+                        'quantity' => $inputDetail['quantity'] ?? $existingDetail->quantity,
+                    ]);
+
+                } else {
+                    // Tambah jika belum ada
+                    $this->bundlingDetailRepo->store([
+                        'product_bundling_id' => $bundling->id,
+                        'product_detail_id' => $inputDetail['product_detail_id'],
+                        'unit' => $inputDetail['unit'],
+                        'unit_id' => $inputDetail['unit_id'],
+                        'quantity' => $inputDetail['quantity'],
+                    ]);
+                }
             }
 
             DB::commit();
@@ -166,6 +198,7 @@ class ProductBundlingController extends Controller
             return BaseResponse::Error($e->getMessage(), null);
         }
     }
+
 
     public function destroy(string $id)
     {

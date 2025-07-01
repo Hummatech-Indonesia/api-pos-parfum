@@ -30,7 +30,7 @@ class AuditController extends Controller
     {
         $per_page = $request->per_page ?? 8;
         $page = $request->page ?? 1;
-        $payload = $request->only(['search', 'name', 'status', 'date']);
+        $payload = $request->only(['search', 'name', 'status', 'min_variant', 'max_variant', 'from_date', 'until_date']);
 
         $payload['user_id'] = auth()?->user()?->id;
 
@@ -229,7 +229,8 @@ class AuditController extends Controller
     public function list(Request $request)
     {
         try {
-            $payload = [];
+            $payload = $request->only(['search', 'name', 'status', 'min_variant', 'max_variant', 'from_date', 'until_date']);
+
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
             $data = $this->auditRepository->customQuery($payload)->get();

@@ -7,6 +7,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\Rule;
 
 class RoleRequest extends FormRequest
 {
@@ -25,9 +26,10 @@ class RoleRequest extends FormRequest
      */
     public function rules(): array
     {
-        $id = $this->route('id'); // ambil ID dari route untuk update
+        $id = $this->route('role')?->id ?? $this->route('id');
         return [
-            "name" => 'required|unique:roles,name' . ($id ? ',' . $id . ',id' : ''),
+            "name" => 'required',
+            Rule::unique('roles', 'name')->ignore($id),
             'guard_name' => 'required|in:web,api',
         ];
     }

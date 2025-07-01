@@ -22,7 +22,7 @@ class AuditResource extends JsonResource
             'date' => $this->date,
             'status' => $this->status,
             'auditor' => $this->user->name,
-            'variant_count' => $this->auditDetails->count(),
+            'variant_count' => $this->audit_details_count,
             'store_name' => $this->store->name,
             'retail_name' => $this->outlet->name,
             // 'items_with_discrepancy' => $items->filter(fn($i) => $i->audit_stock != $i->old_stock)->count(),

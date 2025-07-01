@@ -63,5 +63,17 @@ class RoleRepository extends BaseRepository implements RoleInterface
         return $role ? $role->restore() : false;
     }
 
+    public function customPaginate(int $pagination = 5, int $page = 1, ?array $data = []): mixed
+    {
+        return $this->model->withTrashed()
+            ->withCount('users')
+            ->when(isset($data["search"]), function ($query) use ($data) {
+                $query->where('name', 'like', '%' . $data["search"] . '%');
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate($pagination, ['*'], 'page', $page);
+    }
+
+
 
 }
