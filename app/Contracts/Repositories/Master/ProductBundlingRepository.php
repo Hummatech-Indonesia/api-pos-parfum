@@ -89,7 +89,42 @@ class ProductBundlingRepository extends BaseRepository implements ProductBundlin
                         $query->where('created_at', '>=', $data['created_from'] . ' 00:00:00');
                     } elseif (!empty($data['created_to'])) {
                         $query->where('created_at', '<=', $data['created_to'] . ' 23:59:59');
+                    }
+                
+                if (!empty($data['min_stock'])) {
+                    $query->where('stock', '>=', $data['min_stock']);
                 }
+
+                if (!empty($data['max_stock'])) {
+                    $query->where('stock', '<=', $data['max_stock']);
+                }
+
+                if (!empty($data['min_price'])) {
+                    $query->where('price', '>=', $data['min_price']);
+                }
+
+                if (!empty($data['max_price'])) {
+                    $query->where('price', '<=', $data['max_price']);
+                }
+
+                if (!empty($data['status'])) {
+                    if ($data['status'] === 'active') {
+                        $query->where('stock', '>', 0);
+                    } elseif ($data['status'] === 'non-active') {
+                        $query->where('stock', '<=', 0);
+                    }
+                }
+
+                if (!empty($data['min_material']) || !empty($data['max_material'])) {
+                    $query->withCount('details');
+                    if (!empty($data['min_material'])) {
+                        $query->having('details_count', '>=', $data['min_material']);
+                    }
+                    if (!empty($data['max_material'])) {
+                        $query->having('details_count', '<=', $data['max_material']);
+                    }
+                }
+
             })
             ->paginate($pagination, ['*'], 'page', $page);
     }

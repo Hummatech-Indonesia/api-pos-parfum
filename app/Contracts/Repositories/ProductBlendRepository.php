@@ -108,12 +108,13 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
                 'productDetail',
                 'product',
                 'productBlendDetails',
+                'productBlendDetails.productStock',
                 'productBlendDetails.productDetail',
                 'productBlendDetails.productDetail.product',
             ])
             ->withCount('productBlendDetails as used_product_count')
+            
             ->when($data, function ($query) use ($data) {
-                // dd($query->toSql(), $query->getBindings());
                 if (!empty($data["search"])) {
                     $query->where(function ($q) use ($data) {
                         $q->where('date', 'like', '%' . $data["search"] . '%');

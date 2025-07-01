@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ProductBlendDetail extends Model
 {
@@ -36,8 +37,9 @@ class ProductBlendDetail extends Model
         return $this->belongsTo(Unit::class);
     }
     
-    public function productStock(): BelongsTo
+    public function productStock(): HasOne
     {
-        return $this->belongsTo(ProductStock::class);
+        return $this->hasOne(ProductStock::class, 'product_detail_id', 'product_detail_id')
+        ->where('warehouse_id', auth()->user()->warehouse_id);
     }
 }

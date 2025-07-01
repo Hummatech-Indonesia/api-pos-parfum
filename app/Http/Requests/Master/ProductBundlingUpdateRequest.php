@@ -30,8 +30,8 @@ class ProductBundlingUpdateRequest extends FormRequest
             'category_id' => 'sometimes|required|exists:categories,id',
             'quantity' => 'sometimes|required|numeric|min:0',
 
-            'details' => 'required|array|min:1',
-            'details.*.product_detail_id' => 'required|uuid|exists:product_details,id',
+            'details' => 'array|min:1',
+            'details.*.product_detail_id' => 'uuid|exists:product_details,id',
 
             'details.*.unit' => 'nullable|string',
             'details.*.unit_id' => 'nullable|uuid|exists:units,id',

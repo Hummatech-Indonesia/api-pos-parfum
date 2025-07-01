@@ -40,7 +40,10 @@ class ProductBundlingController extends Controller
         try {
             $perPage = $request->per_page ?? 10;
             $page = $request->page ?? 1;
-            $payload = $request->only(['search', 'name', 'category', 'product', 'mulai_tanggal', 'sampai_tanggal']);
+            $payload = $request->only([
+                'search', 'name', 'category', 'product', 'mulai_tanggal', 'sampai_tanggal',
+                'min_stock', 'max_stock', 'min_price', 'max_price', 'min_material', 'max_material', 'status'
+            ]);
             $payload['created_from'] = $payload['mulai_tanggal'] ?? null;
             $payload['created_to'] = $payload['sampai_tanggal'] ?? null;
 
@@ -156,7 +159,6 @@ class ProductBundlingController extends Controller
 
             $validated = $request->validated();
 
-            // Update data bundling
             $bundlingData = [
                 'name' => $validated['name'] ?? $bundling->name,
                 'category_id' => $validated['category_id'] ?? $bundling->category_id,
@@ -166,7 +168,6 @@ class ProductBundlingController extends Controller
             ];
             $this->repository->update($bundling->id, $bundlingData);
 
-            // Update detail
             foreach ($validated['details'] as $inputDetail) {
                 $existingDetail = $bundling->details
                     ->where('product_detail_id', $inputDetail['product_detail_id'])
@@ -180,7 +181,6 @@ class ProductBundlingController extends Controller
                     ]);
 
                 } else {
-                    // Tambah jika belum ada
                     $this->bundlingDetailRepo->store([
                         'product_bundling_id' => $bundling->id,
                         'product_detail_id' => $inputDetail['product_detail_id'],

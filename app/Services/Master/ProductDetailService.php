@@ -42,7 +42,7 @@ class ProductDetailService
                 "product_code" => $data["product_code"] ?? null,
                 "variant_name" => isset($data["variant"], $data["opsi"]) && $data["variant"] !== '' && $data["opsi"] !== ''
                     ? $data["variant"] . '-' . $data["opsi"]
-                    : null,
+                    : ($data['variant'] ?? null),
             ];
             return $result;
         } catch (\Throwable $th) {
