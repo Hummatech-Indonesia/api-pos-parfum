@@ -36,7 +36,7 @@ class UserController extends Controller
 
         if (!$request->role && $request->role == "") {
             $request->merge([
-                "role" => "['manager','auditor','warehouse','outlet','cashier']",
+                "role" => ['manager','auditor','warehouse','outlet','cashier'],
             ]);
         }
 
@@ -51,7 +51,7 @@ class UserController extends Controller
 
             return BaseResponse::Paginate('Berhasil mengambil list data user!', $result, $meta);
         } catch (\Throwable $th) {
-            return BaseResponse::Error("Gagal dalam mengambil list paginate user!", $th);
+            return BaseResponse::Error("Gagal dalam mengambil list paginate user!", $th->getMessage());
         }
     }
 
