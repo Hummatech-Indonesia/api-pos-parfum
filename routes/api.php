@@ -22,6 +22,7 @@ use App\Http\Controllers\Transaction\ShiftUserController;
 use App\Http\Controllers\Master\DiscountVoucherController;
 use App\Http\Controllers\Master\ProductBundlingController;
 use App\Http\Controllers\Master\ProductBundlingDetailController;
+use App\Http\Controllers\Master\ProductExportImportController;
 use App\Http\Controllers\ProductBlendController;
 use App\Http\Controllers\Transaction\TransactionController;
 
@@ -62,7 +63,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('warehouses/history/stock', [WarehouseController::class, 'listWarehouseStock']);
     });
 
-        // API FOR ROLE OWNER & WAREHOUSE
+    // API FOR ROLE OWNER & WAREHOUSE
     Route::middleware('role:owner|warehouse|outlet')->group(function () {
         Route::Resource('/product-bundling', ProductBundlingController::class);
         Route::post('/product-bundling/{id}/restore', [ProductBundlingController::class, 'restore']);
@@ -90,6 +91,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // API FOR DATA PRODUCT
         Route::get('products/no-paginate', [ProductController::class, 'listProduct'])->name('list-products-no-paginate');
         Route::resource("products", ProductController::class)->only(['store', 'destroy', 'update']);
+        Route::post('product/import', [ProductExportImportController::class, 'import']);
         // API FOR DATA PRODUCT DETAIL
         Route::get('product-details/no-paginate', [ProductDetailController::class, 'listProduct'])->name('list-product-details-no-paginate');
         Route::resource("product-details", ProductDetailController::class)->only(['store', 'destroy', 'update']);
@@ -142,7 +144,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // API FOR DATA USER
     Route::post("users/sync", [UserController::class, 'syncStoreData']);
-    Route::resource("users", UserController::class)->except(['store','destroy','update']);
+    Route::resource("users", UserController::class)->except(['store', 'destroy', 'update']);
     // API FOR DATA OUTLET
     Route::resource("outlets", OutletController::class)->except(['store', 'destroy', 'update']);
     // API FOR DATA WAREHOUSE
