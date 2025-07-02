@@ -5,6 +5,7 @@ namespace App\Contracts\Repositories\Master;
 use App\Contracts\Interfaces\Master\ProductInterface;
 use App\Contracts\Repositories\BaseRepository;
 use App\Models\Product;
+use App\Models\ProductStock;
 
 class ProductRepository extends BaseRepository implements ProductInterface
 {
@@ -27,15 +28,19 @@ class ProductRepository extends BaseRepository implements ProductInterface
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
-            ->with(['store', 'details' => function ($query) {
-                $query->with('category')->withCount('transactionDetails');
-            }
+            ->with([
+                'store',
+                'details' => function ($query) {
+                    $query->with('category')->withCount('transactionDetails');
+                }
             ])
             ->with([
-                'store', 'productBundling.details',
+                'store',
+                'productBundling.details',
                 'details' => function ($query) {
-                $query->with('varian', 'category')->withCount('transactionDetails');
-            }])
+                    $query->with('varian', 'category')->withCount('transactionDetails');
+                }
+            ])
             ->when(count($data) > 0, function ($query) use ($data) {
                 foreach ($data as $index => $value) {
                     if (in_array($index, ['search', 'sort_by', 'sort_order', 'orderby_total_stock'])) continue;
@@ -52,9 +57,11 @@ class ProductRepository extends BaseRepository implements ProductInterface
                 'category',
                 'details' => function ($q) {
                     $q->withCount('transactionDetails')
-                    ->with(['category:id,name'])
-                    ->withSum('productStockOutlet', 'stock')
-                    ->withSum('productStockWarehouse', 'stock');
+                        ->with([
+                            'category:id,name',
+                            'productStockOutlet',
+                            'productStockWarehouse',
+                        ]);
                 }
             ])
             ->withSum('details', 'stock');
@@ -176,5 +183,4 @@ class ProductRepository extends BaseRepository implements ProductInterface
 
         return $query->get();
     }
-
 }

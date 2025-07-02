@@ -111,7 +111,7 @@ class ProductController extends Controller
                 $storedDetail = $this->productDetail->store($mappingDetail);
 
                 $this->productStock->store([
-                    'warehouse_id' => auth()->user()->warehouse_id,
+                    'warehouse_id' => auth()->user()->warehouse_id ?? null,
                     'outlet_id' => auth()->user()->outlet_id ?? null,
                     'product_id' => $result_product->id,
                     'product_detail_id' => $storedDetail->id,
