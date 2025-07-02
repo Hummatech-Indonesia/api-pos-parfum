@@ -11,10 +11,10 @@ class StockRequestDetailResource extends JsonResource
     {
         return [
             'product_name' => optional($this->detailProduct->product)->name,
-            'variant_name' => optional($this->detailProduct)->name,
+            'variant_name' => optional($this->detailProduct)->variant_name,
             'requested_stock' => $this->requested_stock,
             'kategori' => optional($this->detailProduct->product->category)->name,
-            'variant_code' => optional($this->detailProduct)->code,
+            'variant_code' => optional($this->detailProduct)->product_code,
         ];
     }
 }

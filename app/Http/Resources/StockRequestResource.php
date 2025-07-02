@@ -19,8 +19,7 @@ class StockRequestResource extends JsonResource
             'requested_at' => $this->created_at,
             'requested_stock' => $this->detailRequestStock->map(function ($detail) {
                 return [
-                    'product_name' => optional($detail->detailProduct->product)->name,
-                    'variant_name' => optional($detail->detailProduct)->name,
+                    'variant_name' => optional($detail->detailProduct)->variant_name,
                     'requested_stock' => $detail->requested_stock,
                 ];
             }),
