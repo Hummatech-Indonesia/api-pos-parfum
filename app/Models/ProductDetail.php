@@ -79,7 +79,4 @@ class ProductDetail extends Model
         return $this->hasMany(AuditDetail::class, 'product_detail_id');
     }
 
-    public function productStock(){
-        return $this->hasOne(ProductStock::class);
-    }
 }
