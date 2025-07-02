@@ -252,4 +252,26 @@ class ProductController extends Controller
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
+
+    public function listProductV2(Request $request)
+    {
+        try {
+            $payload = [
+                'is_delete' => $request->get('is_delete', 0),
+                'search' => $request->get('search'),
+                'sort_by' => in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null,
+                'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
+            ];
+
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
+                $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+            }
+
+            $products = $this->product->customQuery($payload)->get();
+
+            return BaseResponse::Ok("Berhasil mengambil data product", $products);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
 }
