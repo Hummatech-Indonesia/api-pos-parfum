@@ -32,6 +32,7 @@ class WarehouseService{
                 "image" => $image,
                 "address" => $data["address"] ?? null,
                 "telp" => $data["telp"] ?? null,
+                "person_responsible" => $data["person_responsible"] ?? null,
             ];
             return $result;
         }catch(\Throwable $th){
@@ -58,6 +59,8 @@ class WarehouseService{
                 "image" => $image,
                 "address" => $data["address"] ?? $warehouse->address,
                 "telp" => $data["telp"] ?? $warehouse->telp,
+                "person_responsible" => $data["person_responsible"] ?? null,
+
             ];
         }catch(\Throwable $th){
             Log::error($th->getMessage());
