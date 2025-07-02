@@ -6,6 +6,7 @@ use App\Contracts\Interfaces\Master\ProductBundlingInterface;
 use App\Contracts\Interfaces\Master\ProductInterface;
 use App\Contracts\Interfaces\Master\ProductBundlingDetailInterface;
 use App\Contracts\Interfaces\Master\ProductDetailInterface;
+use App\Contracts\Interfaces\Master\ProductStockInterface;
 use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\ProductBundlingRequest;
@@ -19,20 +20,22 @@ use Illuminate\Support\Facades\DB;
 class ProductBundlingController extends Controller
 {
     private $repository, $service;
-    private $productRepo, $bundlingDetailRepo, $productDetailRepo;
+    private $productRepo, $bundlingDetailRepo, $productDetailRepo, $productStock;
 
     public function __construct(
         ProductBundlingInterface $repository,
         ProductBundlingService $service,
         ProductInterface $productRepo,
         ProductBundlingDetailInterface $bundlingDetailRepo,
-        ProductDetailInterface $productDetailRepo
+        ProductDetailInterface $productDetailRepo,
+        ProductStockInterface $productStock
     ) {
         $this->repository = $repository;
         $this->service = $service;
         $this->productRepo = $productRepo;
         $this->bundlingDetailRepo = $bundlingDetailRepo;
         $this->productDetailRepo = $productDetailRepo;
+        $this->productStock = $productStock;
     }
 
     public function index(Request $request)
@@ -80,6 +83,14 @@ class ProductBundlingController extends Controller
                 'is_delete' => 0
             ]);
 
+            $this->productStock->store([
+                'warehouse_id' => auth()->user()->warehouse_id ?? null,
+                'outlet_id' => auth()->user()->outlet_id ?? null,
+                'product_id' => $product->id,
+                'product_detail_id' => $productDetail->id,
+                'stock' => $validated['quantity'],
+            ]);
+
             $bundlingData = $this->service->mapBundlingData($validated, $product->id, $validated['category_id']);
             $bundling = $this->repository->store($bundlingData);
 
@@ -94,18 +105,18 @@ class ProductBundlingController extends Controller
                 })->toArray();
 
             foreach ($details as $detail) {
-                $productDetailItem = $this->productDetailRepo->show($detail['product_detail_id']);
+                $productStock = $this->productStock->getFromProductDetail($detail['product_detail_id']);
 
-                if (!$productDetailItem) {
-                    DB::rollBack();
-                    return BaseResponse::Error("Product detail dengan ID {$detail['product_detail_id']} tidak ditemukan.", null);
-                }
+                    if (!$productStock) {
+                        DB::rollBack();
+                        return BaseResponse::Error("Stock untuk Product Detail ID {$detail['product_detail_id']} tidak ditemukan.", null);
+                    }
 
-                if ($productDetailItem->stock < $detail['quantity']) {
-                    DB::rollBack();
-                    $productName = $productDetailItem->product->name ?? 'Tidak diketahui';
-                    return BaseResponse::Error("Stok produk '{$productName}' tidak cukup. Sisa: {$productDetailItem->stock}, Dibutuhkan: {$detail['quantity']}", null);
-                }
+                    if ($productStock->stock < $detail['quantity']) {
+                        DB::rollBack();
+                        $productName = $productStock->product?->name ?? 'Tidak diketahui';
+                        return BaseResponse::Error("Stok produk '{$productName}' tidak cukup. Sisa: {$productStock->stock}, Dibutuhkan: {$detail['quantity']}", null);
+                    }
             }
 
             foreach ($details as $detail) {
@@ -117,9 +128,16 @@ class ProductBundlingController extends Controller
                     'quantity' => $detail['quantity'],
                 ]);
 
-                $productDetailItem = $this->productDetailRepo->show($detail['product_detail_id']);
-                $newStock = max(0, $productDetailItem->stock - $detail['quantity']);
-                $this->productDetailRepo->update($productDetailItem->id, ['stock' => $newStock]);
+                $productStock = $this->productStock->getFromProductDetail($detail['product_detail_id']);
+
+                if (!$productStock || $productStock->stock < $detail['quantity']) {
+                    DB::rollBack();
+                    return BaseResponse::Error("Stok tidak cukup untuk detail ID: {$detail['product_detail_id']}", null);
+                }
+
+                $newStock = max(0, $productStock->stock - $detail['quantity']);
+                $this->productStock->update($productStock->id, ['stock' => $newStock]);
+
             }
 
             DB::commit();
