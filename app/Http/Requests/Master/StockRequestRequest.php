@@ -10,26 +10,19 @@ use Illuminate\Http\JsonResponse;
 
 class StockRequestRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
             'warehouse_id' => 'required|exists:warehouses,id',
-            'product_detail' => 'sometimes|array',
-            "product_detail.*.product_detail_id" => "nullable",
-            "product_detail.*.requested_stock" => "nullable",
+            'requested_stock' => 'required|array|min:1',
+            'requested_stock.*.product_id' => 'nullable|string',
+            'requested_stock.*.variant_id' => 'required|uuid|exists:product_details,id',
+            'requested_stock.*.requested_stock' => 'required|integer|min:1',
         ];
     }
 
@@ -37,20 +30,21 @@ class StockRequestRequest extends FormRequest
     {
         return [
             'warehouse_id.required' => 'Warehouse tidak boleh kosong!',
-            'warehouse_id.exists' => 'Warehouse tidak ada!',
-            'product_detail.array' => 'Data produk tidak valid!',
-            // 'product_detail.*.product_detail_id.unique' => 'Produk tidak ada!',
-            // 'product_detail.*.requested_stock.required' => 'Stock tidak boleh kosong!',
+            'warehouse_id.exists' => 'Warehouse tidak ditemukan!',
+            'requested_stock.required' => 'Data permintaan stock wajib diisi!',
+            'requested_stock.array' => 'Format permintaan stock tidak valid!',
+            'requested_stock.*.variant_id.required' => 'Variant (product detail) wajib diisi!',
+            'requested_stock.*.variant_id.exists' => 'Variant (product detail) tidak ditemukan!',
+            'requested_stock.*.requested_stock.required' => 'Jumlah stock harus diisi!',
+            'requested_stock.*.requested_stock.integer' => 'Jumlah stock harus berupa angka!',
+            'requested_stock.*.requested_stock.min' => 'Jumlah stock minimal 1!',
         ];
-    }
-
-    public function prepareForValidation()
-    {
-        // if(!$this->user_id) $this->merge(["user_id" => []]);
     }
 
     public function failedValidation(Validator $validator): JsonResponse
     {
-        throw new HttpResponseException(BaseResponse::Error("Kesalahan dalam validasi", $validator->errors()));
+        throw new HttpResponseException(
+            BaseResponse::Error("Kesalahan dalam validasi", $validator->errors())
+        );
     }
 }

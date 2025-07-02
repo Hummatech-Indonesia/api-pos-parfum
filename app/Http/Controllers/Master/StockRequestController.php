@@ -10,6 +10,8 @@ use App\Helpers\BaseResponse;
 use App\Http\Requests\Master\StockRequestRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\StockRequestUpdateRequest;
+use App\Http\Resources\StockRequestDetailResource;
+use App\Http\Resources\StockRequestResource;
 use App\Models\StockRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -42,16 +44,18 @@ class StockRequestController extends Controller
         $page = $request->page ?? 1;
         $payload = [];
 
-        // check query filter
-        // if ($request->search) $payload["search"] = $request->search;
-        if (auth()->user()->warehouse_id) $payload["warehouse_id"] = auth()->user()->warehouse_id; 
+        if (auth()->user()->warehouse_id) {
+            $payload["warehouse_id"] = auth()->user()->warehouse_id;
+        }
 
-        $data = $this->stockRequest->customPaginate($per_page, $page, $payload)->toArray();
+        $data = $this->stockRequest->customPaginate($per_page, $page, $payload);
 
-        $result = $data["data"];
-        unset($data["data"]);
+        $result = StockRequestResource::collection($data->items());
 
-        return BaseResponse::Paginate('Berhasil mengambil list stock request !', $result, $data);
+        $pagination = $data->toArray();
+        unset($pagination['data']);
+
+        return BaseResponse::Paginate('Berhasil mengambil list stock request !', $result, $pagination);
     }
 
     public function listStockRequest(Request $request)
@@ -87,49 +91,85 @@ class StockRequestController extends Controller
         DB::beginTransaction();
         try {
 
-            foreach($data["product_detail"] as $detail){
-
-                // Check if product_detail exists
-                $check = $this->productDetail->show($detail["product_detail_id"]);
-                if (!$check) return BaseResponse::Notfound("Tidak ada data product detail!");
-            }
-
-            // Check if outlet_id is null and the user has an outlet_id
             if (auth()->user()->outlet_id === null) {
                 return BaseResponse::Error("User tidak punya Outlet", null);
             }
 
-            // Assign user_id and outlet_id from authenticated user
-            $data["user_id"] = auth()->user()->id;
-            $data["outlet_id"] = auth()->user()->outlet_id;
-            $data["product_detail_id"] = null;
-            unset($data["product_detail"]);
+            $productDetails = [];
+            foreach ($data['requested_stock'] as $item) {
+                $productDetailId = $item['variant_id'];
+                $check = $this->productDetail->show($productDetailId);
 
-            // Store the stock request
-            $result_product = $this->stockRequest->store($data);
-            
-            foreach ($request->product_detail as $detail) {
+                if (!$check) {
+                    return BaseResponse::Notfound("Product detail dengan ID {$productDetailId} tidak ditemukan!");
+                }
+
+                $productDetails[] = [
+                    'product_detail_id' => $productDetailId,
+                    'requested_stock' => $item['requested_stock']
+                ];
+            }
+
+            $stockRequestData = [
+                'user_id' => auth()->user()->id,
+                'outlet_id' => auth()->user()->outlet_id,
+                'warehouse_id' => $data['warehouse_id'],
+                'product_detail_id' => null, // nullable
+            ];
+
+            $stockRequest = $this->stockRequest->store($stockRequestData);
+
+            foreach ($productDetails as $detail) {
                 $this->stockRequestDetail->store([
-                    'stock_request_id' => $result_product->id,
+                    'stock_request_id' => $stockRequest->id,
                     'product_detail_id' => $detail['product_detail_id'],
                     'requested_stock' => $detail['requested_stock'],
                 ]);
             }
 
             DB::commit();
-            return BaseResponse::Ok('Berhasil membuat stock request', $result_product);
+            return BaseResponse::Ok('Berhasil membuat stock request', $stockRequest);
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
 
+
     /**
      * Display the specified resource.
      */
-    public function show(StockRequest $stockRequest)
+    public function show(string $id)
     {
-        //
+        try {
+            $stockRequest = $this->stockRequest->show($id);
+
+            if (!$stockRequest) {
+                return BaseResponse::Notfound("Stock request tidak ditemukan");
+            }
+
+            $data = [
+                'id' => $stockRequest->id,
+                'outlet_id' => $stockRequest->outlet_id,
+                'warehouse_id' => $stockRequest->warehouse_id,
+                'status' => $stockRequest->status,
+                'variant_chose' => $stockRequest->detailRequestStock->count(),
+                'requested_stock_count' => $stockRequest->detailRequestStock->sum('requested_stock'),
+                'requested_at' => $stockRequest->created_at,
+                'requested_stock' => StockRequestDetailResource::collection($stockRequest->detailRequestStock),
+                'warehouse' => [
+                    'id' => optional($stockRequest->warehouse)->id,
+                    'name' => optional($stockRequest->warehouse)->name,
+                    'alamat' => optional($stockRequest->warehouse)->address,
+                    'telp' => optional($stockRequest->warehouse)->telp,
+                    'image' => optional($stockRequest->warehouse)->image,
+                ],
+            ];
+
+            return BaseResponse::Ok("Berhasil mengambil detail stock request !", [$data]);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
     }
 
     /**

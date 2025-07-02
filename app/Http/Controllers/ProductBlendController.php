@@ -41,7 +41,7 @@ class ProductBlendController extends Controller
         $page = $request->page ?? 1;
         $payload = [];
 
-        
+
         if ($request->search) $payload["search"] = $request->search;
         if ($request->date) $payload["date"] = $request->date;
         if ($request->description) $payload["description"] = $request->description;
@@ -50,7 +50,7 @@ class ProductBlendController extends Controller
         if ($request->end_date) $payload["end_date"] = $request->end_date;
         if ($request->min_quantity) $payload["min_quantity"] = $request->min_quantity;
         if ($request->max_quantity) $payload["max_quantity"] = $request->max_quantity;
-        
+
         if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
         try {
@@ -80,17 +80,6 @@ class ProductBlendController extends Controller
                 }
             }
 
-            $image = null;
-            if ($request->hasFile('image') && $request->file('image')->isValid()) {
-                $image = $request->file('image')->store('public/product');
-            }
-
-            $product = $this->product->store([
-                'store_id' => auth()->user()->store_id,
-                'name' => "blending",
-            ]);
-
-            $product_id = $product->id;
             $productBlends = [];
 
             foreach ($data['product_blend'] as $productBlend) {
@@ -99,7 +88,7 @@ class ProductBlendController extends Controller
                     'warehouse_id' => auth()->user()->warehouse_id,
                     'result_stock' => $productBlend['result_stock'],
                     'product_detail_id' => $productBlend['product_detail_id'],
-                    'product_id' => $product_id,
+                    'product_id' => null,
                     'date' => now(),
                     'description' => $productBlend['description'],
                 ];
@@ -136,20 +125,13 @@ class ProductBlendController extends Controller
                     ]);
                 }
 
-                $detail = $this->productDetail->store([
-                    'product_id' => $product_id,
-                ]);
+                $detail = $this->productDetail->find($productBlend['product_detail_id']);
 
                 // Tambahkan stok hasil blending ke detail produk baru
-                $stock = $this->productStock->checkNewStock($productBlend['product_detail_id'], $product_id);
+                $stock = $this->productStock->getFromProductDetail($productBlend['product_detail_id']);
+
                 if (!$stock) {
-                    $stock = $this->productStock->store([
-                        'outlet_id' => auth()->user()->outlet_id,
-                        'warehouse_id' => auth()->user()->warehouse_id,
-                        'product_detail_id' => $detail->id,
-                        'product_id' => $product_id,
-                        'stock' => 0,
-                    ]);
+                    return BaseResponse::Custom(false, "Produk hasil blend belum memiliki stok di gudang ini.", null, 422);
                 }
 
                 $stock->stock += $productBlend['result_stock'];

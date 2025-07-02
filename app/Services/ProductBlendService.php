@@ -73,23 +73,6 @@ class ProductBlendService
         }
     }
 
-    public function storeProduct(ProductBlendRequest $request)
-    {
-        $data = $request->validated();
-
-        foreach ($data['product_blend'] as $productBlend) {
-            // $image = null;
-            // if ($request->hasFile('image') && $request->file('image')->isValid()) {
-            //     $image = $request->file('image')->store('public/product');
-            // }
-
-            return [
-                'store_id' => auth()->user()->store_id,
-                'name' => "blending",
-            ];
-        }
-    }
-
     public function storeProductStock(array $data)
     {
         foreach ($data['product_blend'] as $productBlend) {

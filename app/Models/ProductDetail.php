@@ -42,7 +42,7 @@ class ProductDetail extends Model
      */
     public function productStockOutlet(): HasOne
     {
-        return $this->hasOne(ProductStock::class)->where('outlet_id', auth()->user()->outlet_id);
+        return $this->hasOne(ProductStock::class, 'product_detail_id', 'id')->where('outlet_id', auth()->user()->outlet_id);
     }
 
     /**
@@ -50,7 +50,7 @@ class ProductDetail extends Model
      */
     public function productStockWarehouse(): HasOne
     {
-        return $this->hasOne(ProductStock::class)->where('warehouse_id', auth()->user()->warehouse_id);
+        return $this->hasOne(ProductStock::class, 'product_detail_id', 'id')->where('warehouse_id', auth()->user()->warehouse_id);
     }
 
     public function transactionDetails()
@@ -79,5 +79,4 @@ class ProductDetail extends Model
         return $this->hasMany(AuditDetail::class, 'product_detail_id');
     }
 
-    
 }
