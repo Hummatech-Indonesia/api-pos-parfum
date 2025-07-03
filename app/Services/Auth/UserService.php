@@ -65,9 +65,9 @@ class UserService
     $userRole = $user->getRoleNames()->first();
 
     $allowedRoles = match ($userRole) {
-        'owner' => ['owner', 'outlet', 'karyawan_outlet', 'warehouse', 'karyawan_warehouse', 'auditor', 'manager', 'cashier', 'admin'],
-        'outlet' => ['outlet', 'karyawan_outlet'],
-        'warehouse' => ['warehouse', 'karyawan_warehouse'],
+        'owner' => ['owner', 'outlet', 'employee', 'warehouse', 'employee', 'auditor', 'manager', 'cashier', 'admin'],
+        'outlet' => ['outlet', 'employee', 'cashier'],
+        'warehouse' => ['warehouse', 'employee'],
         default => [],
     };
 
