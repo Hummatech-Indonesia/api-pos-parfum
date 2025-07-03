@@ -32,6 +32,8 @@ class UnitController extends Controller
 
         // check query filter
         if ($request->search) $payload["search"] = $request->search;
+        if ($request->start_date) $payload["start_date"] = $request->start_date;
+        if ($request->end_date) $payload["end_date"] = $request->end_date;
 
         try {
             $data = $this->unit->customPaginate($per_page, $page, $payload)->toArray();

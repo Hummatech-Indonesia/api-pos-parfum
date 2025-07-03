@@ -45,20 +45,29 @@ class UnitRepository extends BaseRepository implements UnitInterface
 
     public function customPaginate(int $pagination = 8, int $page = 1, ?array $data): mixed
     {
+        $orderBy = $data['order_by'] ?? 'created_at';
+        $orderDirection = $data['order_direction'] ?? 'desc';
+        unset($data['order_by'], $data['order_direction']);
+
+        unset($data['order_by'], $data['order_direction']);
+
         return $this->model->query()
-            ->when(count($data) > 0, function ($query) use ($data) {
-                if (isset($data["search"])) {
+            ->when($data, function ($query) use ($data) {
+                if (!empty($data["search"])) {
                     $query->where(function ($query2) use ($data) {
-                        $query2->where('name', 'like', '%' . $data["search"] . '%')
-                            ->orwhere('code', 'like', '%' . $data["search"] . '%');
+                        $query2->where('name', 'like', '%' . $data["search"] . '%');
                     });
-                    unset($data["search"]);
                 }
 
-                foreach ($data as $index => $value) {
-                    $query->where($index, $value);
+                if (!empty($data["start_date"])) {
+                    $query->whereDate('created_at', '>=', $data["start_date"]);
+                }
+
+                if (!empty($data["end_date"])) {
+                    $query->whereDate('created_at', '<=', $data["end_date"]);
                 }
             })
+            ->orderBy($orderBy, $orderDirection)
             ->paginate($pagination, ['*'], 'page', $page);
         // ->appends(['search' => $request->search, 'year' => $request->year]);
     }
