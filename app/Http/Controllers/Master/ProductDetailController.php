@@ -50,6 +50,9 @@ class ProductDetailController extends Controller
         $payload = [
             "is_delete" => 0
         ];
+        if (auth()?->user()?->store_id ?? auth()?->user()?->store?->id) {
+            $payload['store_id'] = auth()?->user()?->store_id ?? auth()?->user()?->store->id;
+        }
 
         // check query filter
         if ($request->search) $payload["search"] = $request->search;
@@ -165,6 +168,11 @@ class ProductDetailController extends Controller
             $payload = [];
 
             if ($request->product_id) $payload['product_id'] = $request->product_id;
+
+            if (auth()?->user()?->store_id ?? auth()?->user()?->store?->id) {
+                $payload['store_id'] = auth()?->user()?->store_id ?? auth()?->user()?->store->id;
+            }
+
             $data = $this->productDetail->customQuery($payload)->get();
             $resource = ProductDetailResource::collection($data);
 

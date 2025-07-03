@@ -29,11 +29,15 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
         return $this->model->query()
             ->withCount('product')
             ->with('product.productBundling.details', 'category', 'productStockOutlet', 'productStockWarehouse')
-            ->when(count($data) > 0, function ($query) use ($data) {
-                foreach ($data as $index => $value) {
-                    $query->where($index, $value);
-                }
-            })->where('is_delete', 0);
+            ->when(isset($data['store_id']), function ($query) use ($data) {
+                $query->whereHas('product', function ($q) use ($data) {
+                    $q->where('store_id', $data['store_id']);
+                });
+            })
+            ->when(isset($data['product_id']), function ($query) use ($data) {
+                $query->where('product_id', $data['product_id']);
+            })
+            ->where('is_delete', 0);
     }
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
@@ -49,6 +53,13 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
                     });
                     unset($data["search"]);
                 }
+
+                if (isset($data['store_id'])) {
+                    $query->whereHas('product', function ($q) use ($data) {
+                        $q->where('store_id', $data['store_id']);
+                    });
+                }
+
                 if (!empty($data['sort_by']) && !empty($data['sort_direction'])) {
                     $allowedSorts = ['name', 'category', 'created_at'];
                     $allowedDirections = ['asc', 'desc'];
@@ -64,7 +75,9 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
                 }
 
                 foreach ($data as $index => $value) {
-                    $query->where($index, $value);
+                    if (!in_array($index, ['search', 'sort_by', 'sort_direction', 'store_id'])) {
+                        $query->where($index, $value);
+                    }
                 }
             })
 

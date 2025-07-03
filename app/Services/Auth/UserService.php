@@ -60,31 +60,30 @@ class UserService
         return Role::all();
     }
     public function prepareUserCreationData(array $data, array $requestedRoles): array
-{
-    $user = auth()->user();
-    $userRole = $user->getRoleNames()->first();
+    {
+        $user = auth()->user();
+        $userRole = $user->getRoleNames()->first();
 
-    $allowedRoles = match ($userRole) {
-        'owner' => ['owner', 'outlet', 'employee', 'warehouse', 'employee', 'auditor', 'manager', 'cashier', 'admin'],
-        'outlet' => ['outlet', 'employee', 'cashier'],
-        'warehouse' => ['warehouse', 'employee'],
-        default => [],
-    };
+        $allowedRoles = match ($userRole) {
+            'owner' => ['owner', 'outlet', 'employee', 'warehouse', 'auditor', 'manager', 'cashier', 'admin'],
+            'outlet' => ['outlet', 'employee', 'cashier'],
+            'warehouse' => ['warehouse', 'employee', 'cashier'],
+            default => [],
+        };
 
-    $invalidRoles = array_diff($requestedRoles, $allowedRoles);
+        $invalidRoles = array_diff($requestedRoles, $allowedRoles);
 
-    if (count($invalidRoles) > 0) {
-        $invalidList = implode(', ', $invalidRoles);
-        throw new \Exception("Role '{$invalidList}' tidak diizinkan untuk dibuat oleh '{$userRole}'");
+        if (count($invalidRoles) > 0) {
+            $invalidList = implode(', ', $invalidRoles);
+            throw new \Exception("Role '{$invalidList}' tidak diizinkan untuk dibuat oleh '{$userRole}'");
+        }
+
+        return [
+            ...$this->mappingDataUser($data),
+            'store_id' => $user->store->id ?? $user->store_id,
+            'outlet_id' => $user->outlet->id ?? null,
+            'warehouse_id' => $user->warehouse->id ?? null,
+            'is_delete' => 0,
+        ];
     }
-
-    return [
-        ...$this->mappingDataUser($data),
-        'store_id' => $user->store->id ?? $user->store_id,
-        'outlet_id' => $user->outlet->id ?? null,
-        'warehouse_id' => $user->warehouse->id ?? null,
-        'is_delete' => 0,
-    ];
-}
-
 }
