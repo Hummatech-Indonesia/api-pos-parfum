@@ -35,11 +35,12 @@ class ProductBlendService
     public function store(ProductBlendRequest $request)
     {
         $data = $request->validated();
-
+        
         foreach ($data['product_blend'] as $productBlend) {
             $data['store_product_blend'] = [
                 'store_id' => auth()->user()->store_id,
                 'warehouse_id' => auth()->user()->warehouse_id,
+                'unit_id' => $productBlend['unit_id'],
                 'result_stock' => $productBlend['result_stock'],
                 'product_detail_id' => $productBlend['product_detail_id'],
                 'date' => now(),

@@ -79,6 +79,7 @@ class ProductBlendController extends Controller
                 $storeBlend = [
                     'store_id' => auth()->user()->store_id,
                     'warehouse_id' => auth()->user()->warehouse_id,
+                    'unit_id' => $productBlend['unit_id'],
                     'result_stock' => $productBlend['result_stock'],
                     'product_detail_id' => $productBlend['product_detail_id'],
                     'product_id' => null,
@@ -120,7 +121,6 @@ class ProductBlendController extends Controller
 
                 $detail = $this->productDetail->find($productBlend['product_detail_id']);
 
-                // Tambahkan stok hasil blending ke detail produk baru
                 $stock = $this->productStock->getFromProductDetail($productBlend['product_detail_id']);
 
                 if (!$stock) {
