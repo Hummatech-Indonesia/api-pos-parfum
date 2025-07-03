@@ -33,10 +33,15 @@ class UserController extends Controller
         $per_page = $request->per_page ?? 10;
         $page = $request->page ?? 1;
         $request->merge([]);
+        $payload = [];
+
+        if ($request->search) $payload["search"] = $request->search;
+        if ($request->start_date) $payload["start_date"] = $request->start_date;
+        if ($request->end_date) $payload["end_date"] = $request->end_date;
 
         if (!$request->role && $request->role == "") {
             $request->merge([
-                "role" => ['manager','auditor','warehouse','outlet','cashier'],
+                "role" => ['manager', 'auditor', 'warehouse', 'outlet', 'cashier'],
             ]);
         }
 
@@ -123,7 +128,7 @@ class UserController extends Controller
             return BaseResponse::Ok('Berhasil update user', null);
         } catch (\Throwable $th) {
             DB::rollBack();
-            return BaseResponse::Error('Gagal Update User',$th->getMessage());
+            return BaseResponse::Error('Gagal Update User', $th->getMessage());
         }
     }
 

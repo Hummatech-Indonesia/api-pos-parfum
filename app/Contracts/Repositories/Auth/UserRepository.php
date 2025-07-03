@@ -201,26 +201,35 @@ class UserRepository extends BaseRepository implements UserInterface
 
         $orderBy = $data['order_by'] ?? 'created_at';
         $orderDirection = $data['order_direction'] ?? 'desc';
-
         unset($data['order_by'], $data['order_direction']);
+
+        $isDelete = $data['is_delete'] ?? null;
+        unset($data['is_delete']);
 
         return $this->model->query()
             ->with([
                 'roles',
             ])
-            ->when(count($data) > 0, function ($query) use ($data, $search) {
-                if ($search && $search != '') {
-                    $query->where(function ($query2) use ($search) {
-                        $query2->where('name', 'like', '%' . $search . '%')
-                            ->orwhere('email', 'like', '%' . $search . '%');
+            ->when(!is_null($isDelete), function ($query) use ($isDelete) {
+                $query->where('is_delete', $isDelete);
+            }, function ($query) {
+                $query->where('is_delete', 0); // default ke user aktif
+            })
+            ->when($data, function ($query) use ($data) {
+                if (!empty($data["search"])) {
+                    $query->where(function ($query2) use ($data) {
+                        $query2->where('name', 'like', '%' . $data["search"] . '%');
                     });
                 }
-                // dd($data);
-                foreach ($data as $index => $value) {
-                    if ($value && $value != "") $query->where($index, $value);
+
+                if (!empty($data["start_date"])) {
+                    $query->whereDate('created_at', '>=', $data["start_date"]);
+                }
+
+                if (!empty($data["end_date"])) {
+                    $query->whereDate('created_at', '<=', $data["end_date"]);
                 }
             })
-            ->where('is_delete', 0)
             ->when($role, function ($query) use ($role) {
                 $query->role($role);
             })
