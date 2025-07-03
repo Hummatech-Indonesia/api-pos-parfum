@@ -33,6 +33,8 @@ class ProductResource extends JsonResource
 
                         return [
                             'product_name' => $productDetail->product->name,
+                            'category_id' => $productDetail->category->id,
+                            'category' => $productDetail->category->name,
                             'product_detail_id' => $productDetail->id,
                             'product_code' => $productDetail->product_code,
                             'variant_name' => $productDetail->variant_name,
@@ -53,6 +55,7 @@ class ProductResource extends JsonResource
                         return [
                             'id' => $detail->id,
                             'category' => $detail->category?->name,
+                            'category_id' => $detail->category?->id,
                             'price' => $detail->price,
                             'variant_name' => $detail->variant_name,
                             'product_code' => $detail->product_code,
