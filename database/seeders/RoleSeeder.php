@@ -22,7 +22,7 @@ class RoleSeeder extends Seeder
             ['name' => 'outlet'],
             ['name' => 'cashier'],
             ['name' => 'member'],
-            ['name' => 'karyawan'],
+            ['name' => 'employee'],
         ];
 
         foreach ($roles as $role) {
