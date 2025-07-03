@@ -73,13 +73,6 @@ class ProductBlendController extends Controller
         try {
             $data = $request->validated();
 
-            foreach ($data['product_blend'] as $blend) {
-                $totalUsed = collect($blend['product_blend_details'])->sum('used_stock');
-                if ($totalUsed > $blend['result_stock']) {
-                    return BaseResponse::Custom(false, "Total used stock melebihi result stock", null, 422);
-                }
-            }
-
             $productBlends = [];
 
             foreach ($data['product_blend'] as $productBlend) {
