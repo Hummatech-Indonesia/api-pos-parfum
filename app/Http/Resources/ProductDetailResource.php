@@ -11,22 +11,19 @@ class ProductDetailResource extends JsonResource
     {
         $user = auth()->user();
 
-        $data =  [
+        return [
             'product' => $this->product?->name,
             'id' => $this->id,
             'category' => $this->category?->name,
+            'category_id' => $this->category?->id,
             'price' => $this->price,
             'variant_name' => $this->variant_name,
             'product_code' => $this->product_code,
             'product_image' => $this->image,
             'transaction_details_count' => $this->transaction_details_count ?? 0,
+            'stock' => $user->hasRole('outlet')
+                ? optional($this->productStockOutlet)->stock ?? 0
+                : optional($this->productStockWarehouse)->stock ?? 0,
         ];
-        if ($user->hasRole('outlet')) {
-            $data['stock'] = optional($this->productStockOutlet)->stock;
-        } elseif ($user->hasRole('warehouse')) {
-            $data['stock'] = optional($this->productStockWarehouse)->stock;
-        }
-
-        return $data;
     }
 }

@@ -27,13 +27,13 @@ class ProductBundlingService
             'id' => $data['id'] ?? uuid_create(),
             'product_id' => $productId,
             'name' => $data['name'],
-            // 'description' => $data['deskripsi'] ?? null,
             'category_id' => $categoryId,
-            'stock' => $data['quantity'] ?? 0,
+            'stock' => null, // JANGAN ambil dari $data['quantity']
             'price' => $data['harga'] ?? 0,
             'bundling_code' => $data['kode_Blend'] ?? null,
         ];
     }
+
 
     public function mapBundlingMaterial(array $details, int $bundlingStock): array
     {

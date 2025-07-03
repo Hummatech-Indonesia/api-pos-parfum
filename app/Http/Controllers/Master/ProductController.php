@@ -58,6 +58,12 @@ class ProductController extends Controller
 
         $payload = [
             "is_delete" => $request->get('is_delete', 0),
+            'min_price'    => $request->get('min_price'),
+            'max_price'    => $request->get('max_price'),
+            'min_sales'    => $request->get('min_sales'),
+            'max_sales'    => $request->get('max_sales'),
+            'min_stock'    => $request->get('min_stock'),
+            'max_stock'    => $request->get('max_stock'),
         ];
 
         if ($request->search) {
@@ -72,7 +78,7 @@ class ProductController extends Controller
         $payload["sort_order"] = in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'asc';
 
         $paginated = $this->product->customPaginate($perPage, $page, $payload);
-        $paginated->load('details.category', 'category');
+
 
         $resource = ProductResource::collection($paginated);
         $meta = PaginationHelper::meta($paginated);
@@ -138,7 +144,12 @@ class ProductController extends Controller
             return BaseResponse::Notfound("Tidak dapat menemukan data product !");
         }
 
-        $product->loadMissing(['details.productStockWarehouse', 'details.productStockOutlet', 'details.category', 'details.category']);
+        $product->loadMissing([
+            'details.productStockWarehouse',
+            'details.productStockOutlet',
+            'details.category',
+            'productBundling.details.productDetail.product',
+        ]);
 
         return BaseResponse::Ok("Berhasil mengambil detail product !", new ProductResource($product));
     }

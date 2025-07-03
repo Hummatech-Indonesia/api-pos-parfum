@@ -6,6 +6,7 @@ use App\Contracts\Interfaces\Master\ProductBundlingInterface;
 use App\Contracts\Interfaces\Master\ProductInterface;
 use App\Contracts\Interfaces\Master\ProductBundlingDetailInterface;
 use App\Contracts\Interfaces\Master\ProductDetailInterface;
+use App\Contracts\Interfaces\Master\ProductStockInterface;
 use App\Helpers\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\ProductBundlingRequest;
@@ -19,20 +20,22 @@ use Illuminate\Support\Facades\DB;
 class ProductBundlingController extends Controller
 {
     private $repository, $service;
-    private $productRepo, $bundlingDetailRepo, $productDetailRepo;
+    private $productRepo, $bundlingDetailRepo, $productDetailRepo, $productStock;
 
     public function __construct(
         ProductBundlingInterface $repository,
         ProductBundlingService $service,
         ProductInterface $productRepo,
         ProductBundlingDetailInterface $bundlingDetailRepo,
-        ProductDetailInterface $productDetailRepo
+        ProductDetailInterface $productDetailRepo,
+        ProductStockInterface $productStock
     ) {
         $this->repository = $repository;
         $this->service = $service;
         $this->productRepo = $productRepo;
         $this->bundlingDetailRepo = $bundlingDetailRepo;
         $this->productDetailRepo = $productDetailRepo;
+        $this->productStock = $productStock;
     }
 
     public function index(Request $request)
@@ -66,47 +69,36 @@ class ProductBundlingController extends Controller
         try {
             $validated = $request->validated();
 
+            // Simpan ke tabel products
             $productData = $this->service->mapProductData($validated);
             $product = $this->productRepo->store($productData);
 
+            // Simpan ke product_details (tanpa stok)
             $productDetail = $this->productDetailRepo->store([
                 'id' => uuid_create(),
                 'product_id' => $product->id,
                 'product_code' => $validated['kode_Blend'],
-                'stock' => $validated['quantity'],
+                'stock' => 0, // stok tidak diatur
                 'unit' => 'pcs',
                 'price' => $validated['harga'],
                 'product_image' => $product->image,
                 'is_delete' => 0
             ]);
 
+            // Simpan ke product_bundlings (stok null)
             $bundlingData = $this->service->mapBundlingData($validated, $product->id, $validated['category_id']);
             $bundling = $this->repository->store($bundlingData);
 
+            // Mapping & simpan ke product_bundling_details
             $details = collect($validated['details'][0]['product_bundling_material'])
-                ->map(function ($item) use ($validated, $productDetail) {
+                ->map(function ($item) {
                     return [
-                        'product_detail_id' => $item['product_detail_id'] ?? $productDetail->id,
-                        'unit' => $item['unit'] ?? 'pcs',
-                        'unit_id' => $item['unit_id'] ?? null,
-                        'quantity' => $item['quantity'] ?? $validated['quantity'],
+                        'product_detail_id' => $item['product_detail_id'],
+                        'unit' => 'pcs', // default value
+                        'unit_id' => null,
+                        'quantity' => $item['quantity'],
                     ];
                 })->toArray();
-
-            foreach ($details as $detail) {
-                $productDetailItem = $this->productDetailRepo->show($detail['product_detail_id']);
-
-                if (!$productDetailItem) {
-                    DB::rollBack();
-                    return BaseResponse::Error("Product detail dengan ID {$detail['product_detail_id']} tidak ditemukan.", null);
-                }
-
-                if ($productDetailItem->stock < $detail['quantity']) {
-                    DB::rollBack();
-                    $productName = $productDetailItem->product->name ?? 'Tidak diketahui';
-                    return BaseResponse::Error("Stok produk '{$productName}' tidak cukup. Sisa: {$productDetailItem->stock}, Dibutuhkan: {$detail['quantity']}", null);
-                }
-            }
 
             foreach ($details as $detail) {
                 $this->bundlingDetailRepo->store([
@@ -114,13 +106,10 @@ class ProductBundlingController extends Controller
                     'product_detail_id' => $detail['product_detail_id'],
                     'unit' => $detail['unit'],
                     'unit_id' => $detail['unit_id'],
-                    'quantity' => $detail['quantity'],
+                    'quantity' => $detail['quantity'], // pastikan disimpan
                 ]);
-
-                $productDetailItem = $this->productDetailRepo->show($detail['product_detail_id']);
-                $newStock = max(0, $productDetailItem->stock - $detail['quantity']);
-                $this->productDetailRepo->update($productDetailItem->id, ['stock' => $newStock]);
             }
+
 
             DB::commit();
             return BaseResponse::Ok("Berhasil membuat bundling", $this->repository->show($bundling->id)->load('details'));
@@ -130,6 +119,8 @@ class ProductBundlingController extends Controller
             return BaseResponse::Error($e->getMessage(), null);
         }
     }
+
+
 
 
     public function show(string $id)
@@ -162,7 +153,7 @@ class ProductBundlingController extends Controller
             $bundlingData = [
                 'name' => $validated['name'] ?? $bundling->name,
                 'category_id' => $validated['category_id'] ?? $bundling->category_id,
-                'stock' => $validated['quantity'] ?? $bundling->stock,
+                'stock' => null,
                 'price' => $validated['harga'] ?? $bundling->price,
                 'bundling_code' => $validated['kode_Blend'] ?? $bundling->bundling_code,
             ];

@@ -76,20 +76,19 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
         }
 
         return $this->model->query()
-            // ->with('store:id,name')
-            // ->withCount(['products' => function ($q) {
-            //     $q->where('is_delete', 0);
-            // }])
-            ->when(count($data) > 0, function ($query) use ($data) {
-                if (isset($data["search"])) {
+            ->when($data, function ($query) use ($data) {
+                if (!empty($data["search"])) {
                     $query->where(function ($query2) use ($data) {
                         $query2->where('name', 'like', '%' . $data["search"] . '%');
                     });
-                    unset($data["search"]);
                 }
 
-                foreach ($data as $index => $value) {
-                    $query->where($index, $value);
+                if (!empty($data["start_date"])) {
+                    $query->whereDate('created_at', '>=', $data["start_date"]);
+                }
+
+                if (!empty($data["end_date"])) {
+                    $query->whereDate('created_at', '<=', $data["end_date"]);
                 }
             })
             ->select('id', 'name', 'created_at')

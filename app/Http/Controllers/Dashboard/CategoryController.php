@@ -38,17 +38,19 @@ class CategoryController extends Controller
         ];
 
         // check query filter
-        if($request->search) $payload["search"] = $request->search;
-        if($request->is_delete) $payload["is_delete"] = $request->is_delete;
+        if ($request->search) $payload["search"] = $request->search;
+        if ($request->start_date) $payload["start_date"] = $request->start_date;
+        if ($request->end_date) $payload["end_date"] = $request->end_date;
+        if ($request->is_delete) $payload["is_delete"] = $request->is_delete;
 
         // add sorting
         $sorting = $this->category->sorted($sort, $order);
         $payload['sorting'] = $sorting;
-        
-        if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+
+        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
         $data = $this->category->customPaginate($per_page, $page, $payload);
-            $meta = PaginationHelper::meta($data);
+        $meta = PaginationHelper::meta($data);
 
         $result = $data->items();
 
@@ -58,10 +60,7 @@ class CategoryController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
@@ -70,8 +69,8 @@ class CategoryController extends Controller
     {
         DB::beginTransaction();
         try {
-            $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id; 
-            
+            $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+
             $result_category = $this->category->store([
                 "name" => $request->name,
                 "store_id" => $store_id
@@ -79,7 +78,7 @@ class CategoryController extends Controller
 
             DB::commit();
             return BaseResponse::Ok('Berhasil membuat category', $result_category);
-        } catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -91,7 +90,7 @@ class CategoryController extends Controller
     public function show(string $id)
     {
         $check_category = $this->category->show($id);
-        if(!$check_category) return BaseResponse::Notfound("Tidak dapat menemukan data category!");
+        if (!$check_category) return BaseResponse::Notfound("Tidak dapat menemukan data category!");
 
         return BaseResponse::Ok("Berhasil mengambil detail category!", $check_category);
     }
@@ -118,7 +117,7 @@ class CategoryController extends Controller
 
             DB::commit();
             return BaseResponse::Ok('Berhasil update data category', ["name" => $request->name]);
-        } catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -129,10 +128,10 @@ class CategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        
+
         $check = $this->category->checkActive($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data category!");
-        if($check->products_count) return BaseResponse::Notfound("Data masih terikat dalam product!");
+        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data category!");
+        if ($check->products_count) return BaseResponse::Notfound("Data masih terikat dalam product!");
 
         DB::beginTransaction();
         try {
@@ -140,7 +139,7 @@ class CategoryController extends Controller
 
             DB::commit();
             return BaseResponse::Ok('Berhasil menghapus data', null);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -151,7 +150,7 @@ class CategoryController extends Controller
         $sort = $request->sort ?? 'created_at';
         $order = $request->order ?? 'ASC';
 
-        try{
+        try {
             $payload = [
                 "is_delete" => 0
             ];
@@ -159,12 +158,12 @@ class CategoryController extends Controller
             $sorting = $this->category->sorted($sort, $order);
             $payload['sorting'] = $sorting;
 
-            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             $data = $this->category->customQuery($payload)->get();
 
             return BaseResponse::Ok("Berhasil mengambil data category", $data);
-        }catch(\Throwable $th) {
-          return BaseResponse::Error($th->getMessage(), null);  
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
         }
     }
 }
