@@ -42,14 +42,21 @@ class StockRequestController extends Controller
     {
         $per_page = $request->per_page ?? 10;
         $page = $request->page ?? 1;
-        $payload = [];
+
+        $payload = [
+            'status' => $request->status,
+            'warehouse_name' => $request->warehouse_name,
+            'created_at_start' => $request->created_at_start,
+            'created_at_end' => $request->created_at_end,
+            'requested_stock_min' => $request->requested_stock_min,
+            'requested_stock_max' => $request->requested_stock_max,
+        ];
 
         if (auth()->user()->warehouse_id) {
             $payload["warehouse_id"] = auth()->user()->warehouse_id;
         }
 
         $data = $this->stockRequest->customPaginate($per_page, $page, $payload);
-
         $result = StockRequestResource::collection($data->items());
 
         $pagination = $data->toArray();
@@ -57,6 +64,7 @@ class StockRequestController extends Controller
 
         return BaseResponse::Paginate('Berhasil mengambil list stock request !', $result, $pagination);
     }
+
 
     public function listStockRequest(Request $request)
     {
