@@ -47,6 +47,7 @@ class ProductRepository extends BaseRepository implements ProductInterface
     {
         $query = $this->model->query()
             ->with([
+                'productBundling',
                 'store',
                 'category',
                 'details' => function ($q) {
@@ -54,7 +55,10 @@ class ProductRepository extends BaseRepository implements ProductInterface
                         ->with([
                             'category:id,name',
                             'productStockOutlet',
+                            'category',
                             'productStockWarehouse',
+                            'productBundlingDetail.productDetail.productStockOutlet',
+                            'productBundlingDetail.productDetail.productStockWarehouse',
                         ]);
                 }
             ])
