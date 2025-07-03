@@ -29,11 +29,12 @@ class ProductResource extends JsonResource
                         'variant_name' => $detail->variant_name,
                         'product_code' => $detail->product_code,
                         'product_image' => $detail->image,
+                        'transaction_details_count' => $detail->transaction_details_count ?? 0,
                     ];
                     if ($user->hasRole('outlet')) {
-                        $data['stock'] = optional($detail->productStockOutlet)->stock;
+                        $data['stock'] = optional($detail->productStockOutlet)->stock ?? 0;
                     } elseif ($user->hasRole('warehouse')) {
-                        $data['stock'] = optional($detail->productStockWarehouse)->stock;
+                        $data['stock'] = optional($detail->productStockWarehouse)->stock ?? 0;
                     }
 
 

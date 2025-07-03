@@ -39,6 +39,7 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
+            ->withCount('transactionDetails')
             ->withCount('product')
             ->with('product.productBundling.details', 'category', 'productStockOutlet', 'productStockWarehouse', 'product')
             ->when(count($data) > 0, function ($query) use ($data) {
