@@ -138,7 +138,8 @@ class AuditController extends Controller
             ];
 
             $audit->update($updateData, $auditData);
-            $resources = AuditResource::collection($audit);
+            $resources = new AuditResource($audit);
+
             // Jika approved, update stok seperti biasa
             if ($updateData['status'] === 'approved') {
                 $outlet = $audit->outlet;
