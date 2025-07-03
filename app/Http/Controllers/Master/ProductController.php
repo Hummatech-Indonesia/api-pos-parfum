@@ -144,7 +144,12 @@ class ProductController extends Controller
             return BaseResponse::Notfound("Tidak dapat menemukan data product !");
         }
 
-        $product->loadMissing(['details.productStockWarehouse', 'details.productStockOutlet', 'details.category', 'details.category']);
+        $product->loadMissing([
+            'details.productStockWarehouse',
+            'details.productStockOutlet',
+            'details.category',
+            'productBundling.details.productDetail.product',
+        ]);
 
         return BaseResponse::Ok("Berhasil mengambil detail product !", new ProductResource($product));
     }
