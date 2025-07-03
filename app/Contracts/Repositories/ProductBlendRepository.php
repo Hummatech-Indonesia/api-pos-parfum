@@ -103,6 +103,10 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
+        $orderBy = $data['order_by'] ?? 'created_at';
+        $orderDirection = $data['order_direction'] ?? 'desc';
+        unset($data['order_by'], $data['order_direction']);
+
         return $this->model->query()
             ->with([
                 'productDetail',
@@ -152,6 +156,7 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
                     $query->where('result_stock', '<=', $data['max_quantity']);
                 }
             })
+            ->orderBy($orderBy, $orderDirection)
             ->paginate($pagination, ['*'], 'page', $page);
     }
 }
