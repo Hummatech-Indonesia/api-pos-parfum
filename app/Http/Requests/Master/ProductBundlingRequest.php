@@ -19,7 +19,6 @@ class ProductBundlingRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'quantity' => 'required|numeric|min:1',
             'harga' => 'required|numeric|min:0',
             'kode_Blend' => 'nullable|string|max:100',
             'deskripsi' => 'nullable|string|max:1000',
@@ -29,8 +28,10 @@ class ProductBundlingRequest extends FormRequest
             'details' => 'required|array|min:1',
             'details.*.product_bundling_material' => 'required|array|min:1',
             'details.*.product_bundling_material.*.product_detail_id' => 'required|uuid|exists:product_details,id',
+            'details.*.product_bundling_material.*.quantity' => 'required|numeric|min:1', // <-- tambahkan ini
         ];
     }
+
 
 
 
@@ -38,9 +39,6 @@ class ProductBundlingRequest extends FormRequest
     {
         return [
             'name.required' => 'Nama bundling harus diisi.',
-            'quantity.required' => 'Stok bundling harus diisi.',
-            'quantity.numeric' => 'Stok harus berupa angka.',
-            'quantity.min' => 'Stok minimal harus 1.',
 
             'harga.required' => 'Harga bundling harus diisi.',
             'harga.numeric' => 'Harga harus berupa angka.',
@@ -60,8 +58,14 @@ class ProductBundlingRequest extends FormRequest
             'details.*.product_bundling_material.required' => 'Daftar bahan wajib diisi.',
             'details.*.product_bundling_material.*.product_detail_id.required' => 'ID produk detail wajib diisi.',
             'details.*.product_bundling_material.*.product_detail_id.exists' => 'Produk detail tidak ditemukan.',
+            
+            // Baru:
+            'details.*.product_bundling_material.*.quantity.required' => 'Jumlah quantity wajib diisi.',
+            'details.*.product_bundling_material.*.quantity.numeric' => 'Quantity harus berupa angka.',
+            'details.*.product_bundling_material.*.quantity.min' => 'Quantity minimal harus 1.',
         ];
     }
+
 
 
     public function failedValidation(Validator $validator): JsonResponse
