@@ -23,6 +23,7 @@ class ProductBundlingDetailResource extends JsonResource
             'bundling_material' => $this->whenLoaded('details', function () {
                 return $this->details->map(function ($detail) {
                     return [
+                        'product_name' => $this->product->name ?? null,
                         'product_detail_id' => $detail->product_detail_id,
                         'variant_name' => $detail->productDetail->variant_name ?? '-', 
                         'image' => $this->product->image ?? null,
