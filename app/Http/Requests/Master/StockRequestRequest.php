@@ -23,6 +23,8 @@ class StockRequestRequest extends FormRequest
             'requested_stock.*.product_id' => 'nullable|string',
             'requested_stock.*.variant_id' => 'required|uuid|exists:product_details,id',
             'requested_stock.*.requested_stock' => 'required|integer|min:1',
+            'requested_stock.*.unit_id' => 'nullable|uuid',
+            'requested_stock.*.unit' => 'nullable|string|max:255',
         ];
     }
 

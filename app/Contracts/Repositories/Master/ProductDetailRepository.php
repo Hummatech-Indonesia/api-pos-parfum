@@ -29,11 +29,16 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
         return $this->model->query()
             ->withCount('product')
             ->with('product.productBundling.details', 'category', 'productStockOutlet', 'productStockWarehouse')
-            ->when(count($data) > 0, function ($query) use ($data) {
-                foreach ($data as $index => $value) {
-                    $query->where($index, $value);
-                }
-            })->where('is_delete', 0);
+            ->when(isset($data['store_id']), function ($query) use ($data) {
+                $query->whereHas('product', function ($q) use ($data) {
+                    $q->where('store_id', $data['store_id']);
+                });
+            })
+            ->when(isset($data['product_id']), function ($query) use ($data) {
+                $query->where('product_id', $data['product_id']);
+            })
+            ->where('is_delete', 0)
+            ->orderBy('updated_at', 'desc');;
     }
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
@@ -49,22 +54,31 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
                     });
                     unset($data["search"]);
                 }
+
+                if (isset($data['store_id'])) {
+                    $query->whereHas('product', function ($q) use ($data) {
+                        $q->where('store_id', $data['store_id']);
+                    });
+                }
+
                 if (!empty($data['sort_by']) && !empty($data['sort_direction'])) {
-                    $allowedSorts = ['name', 'category', 'created_at'];
+                    $allowedSorts = ['name', 'category', 'created_at', 'updated_at'];
                     $allowedDirections = ['asc', 'desc'];
 
-                    $sortBy = in_array($data['sort_by'], $allowedSorts) ? $data['sort_by'] : 'created_at';
+                    $sortBy = in_array($data['sort_by'], $allowedSorts) ? $data['sort_by'] : 'updated_at';
                     $sortDirection = in_array(strtolower($data['sort_direction']), $allowedDirections)
                         ? strtolower($data['sort_direction'])
                         : 'desc';
 
                     $query->orderBy($sortBy, $sortDirection);
                 } else {
-                    $query->orderBy('created_at', 'desc');
+                    $query->orderBy('updated_at', 'desc');
                 }
 
                 foreach ($data as $index => $value) {
-                    $query->where($index, $value);
+                    if (!in_array($index, ['search', 'sort_by', 'sort_direction', 'store_id'])) {
+                        $query->where($index, $value);
+                    }
                 }
             })
 

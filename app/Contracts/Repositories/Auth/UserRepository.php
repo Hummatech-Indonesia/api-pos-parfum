@@ -207,6 +207,9 @@ class UserRepository extends BaseRepository implements UserInterface
         unset($data['is_delete']);
 
         return $this->model->query()
+            ->when(isset($data['store_id']), function ($q) use ($data) {
+                $q->where('store_id', $data['store_id']);
+            })
             ->with([
                 'roles',
             ])

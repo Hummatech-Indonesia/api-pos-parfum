@@ -13,6 +13,7 @@ use App\Http\Requests\Master\ProductBundlingRequest;
 use App\Http\Requests\Master\ProductBundlingUpdateRequest;
 use App\Http\Resources\ProductBundlingDetailResource;
 use App\Http\Resources\ProductBundlingResource;
+use App\Models\Unit;
 use App\Services\Master\ProductBundlingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -92,13 +93,19 @@ class ProductBundlingController extends Controller
             // Mapping & simpan ke product_bundling_details
             $details = collect($validated['details'][0]['product_bundling_material'])
                 ->map(function ($item) {
+                    $unit = Unit::find($item['unit_id']);
+                    if (!$unit) {
+                        throw new \Exception("Unit dengan ID {$item['unit_id']} tidak ditemukan");
+                    }
+
                     return [
                         'product_detail_id' => $item['product_detail_id'],
-                        'unit' => 'pcs', // default value
-                        'unit_id' => null,
+                        'unit' => $unit->name,
+                        'unit_id' => $item['unit_id'],
                         'quantity' => $item['quantity'],
                     ];
                 })->toArray();
+
 
             foreach ($details as $detail) {
                 $this->bundlingDetailRepo->store([
@@ -106,7 +113,7 @@ class ProductBundlingController extends Controller
                     'product_detail_id' => $detail['product_detail_id'],
                     'unit' => $detail['unit'],
                     'unit_id' => $detail['unit_id'],
-                    'quantity' => $detail['quantity'], // pastikan disimpan
+                    'quantity' => $detail['quantity'],
                 ]);
             }
 
@@ -133,7 +140,7 @@ class ProductBundlingController extends Controller
             }
 
             $bundling = $this->repository->show($id);
-            $bundling->load('details.productDetail');
+            $bundling->load('details.productDetail', 'details.unit');
             return BaseResponse::Ok("Detail bundling ditemukan", new ProductBundlingDetailResource($bundling));
 
         } catch (\Throwable $e) {
@@ -160,27 +167,36 @@ class ProductBundlingController extends Controller
             $this->repository->update($bundling->id, $bundlingData);
 
             foreach ($validated['details'] as $inputDetail) {
+                $unitName = null;
+                if (!empty($inputDetail['unit_id'])) {
+                    $unit = Unit::find($inputDetail['unit_id']);
+                    if (!$unit) {
+                        return BaseResponse::Error("Unit dengan ID {$inputDetail['unit_id']} tidak ditemukan", 400);
+                    }
+                    $unitName = $unit->name;
+                }
+
                 $existingDetail = $bundling->details
                     ->where('product_detail_id', $inputDetail['product_detail_id'])
                     ->first();
 
                 if ($existingDetail) {
                     $this->bundlingDetailRepo->update($existingDetail->id, [
-                        'unit' => $inputDetail['unit'] ?? $existingDetail->unit,
+                        'unit' => $unitName ?? $existingDetail->unit,
                         'unit_id' => $inputDetail['unit_id'] ?? $existingDetail->unit_id,
                         'quantity' => $inputDetail['quantity'] ?? $existingDetail->quantity,
                     ]);
-
                 } else {
                     $this->bundlingDetailRepo->store([
                         'product_bundling_id' => $bundling->id,
                         'product_detail_id' => $inputDetail['product_detail_id'],
-                        'unit' => $inputDetail['unit'],
+                        'unit' => $unitName,
                         'unit_id' => $inputDetail['unit_id'],
                         'quantity' => $inputDetail['quantity'],
                     ]);
                 }
             }
+
 
             DB::commit();
             return BaseResponse::Ok("Berhasil update bundling", $this->repository->show($bundling->id)->load('details'));

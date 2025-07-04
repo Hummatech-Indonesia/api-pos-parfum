@@ -49,6 +49,7 @@ class ProductRepository extends BaseRepository implements ProductInterface
             ->with([
                 'productBundling',
                 'store',
+                'user',
                 'category',
                 'details' => function ($q) {
                     $q->withCount('transactionDetails')

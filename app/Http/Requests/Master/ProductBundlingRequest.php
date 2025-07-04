@@ -28,7 +28,9 @@ class ProductBundlingRequest extends FormRequest
             'details' => 'required|array|min:1',
             'details.*.product_bundling_material' => 'required|array|min:1',
             'details.*.product_bundling_material.*.product_detail_id' => 'required|uuid|exists:product_details,id',
-            'details.*.product_bundling_material.*.quantity' => 'required|numeric|min:1', // <-- tambahkan ini
+            'details.*.product_bundling_material.*.quantity' => 'required|numeric|min:1',
+            'details.*.product_bundling_material.*.unit_id' => 'nullable|uuid',
+            'details.*.product_bundling_material.*.unit' => 'nullable|string|max:255'
         ];
     }
 

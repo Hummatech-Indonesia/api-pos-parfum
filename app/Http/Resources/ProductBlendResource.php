@@ -17,6 +17,7 @@ class ProductBlendResource extends JsonResource
         return [
             'id' => $this->id,
             'product_detail_id' => $this->product_detail_id,
+            'unit_id' => $this->unit_id,
             'product_image' => $this->productDetail?->product_image ?? null,
             'product_name' => $this->productDetail?->product?->name ?? null,
             'variant_blending' => $this->productDetail?->variant_name ?? null,

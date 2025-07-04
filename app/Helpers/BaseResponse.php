@@ -76,4 +76,14 @@ class BaseResponse
             "data" => $data
         ])->setStatusCode(201);
     }
+
+    public static function Forbidden(string $message = 'Akses ditolak'): JsonResponse
+    {
+        return response()->json([
+            "success" => false,
+            "message" => $message,
+            "code" => 403,
+            "data" => null
+        ])->setStatusCode(403);
+    }
 }

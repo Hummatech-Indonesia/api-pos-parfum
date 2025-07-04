@@ -31,6 +31,7 @@ class ProductBundlingService
             'stock' => null, // JANGAN ambil dari $data['quantity']
             'price' => $data['harga'] ?? 0,
             'bundling_code' => $data['kode_Blend'] ?? null,
+            'user_id' => auth()->user()?->id
         ];
     }
 

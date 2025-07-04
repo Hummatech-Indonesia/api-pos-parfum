@@ -17,6 +17,7 @@ class ProductResource extends JsonResource
             'image' => $this->image,
             'details_sum_stock' => $this->details_sum_stock,
             'category' => $this->category?->name,
+            'created_by' => $this->getCreatedBy(),
             'description' => $this->description,
             'is_bundling' => $this->relationLoaded('productBundling')
                 ? $this->productBundling !== null
@@ -71,5 +72,13 @@ class ProductResource extends JsonResource
 
 
         ];
+    }
+    private function getCreatedBy(): ?string
+    {
+        if (!$this->user) return null;
+
+        if ($this->user->hasRole('outlet')) return 'retail';
+        if ($this->user->hasRole('warehouse')) return 'warehouse';
+        return 'Unknown';
     }
 }

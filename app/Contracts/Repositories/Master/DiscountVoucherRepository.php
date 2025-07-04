@@ -225,7 +225,7 @@ class DiscountVoucherRepository extends BaseRepository implements DiscountVouche
 
                     $query->orderBy($sortBy, $sortDirection);
                 } else {
-                    $query->orderBy('created_at', 'desc');
+                    $query->orderBy('updated_at', 'desc');
                 }
             })
             ->paginate($pagination, ['*'], 'page', $page);

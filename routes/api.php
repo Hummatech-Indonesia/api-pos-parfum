@@ -15,6 +15,7 @@ use App\Http\Controllers\Master\ProductController;
 use App\Http\Controllers\Master\WarehouseController;
 use App\Http\Controllers\Dashboard\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExpenditureController;
 use App\Http\Controllers\Master\StockRequestController;
 use App\Http\Controllers\Master\ProductDetailController;
 use App\Http\Controllers\Master\ProductVarianController;
@@ -55,7 +56,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('roles', [UserController::class, 'listRole'])->name('get-roles');
 
     // API FOR ROLE OUTLET & OWNER & GUDANG
-    Route::middleware('role:outlet|owner|warehouse')->group(function () {
+    Route::middleware('role:outlet|owner|warehouse|employee.warehouse')->group(function () {
         Route::get('stock-request/no-paginate', [StockRequestController::class, 'listStockRequest'])->name('list-stock-request-no-paginate');
         Route::resource("stock-request", StockRequestController::class)->only(['update']);
         Route::get('product-details/stock', [ProductDetailController::class, 'stockProduct']);
@@ -76,8 +77,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('product-blends/no-paginate', [ProductBlendController::class, 'listProductBlend'])->name('product-blend-no-paginate');
     });
 
+    Route::middleware('role:owner|warehouse')->group(function () {
+        // API FOR DATA WAREHOUSE
+        Route::get('warehouses/no-paginate', [WarehouseController::class, 'listWarehouse'])->name('list-warehouses-no-paginate');
+        Route::resource("warehouses", WarehouseController::class)->only(['store', 'destroy', 'update']);
+    });
+
     // API FOR ROLE OWNER
-    Route::middleware('role:owner|warehouse|outlet')->group(function () {
+    Route::middleware('role:warehouse|outlet|employee|cashier')->group(function () {
         // API FOR DATA USER
         Route::get('users/no-paginate', [UserController::class, 'listUser'])->name('list-users-no-paginate');
         Route::get('users/v2/no-paginate', [UserController::class, 'listUserV2'])->name('list-users-no-paginate.v2');
@@ -85,9 +92,6 @@ Route::middleware('auth:sanctum')->group(function () {
         // API FOR DATA OUTLET
         Route::get('outlets/no-paginate', [OutletController::class, 'listOutlet'])->name('list-outlets-no-paginate');
         Route::resource("outlets", OutletController::class)->only(['store', 'destroy', 'update']);
-        // API FOR DATA WAREHOUSE
-        Route::get('warehouses/no-paginate', [WarehouseController::class, 'listWarehouse'])->name('list-warehouses-no-paginate');
-        Route::resource("warehouses", WarehouseController::class)->only(['store', 'destroy', 'update']);
         // API FOR DATA PRODUCT
         Route::get('products/no-paginate', [ProductController::class, 'listProduct'])->name('list-products-no-paginate');
         Route::get('products/v2/no-paginate', [ProductController::class, 'listProductV2'])->name('v2.list-products-no-paginate');
@@ -99,10 +103,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource("product-details", ProductDetailController::class)->only(['store', 'destroy', 'update']);
         // API FOR DATA CATEGORY
         Route::get('categories/no-paginate', [CategoryController::class, 'listCategory'])->name('list-categories-no-paginate');
-        Route::resource("categories", CategoryController::class)->only(['store', 'destroy', 'update']);
-        // API FOR DATA PRODUCT VARIAN
-        Route::get('variants/no-paginate', [ProductVarianController::class, 'listProductVarian'])->name('list-variants-no-paginate');
-        Route::resource("variants", ProductVarianController::class)->only(['store', 'destroy', 'update']);
+        Route::resource('categories', CategoryController::class)->only(['store', 'destroy', 'update']);
         // API FOR DATA DISCOUNT VOUCHER
         Route::get('discount-vouchers/no-paginate', [DiscountVoucherController::class, 'listDiscountVoucher'])->name('list-discount-vouchers-no-paginate');
         Route::resource("discount-vouchers", DiscountVoucherController::class)->only(['store', 'destroy', 'update']);
@@ -116,7 +117,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // API FOR ROLE OUTLET & OWNER
-    Route::middleware('role:outlet|owner')->group(function () {
+    Route::middleware('role:outlet|owner|employee.outlet')->group(function () {
         Route::resource("stock-request", StockRequestController::class)->only(['store', 'destroy']);
     });
 
@@ -126,6 +127,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get("audit/alltrashed", [AuditController::class, 'trashed']);
         Route::put('/audit/{id}/detail', [AuditController::class, 'updateStatusWithProducts']);
         Route::resource("audit", AuditController::class)->only(['destroy', 'index', 'show']);
+    });
+
+    Route::middleware('role:outlet|admin|warehouse')->group(function () {
+        Route::resource('expenditure', ExpenditureController::class);
     });
 
     Route::middleware('role:auditor|admin|owner')->group(function () {
