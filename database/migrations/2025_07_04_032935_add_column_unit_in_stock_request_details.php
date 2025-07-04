@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -11,9 +12,20 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('stock_request_details')) return;
+
         Schema::table('stock_request_details', function (Blueprint $table) {
-            $table->foreignUuid('unit_id')->constrained('units')->nullable()->after('product_detail_id');
-            $table->string('unit')->nullable()->after('unit_id');
+            if (!Schema::hasColumn('stock_request_details', 'unit_id')) {
+                if (Schema::hasTable('units')) {
+                    $table->foreignUuid('unit_id')->nullable()->constrained('units')->after('product_detail_id');
+                } else {
+                    $table->uuid('unit_id')->nullable()->after('product_detail_id');
+                }
+            }
+
+            if (!Schema::hasColumn('stock_request_details', 'unit')) {
+                $table->string('unit')->nullable()->after('unit_id');
+            }
         });
     }
 
@@ -22,8 +34,18 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasTable('stock_request_details')) return;
+
         Schema::table('stock_request_details', function (Blueprint $table) {
-            $table->dropColumn(['unit_id', 'unit']);
+            if (Schema::hasColumn('stock_request_details', 'unit_id')) {
+                $table->dropForeign(['unit_id']);
+                $table->dropColumn('unit_id');
+            }
+
+            if (Schema::hasColumn('stock_request_details', 'unit')) {
+                $table->dropColumn('unit');
+            }
         });
     }
 };
+
