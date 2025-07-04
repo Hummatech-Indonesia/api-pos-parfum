@@ -13,6 +13,7 @@ use App\Http\Requests\Master\StockRequestUpdateRequest;
 use App\Http\Resources\StockRequestDetailResource;
 use App\Http\Resources\StockRequestResource;
 use App\Models\StockRequest;
+use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -112,9 +113,20 @@ class StockRequestController extends Controller
                     return BaseResponse::Notfound("Product detail dengan ID {$productDetailId} tidak ditemukan!");
                 }
 
+                $unitName = null;
+                if (!empty($item['unit_id'])) {
+                    $unit = Unit::find($item['unit_id']);
+                    if (!$unit) {
+                        return BaseResponse::Notfound("Unit dengan ID {$item['unit_id']} tidak ditemukan!");
+                    }
+                    $unitName = $unit->name;
+                }
+
                 $productDetails[] = [
                     'product_detail_id' => $productDetailId,
-                    'requested_stock' => $item['requested_stock']
+                    'requested_stock' => $item['requested_stock'],
+                    'unit_id' => $item['unit_id'] ?? null,
+                    'unit' => $unitName
                 ];
             }
 
@@ -132,6 +144,8 @@ class StockRequestController extends Controller
                     'stock_request_id' => $stockRequest->id,
                     'product_detail_id' => $detail['product_detail_id'],
                     'requested_stock' => $detail['requested_stock'],
+                    'unit_id' => $detail['unit_id'],
+                    'unit' => $detail['unit']
                 ]);
             }
 
