@@ -41,8 +41,7 @@ class AuditRepository extends BaseRepository implements AuditInterface
                 'auditDetails.details.product' => function ($query) {
                     $query->select('id', 'name');
                 }
-            ])
-            ->find($id);
+            ])->find($id);
     }
 
 
@@ -109,17 +108,17 @@ class AuditRepository extends BaseRepository implements AuditInterface
                 }
 
                 if (!empty($data['sort_by']) && !empty($data['sort_direction'])) {
-                    $allowedSorts = ['name', 'category','status', 'created_at'];
+                    $allowedSorts = ['name', 'category', 'status', 'created_at', 'updated_at'];
                     $allowedDirections = ['asc', 'desc'];
 
-                    $sortBy = in_array($data['sort_by'], $allowedSorts) ? $data['sort_by'] : 'created_at';
+                    $sortBy = in_array($data['sort_by'], $allowedSorts) ? $data['sort_by'] : 'updated_at';
                     $sortDirection = in_array(strtolower($data['sort_direction']), $allowedDirections)
                         ? strtolower($data['sort_direction'])
                         : 'desc';
 
                     $query->orderBy($sortBy, $sortDirection);
                 } else {
-                    $query->orderBy('created_at', 'desc');
+                    $query->orderBy('updated_at', 'desc');
                 }
             })
             ->paginate($pagination, ['*'], 'page', $page);
@@ -165,17 +164,17 @@ class AuditRepository extends BaseRepository implements AuditInterface
                 }
 
                 if (!empty($data['sort_by']) && !empty($data['sort_direction'])) {
-                    $allowedSorts = ['name', 'status', 'created_at'];
+                    $allowedSorts = ['name', 'status', 'created_at', 'updated_at'];
                     $allowedDirections = ['asc', 'desc'];
 
-                    $sortBy = in_array($data['sort_by'], $allowedSorts) ? $data['sort_by'] : 'created_at';
+                    $sortBy = in_array($data['sort_by'], $allowedSorts) ? $data['sort_by'] : 'updated_at';
                     $sortDirection = in_array(strtolower($data['sort_direction']), $allowedDirections)
                         ? strtolower($data['sort_direction'])
                         : 'desc';
 
                     $query->orderBy($sortBy, $sortDirection);
                 } else {
-                    $query->orderBy('created_at', 'desc');
+                    $query->orderBy('updated_at', 'desc');
                 }
             })->with(['auditDetails', 'auditDetails.details.product' => function ($query) {
                 $query->select('id', 'name');

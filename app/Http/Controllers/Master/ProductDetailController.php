@@ -57,6 +57,8 @@ class ProductDetailController extends Controller
         // check query filter
         if ($request->search) $payload["search"] = $request->search;
         if ($request->is_delete) $payload["is_delete"] = $request->is_delete;
+        if ($request->sort_by) $payload["sort_by"] = $request->sort_by;
+        if ($request->sort_direction) $payload["sort_direction"] = $request->sort_direction;
 
         $data = $this->productDetail->customPaginate($per_page, $page, $payload);
 

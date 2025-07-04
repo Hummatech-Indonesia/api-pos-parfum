@@ -37,7 +37,8 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
             ->when(isset($data['product_id']), function ($query) use ($data) {
                 $query->where('product_id', $data['product_id']);
             })
-            ->where('is_delete', 0);
+            ->where('is_delete', 0)
+            ->orderBy('updated_at', 'desc');;
     }
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
@@ -61,17 +62,17 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
                 }
 
                 if (!empty($data['sort_by']) && !empty($data['sort_direction'])) {
-                    $allowedSorts = ['name', 'category', 'created_at'];
+                    $allowedSorts = ['name', 'category', 'created_at', 'updated_at'];
                     $allowedDirections = ['asc', 'desc'];
 
-                    $sortBy = in_array($data['sort_by'], $allowedSorts) ? $data['sort_by'] : 'created_at';
+                    $sortBy = in_array($data['sort_by'], $allowedSorts) ? $data['sort_by'] : 'updated_at';
                     $sortDirection = in_array(strtolower($data['sort_direction']), $allowedDirections)
                         ? strtolower($data['sort_direction'])
                         : 'desc';
 
                     $query->orderBy($sortBy, $sortDirection);
                 } else {
-                    $query->orderBy('created_at', 'desc');
+                    $query->orderBy('updated_at', 'desc');
                 }
 
                 foreach ($data as $index => $value) {
