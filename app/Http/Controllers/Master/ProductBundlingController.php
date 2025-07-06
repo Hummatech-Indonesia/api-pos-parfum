@@ -95,7 +95,7 @@ class ProductBundlingController extends Controller
                 ->map(function ($item) {
                     $unit = Unit::find($item['unit_id']);
                     if (!$unit) {
-                        throw new \Exception("Unit dengan ID {$item['unit_id']} tidak ditemukan");
+                        throw new \Exception("Unit tidak ditemukan");
                     }
 
                     return [
@@ -171,7 +171,7 @@ class ProductBundlingController extends Controller
                 if (!empty($inputDetail['unit_id'])) {
                     $unit = Unit::find($inputDetail['unit_id']);
                     if (!$unit) {
-                        return BaseResponse::Error("Unit dengan ID {$inputDetail['unit_id']} tidak ditemukan", 400);
+                        return BaseResponse::Error("Unit tidak ditemukan", 400);
                     }
                     $unitName = $unit->name;
                 }

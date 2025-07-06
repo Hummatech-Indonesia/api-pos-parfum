@@ -117,7 +117,7 @@ class StockRequestController extends Controller
                 if (!empty($item['unit_id'])) {
                     $unit = Unit::find($item['unit_id']);
                     if (!$unit) {
-                        return BaseResponse::Notfound("Unit dengan ID {$item['unit_id']} tidak ditemukan!");
+                        return BaseResponse::Notfound("Unit tidak ditemukan!");
                     }
                     $unitName = $unit->name;
                 }
