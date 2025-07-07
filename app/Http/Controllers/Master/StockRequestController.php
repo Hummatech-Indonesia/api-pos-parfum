@@ -288,6 +288,23 @@ class StockRequestController extends Controller
         }
     }
 
+    public function listByWarehouse(Request $request)
+    {
+        $warehouseId = auth()->user()->warehouse_id;
+
+        if (!$warehouseId) {
+            return BaseResponse::Error("User tidak memiliki akses ke gudang", 400);
+        }
+
+        try {
+            $data = $this->stockRequest->customQuery(['warehouse_id' => $warehouseId])->get();
+
+            return BaseResponse::Ok("Berhasil mengambil stock request berdasarkan warehouse", StockRequestResource::collection($data));
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
 
 
     /**
