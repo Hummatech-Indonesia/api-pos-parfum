@@ -275,9 +275,9 @@ class WarehouseController extends Controller
                     'product_detail_id' => $item['variant_id'],
                     'stock' => $item['requested_stock'],
                     'unit_id' => $item['unit_id'],
-                    'store_name' => $data['store_name'],
-                    'total_price' => $data['total_price'],
-                    'store_location' => $data['store_location'],
+                    'store_name' => isset($data['store_name']) ? $data['store_name'] : null,
+                    'total_price' => isset($data['total_price']) ? $data['total_price'] : null,
+                    'store_location' => isset($data['store_location']) ? $data['store_location'] : null,
                     'reason' => '-',
                 ]);
 

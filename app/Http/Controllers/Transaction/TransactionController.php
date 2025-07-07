@@ -126,7 +126,7 @@ class TransactionController extends Controller
                 if(!$productDetail) return BaseResponse::Error("Product tidak terdaftar, silahkan check ke admin!", null);
                 
                 $used_quantity = $item["quantity"];
-                if(strtolower($item["unit"]) == "gram") $used_quantity = $item["quantity"] * $productDetail->density;
+                if(strtolower($item["unit"]) == "gram") $used_quantity = $item["quantity"] * ($productDetail->density ?? 1);
 
                 $productStock->stock -= $used_quantity;
                 $productStock->save();

@@ -135,9 +135,9 @@ class StockRequestController extends Controller
                 'user_id' => auth()->user()->id,
                 'outlet_id' => auth()->user()->outlet_id,
                 'warehouse_id' => $data['warehouse_id'],
-                'store_name' => $data['store_name'],
-                'total_price' => $data['total_price'],
-                'store_location' => $data['store_location'],
+                'store_name' => isset($data['store_name']) ? $data['store_name'] : null,
+                'total_price' => isset($data['total_price']) ? $data['total_price'] : null,
+                'store_location' => isset($data['store_location']) ? $data['store_location'] : null,
                 'product_detail_id' => null, // nullable
             ];
 
@@ -194,7 +194,16 @@ class StockRequestController extends Controller
                     'telp' => optional($stockRequest->warehouse)->telp,
                     'image' => optional($stockRequest->warehouse)->image,
                 ],
+                'store' => [],
             ];
+
+            if($stockRequest->store_name) {
+                $data["store"] = [
+                    'store_name' => $stockRequest->store_name,
+                    'store_address' => $stockRequest->store_location,
+                    'price' => $stockRequest->total_price
+                ];
+            }
 
             return BaseResponse::Ok("Berhasil mengambil detail stock request !", [$data]);
         } catch (\Throwable $th) {

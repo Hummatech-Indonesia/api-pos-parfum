@@ -20,11 +20,9 @@ class RestockWarehouseCollection extends ResourceCollection
 
                 $firstItem = $itemsByTime->first() ?? null;
 
-                return [
+                $data = [
+                    "store" => [],
                     'created_at' => $createdTime,
-                    'store_name' => $firstItem->store_name,
-                    'total_price' => $firstItem->total_price,
-                    'store_location' => $firstItem->store_location,
                     'products' => $itemsByTime
                         ->groupBy(fn($item) => $item->productDetail?->product?->name ?? 'unknown')
                         ->map(function ($itemsByProduct, $productName) {
@@ -50,6 +48,16 @@ class RestockWarehouseCollection extends ResourceCollection
                             ];
                         })->values(),
                 ];
+
+                if($firstItem->store_name) {
+                    $data["store"] = [
+                        'store_name' => $firstItem->store_name,
+                        'total_price' => $firstItem->total_price,
+                        'store_location' => $firstItem->store_location,
+                    ];
+                }
+                
+                return $data;
             })->values()->toArray();
     }
 }
