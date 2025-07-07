@@ -239,7 +239,12 @@ class WarehouseController extends Controller
         $page = $request->page ?? 1;
         $payload = [];
 
-        if ($request->date) $payload["date"] = $request->date;
+        if ($request->from_date) $payload["from_date"] = $request->from_date . ' 00:00:00';
+        if ($request->until_date) $payload["until_date"] = $request->until_date . ' 23:59:59';
+        if ($request->min_stock) $payload["min_stock"] = $request->min_stock;
+        if ($request->max_stock) $payload["max_stock"] = $request->max_stock;
+        $payload['sort_by'] = $request->sort_by ?? 'updated_at';
+        $payload['sort_direction'] = $request->sort_direction ?? 'desc';
 
         try {
             $result = $this->warehouseStock->customPaginate($per_page, $page, $payload);
@@ -301,7 +306,7 @@ class WarehouseController extends Controller
     public function restockByPeriod(Request $request)
     {
         try {
-            $date = $request->query('date'); 
+            $date = $request->query('date');
 
             $data = $this->warehouseStock->getAll($date);
 

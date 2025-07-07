@@ -40,16 +40,41 @@ class WarehouseStockRepository extends BaseRepository implements WarehouseStockI
         return $this->model->query()
             ->with('productDetail.product')
             ->when(count($data) > 0, function ($query) use ($data) {
-                // if(isset($data["search"])){
-                //     $query->where(function ($query2) use ($data) {
-                //         $query2->where('name', 'like', '%' . $data["search"] . '%')
-                //         ->orwhere('address', 'like', '%' . $data["search"] . '%');
-                //     });
-                //     unset($data["search"]);
-                // }
+                if (isset($data["search"])) {
+                    $query->where(function ($query2) use ($data) {
+                        $query2->whereHas('productDetail.product', function ($q) use ($data) {
+                            $q->where('name', 'like', '%' . $data["search"] . '%');
+                        });
+                    });
+                    unset($data["search"]);
+                }
+                if (!empty($data["from_date"])) {
+                    $query->where('created_at', '>=', $data["from_date"]);
+                }
+                if (!empty($data["until_date"])) {
+                    $query->where('created_at', '<=', $data["until_date"]);
+                }
 
-                foreach ($data as $index => $value) {
-                    $query->where($index, $value);
+                if (!empty($data["min_stock"])) {
+                    $query->where('stock', '>=', $data["min_stock"]);
+                }
+
+                if (!empty($data["max_stock"])) {
+                    $query->where('stock', '<=', $data["max_stock"]);
+                }
+
+                if (!empty($data['sort_by']) && !empty($data['sort_direction'])) {
+                    $allowedSorts = ['created_at', 'updated_at'];
+                    $allowedDirections = ['asc', 'desc'];
+
+                    $sortBy = in_array($data['sort_by'], $allowedSorts) ? $data['sort_by'] : 'updated_at';
+                    $sortDirection = in_array(strtolower($data['sort_direction']), $allowedDirections)
+                        ? strtolower($data['sort_direction'])
+                        : 'desc';
+
+                    $query->orderBy($sortBy, $sortDirection);
+                } else {
+                    $query->orderBy('updated_at', 'desc');
                 }
             })
             ->paginate($pagination, ['*'], 'page', $page);
