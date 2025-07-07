@@ -70,6 +70,9 @@ class ProductController extends Controller
             $payload["search"] = $request->search;
         }
 
+        if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
+        if (auth()->user()->hasRole('outlet')) $payload["outlet_id"] = auth()->user()->outlet_id;
+
         if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
             $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
         }
@@ -104,6 +107,9 @@ class ProductController extends Controller
         DB::beginTransaction();
         try {
             $data = $this->productService->injectDensityToDetails($data);
+            if (auth()->user()->hasRole('warehouse')) $data["warehouse_id"] = auth()->user()->warehouse_id;
+            if (auth()->user()->hasRole('outlet')) $data["outlet_id"] = auth()->user()->outlet_id;
+
 
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $data["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             $mapProduct = $this->productService->dataProduct($data);
@@ -257,6 +263,10 @@ class ProductController extends Controller
                 'sort_by' => in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null,
                 'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
             ];
+
+            if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
+            if (auth()->user()->hasRole('outlet')) $payload["outlet_id"] = auth()->user()->outlet_id;
+
 
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
                 $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;

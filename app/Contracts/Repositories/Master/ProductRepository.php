@@ -68,6 +68,13 @@ class ProductRepository extends BaseRepository implements ProductInterface
             ->withSum('details', 'stock');
 
         $user = auth()->user();
+
+        if ($user->hasRole('outlet')) {
+            $query->where('outlet_id', $user->outlet_id);
+        } elseif ($user->hasRole('warehouse')) {
+            $query->where('warehouse_id', $user->warehouse_id);
+        }
+
         if (isset($data["category"])) {
             $query->where('category', $data["category"]);
         }
@@ -276,6 +283,13 @@ class ProductRepository extends BaseRepository implements ProductInterface
             }])
             ->with('category')
             ->withSum('details', 'stock');
+
+        $user = auth()->user();
+        if ($user->hasRole('outlet')) {
+            $query->where('outlet_id', $user->outlet_id);
+        } elseif ($user->hasRole('warehouse')) {
+            $query->where('warehouse_id', $user->warehouse_id);
+        }
 
         if (!empty($filters["search"])) {
             $query->where('name', 'like', '%' . $filters["search"] . '%');

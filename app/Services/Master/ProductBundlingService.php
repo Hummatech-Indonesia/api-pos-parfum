@@ -29,6 +29,8 @@ class ProductBundlingService
             'description' => $data['deskripsi'] ?? null,
             'is_delete' => 0,
             'category_id' => $data['category_id'] ?? null,
+            'warehouse_id' => $data['warehouse_id'] ?? null,
+            'outlet_id' => $data['outlet_id'] ?? null,
         ];
     }
 
@@ -46,7 +48,9 @@ class ProductBundlingService
             'stock' => null,
             'price' => $data['harga'] ?? 0,
             'bundling_code' => $data['kode_Blend'] ?? $generatedCode,
-            'user_id' => auth()->user()?->id
+            'user_id' => auth()->user()?->id,
+            'warehouse_id' => $data['warehouse_id'] ?? null,
+            'outlet_id' => $data['outlet_id'] ?? null,
         ];
     }
 

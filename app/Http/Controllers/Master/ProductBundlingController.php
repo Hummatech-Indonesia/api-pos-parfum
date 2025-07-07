@@ -50,6 +50,9 @@ class ProductBundlingController extends Controller
             ]);
             $payload['created_from'] = $payload['mulai_tanggal'] ?? null;
             $payload['created_to'] = $payload['sampai_tanggal'] ?? null;
+            
+            if(auth()->user()->hasRole('warehouse')) $payload['warehouse_id'] = auth()->user()->warehouse_id;
+            if(auth()->user()->hasRole('outlet')) $payload['outlet_id'] = auth()->user()->outlet_id;
 
             $data = $this->repository->customPaginate($perPage, $page, $payload);
 
@@ -72,6 +75,8 @@ class ProductBundlingController extends Controller
 
             // Simpan ke tabel products
             $productData = $this->service->mapProductData($validated);
+            if(auth()->user()->hasRole('warehouse')) $productData['warehouse_id'] = auth()->user()->warehouse_id;
+            if(auth()->user()->hasRole('outlet')) $productData['outlet_id'] = auth()->user()->outlet_id;
             $product = $this->productRepo->store($productData);
 
             // Simpan ke product_details (tanpa stok)
@@ -88,6 +93,8 @@ class ProductBundlingController extends Controller
 
             // Simpan ke product_bundlings (stok null)
             $bundlingData = $this->service->mapBundlingData($validated, $product->id, $validated['category_id']);
+            if(auth()->user()->hasRole('warehouse')) $bundlingData['warehouse_id'] = auth()->user()->warehouse_id;
+            if(auth()->user()->hasRole('outlet')) $bundlingData['outlet_id'] = auth()->user()->outlet_id;
             $bundling = $this->repository->store($bundlingData);
 
             // Mapping & simpan ke product_bundling_details
