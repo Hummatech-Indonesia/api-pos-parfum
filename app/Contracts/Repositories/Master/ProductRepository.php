@@ -309,4 +309,19 @@ class ProductRepository extends BaseRepository implements ProductInterface
 
         return $query->get();
     }
+
+    public function getListProductWithoutBundling(array $data): mixed
+    {
+        return $this->model->query()
+            ->with(['details', 'productBundling'])
+            ->when(isset($data['store_id']), fn($q) => $q->where('store_id', $data['store_id']))
+            ->when(isset($data['warehouse_id']), fn($q) => $q->where('warehouse_id', $data['warehouse_id']))
+            ->when(isset($data['outlet_id']), fn($q) => $q->where('outlet_id', $data['outlet_id']))
+            ->when(!empty($data['search']), fn($q) => $q->where('name', 'like', '%' . $data['search'] . '%'))
+            ->whereDoesntHave('productBundling')
+            ->when(!empty($data['sort_by']), function ($q) use ($data) {
+                $q->orderBy($data['sort_by'], $data['sort_order'] ?? 'asc');
+            })
+            ->get();
+    }
 }
