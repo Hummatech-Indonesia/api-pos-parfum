@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Transaction\ShiftUserRequest;
 use App\Http\Requests\Transaction\ShiftUserSyncRequest;
 use App\Http\Resources\ShiftResource;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -31,15 +32,19 @@ class ShiftUserController extends Controller
         $payload = [];
 
         if ($request->has('from_date')) {
-            $payload["from_date"] = $request->from_date;
+            $payload['from_date'] = Carbon::createFromFormat('d-m-Y', $request->from_date)->format('Y-m-d');
         }
+
         if ($request->has('until_date')) {
-            $payload["until_date"] = $request->until_date;
+            $payload['until_date'] = Carbon::createFromFormat('d-m-Y', $request->until_date)->format('Y-m-d');
         }
+
         if ($request->has('date')) {
-            $payload["from_date"] = $request->date;
-            $payload["until_date"] = $request->date;
+            $payload['from_date'] = Carbon::createFromFormat('d-m-Y', $request->date)->format('Y-m-d');
+            $payload['until_date'] = $payload['from_date'];
         }
+
+        Carbon::parse($request->form_date)->format('d-m-Y');
 
         // check query filter
         if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
@@ -49,7 +54,7 @@ class ShiftUserController extends Controller
             $data = $this->shiftUser->customPaginate($per_page, $page, $payload);
             $resource = ShiftResource::collection($data);
             $meta = PaginationHelper::meta($data);
- 
+
             $result = $data["data"];
             unset($data["data"]);
 
