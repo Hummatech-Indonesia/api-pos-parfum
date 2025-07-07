@@ -58,6 +58,7 @@ class ProductBlendService
                 $this->productBlendDetail->store([
                     'product_blend_id' => $data['product_blend_id'],
                     'product_detail_id' => $detail['product_detail_id'],
+                    'unit_id' => $detail['unit_id'],
                     'used_stock' => $detail['used_stock'],
                 ]);
 

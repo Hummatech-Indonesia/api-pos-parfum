@@ -115,6 +115,7 @@ class ProductBlendController extends Controller
                     $this->productBlendDetail->store([
                         'product_blend_id' => $product_blend_id,
                         'product_detail_id' => $blendDetail['product_detail_id'],
+                        'unit_id' => $blendDetail['unit_id'],
                         'used_stock' => $blendDetail['used_stock'],
                     ]);
                 }
