@@ -140,7 +140,7 @@ class ProductBundlingController extends Controller
             }
 
             $bundling = $this->repository->show($id);
-            $bundling->load('details.productDetail', 'details.unit');
+            $bundling->load('details.productDetail', 'details.unitRelation');
             return BaseResponse::Ok("Detail bundling ditemukan", new ProductBundlingDetailResource($bundling));
 
         } catch (\Throwable $e) {
