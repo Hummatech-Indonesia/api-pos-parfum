@@ -68,7 +68,7 @@ class TransactionRepository extends BaseRepository implements TransactionInterfa
 
     public function show(mixed $id): mixed
     {
-        return $this->model->with('store')->find($id);
+        return $this->model->with(['store', 'cashier', 'user'])->find($id);
     }
 
     public function update(mixed $id, array $data): mixed

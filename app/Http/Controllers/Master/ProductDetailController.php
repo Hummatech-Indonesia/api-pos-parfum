@@ -54,6 +54,9 @@ class ProductDetailController extends Controller
             $payload['store_id'] = auth()?->user()?->store_id ?? auth()?->user()?->store->id;
         }
 
+        if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
+        if (auth()->user()->hasRole('outlet')) $payload["outlet_id"] = auth()->user()->outlet_id;
+
         // check query filter
         if ($request->search) $payload["search"] = $request->search;
         if ($request->is_delete) $payload["is_delete"] = $request->is_delete;
@@ -168,6 +171,9 @@ class ProductDetailController extends Controller
     {
         try {
             $payload = [];
+
+            if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
+            if (auth()->user()->hasRole('outlet')) $payload["outlet_id"] = auth()->user()->outlet_id;
 
             if ($request->product_id) $payload['product_id'] = $request->product_id;
 
