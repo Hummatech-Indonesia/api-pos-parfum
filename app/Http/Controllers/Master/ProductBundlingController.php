@@ -71,11 +71,7 @@ class ProductBundlingController extends Controller
             $validated = $request->validated();
 
             // Simpan ke tabel products
-            $imagePath = null;
-            if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('products', 'public');
-            }
-            $productData = $this->service->mapProductData($validated, $imagePath);
+            $productData = $this->service->mapProductData($validated);
             $product = $this->productRepo->store($productData);
 
             // Simpan ke product_details (tanpa stok)

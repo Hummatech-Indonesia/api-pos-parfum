@@ -2,17 +2,29 @@
 
 namespace App\Services\Master;
 
+use App\Traits\UploadTrait;
+
 class ProductBundlingService
 {
+    use UploadTrait;
 
     public function mapProductData(array $data): array
     {
+        $image = null;
+
+        try {
+            if(isset($data["image"])) {
+                $image = $this->upload("products", $data["image"]);
+            }
+        } catch (\Throwable $th) {
+
+        }
         return [
             'id' => uuid_create(),
             'store_id' => $data['store_id'] ?? auth()->user()->store_id,
             'name' => $data['name'],
             'unit_type' => 'unit',
-            'image' => $imagePath ?? 'default/Default.jpeg',
+            'image' => $image ?? 'default/Default.jpeg',
             // 'qr_code' => $data['kode_Blend'] ?? null,
             'description' => $data['deskripsi'] ?? null,
             'is_delete' => 0,
