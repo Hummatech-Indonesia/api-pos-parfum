@@ -135,6 +135,9 @@ class StockRequestController extends Controller
                 'user_id' => auth()->user()->id,
                 'outlet_id' => auth()->user()->outlet_id,
                 'warehouse_id' => $data['warehouse_id'],
+                'store_name' => $data['store_name'],
+                'total_price' => $data['total_price'],
+                'store_location' => $data['store_location'],
                 'product_detail_id' => null, // nullable
             ];
 
@@ -177,6 +180,9 @@ class StockRequestController extends Controller
                 'outlet_id' => $stockRequest->outlet_id,
                 'warehouse_id' => $stockRequest->warehouse_id,
                 'status' => $stockRequest->status,
+                'store_name' => $stockRequest->store_name,
+                'total_price' => $stockRequest->total_price,
+                'store_location' => $stockRequest->store_location,
                 'variant_chose' => $stockRequest->detailRequestStock->count(),
                 'requested_stock_count' => $stockRequest->detailRequestStock->sum('requested_stock'),
                 'requested_at' => $stockRequest->created_at,
