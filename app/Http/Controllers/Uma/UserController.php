@@ -47,6 +47,9 @@ class UserController extends Controller
 
         // check if have store_id
         if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $request->merge(['store_id' => auth()?->user()?->store?->id ?? auth()?->user()?->store_id]);
+        if (auth()?->user()?->outlet_id) {
+            $request->merge(['outlet_id' => auth()->user()->outlet_id]);
+        }
 
         try {
             $paginate = $this->user->customPaginate($per_page, $page, $request->all());
