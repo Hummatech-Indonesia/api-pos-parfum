@@ -26,20 +26,23 @@ class WarehouseStockRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_detail_id' => 'required',
-            'stock' => 'required',
-            'reason' => 'required'
+            'restock' => 'required|array|min:1',
+            'restock.*.variant_id' => 'required|uuid|exists:product_details,id', 
+            'restock.*.requested_stock' => 'required|integer|min:1',
+            'restock.*.unit_id' => 'required|uuid|exists:units,id',
         ];
     }
 
-    public function messages(): array 
+    public function messages(): array
     {
         return [
-            'product_detail_id.required' => "Produk harus di pilih terlebih dahulu!",
-            'stock' => 'Stok yang akan di kirimkan harus di isi!',
-            'reason' => 'Catatan harus di isi!'
+            'restock.required' => 'Data restock wajib diisi!',
+            'restock.*.variant_id.required' => 'Varian produk wajib diisi!',
+            'restock.*.requested_stock.required' => 'Jumlah stok wajib diisi!',
+            'restock.*.unit_id.required' => 'Satuan wajib diisi!',
         ];
     }
+
 
     public function failedValidation(Validator $validator): JsonResponse
     {

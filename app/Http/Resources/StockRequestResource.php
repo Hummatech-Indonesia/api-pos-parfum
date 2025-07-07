@@ -23,7 +23,6 @@ class StockRequestResource extends JsonResource
                     'variant_name' => optional($detail->detailProduct)->variant_name,
                     'requested_stock' => $detail->requested_stock,
                     'unit_id' => $detail->unitRelation->id,
-                    'unit' => $detail->unitRelation->name,
                     'unit_code' => $detail->unitRelation->code
                 ];
             }),
