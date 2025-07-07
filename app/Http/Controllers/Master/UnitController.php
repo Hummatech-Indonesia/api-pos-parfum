@@ -150,7 +150,9 @@ class UnitController extends Controller
         try {
             $payload = [];
             if ($request->search) $payload['search'] = $request->search;
-            $data = $this->unit->customQuery($payload)->get();
+            $data = $this->unit->customQuery($payload)
+            ->withCount('productDetails')
+            ->get();
 
 
             return BaseResponse::Ok("Berhasil mengambil data unit", $data);

@@ -36,4 +36,9 @@ class Unit extends Model
     public function productBundlingDetail() {
         return $this->hasMany(ProductBundlingDetail::class);
     }
+
+    public function productDetails()
+    {
+        return $this->hasMany(ProductDetail::class, 'unit_id', 'id');
+    }
 }

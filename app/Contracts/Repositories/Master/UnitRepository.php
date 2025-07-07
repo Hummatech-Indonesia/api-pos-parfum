@@ -28,6 +28,7 @@ class UnitRepository extends BaseRepository implements UnitInterface
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
+            ->withCount('productDetails')
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (isset($data["search"])) {
                     $query->where(function ($query2) use ($data) {
