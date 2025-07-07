@@ -32,6 +32,7 @@ class ShiftUserController extends Controller
 
         // check query filter
         if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+        if(auth()?->user()?->outlet?->id || auth()?->user()?->outlet_id) $payload['outlet_id'] = auth()?->user()?->outlet?->id ?? auth()?->user()?->outlet_id;  
 
         try {
             $data = $this->shiftUser->customPaginate($per_page, $page, $payload)->toArray();
@@ -65,6 +66,7 @@ class ShiftUserController extends Controller
             // check has data user or not 
             $data["user_id"] = auth()->user()->id;
             $data["store_id"] = auth()->user()?->store?->id ?? auth()->user()?->store_id;
+            $data["outlet_id"] = auth()->user()?->outlet?->id ?? auth()->user()?->outlet_id;
             $result = $this->shiftUser->store($data);
 
             DB::commit();
@@ -158,6 +160,7 @@ class ShiftUserController extends Controller
             // check has data user or not
             foreach($data["shift"] as $item) {
                 $item["store_id"] = auth()->user()?->store?->id ?? auth()->user()?->store_id;
+                $item["outlet_id"] = auth()->user()?->outlet?->id ?? auth()->user()?->outlet_id;
                 $this->shiftUser->store($item);
             } 
 

@@ -119,6 +119,7 @@ class ProductController extends Controller
             foreach ($data["product_details"] as $detail) {
                 $detail["product_id"] = $result_product->id;
                 $detail["category_id"] = $data["category_id"];
+                $detail["unit_id"] = $data["unit_id"];
                 $detail["variant"] = $detail["variant"] ?? null;
                 $detail["density"] = $detail["density"] ?? null;
                 $detail["opsi"] = $detail["opsi"] ?? null;
@@ -199,6 +200,7 @@ class ProductController extends Controller
             foreach ($data["product_details"] as $detail) {
                 $detail["product_id"] = $id;
                 $detail["category_id"] = $data["category_id"];
+                $detail["unit_id"] = $data["unit_id"];
 
                 /**
                  * Pengecekan apakah data varian yang dikirim sudah ada atau belum

@@ -19,6 +19,9 @@ class StockRequestRequest extends FormRequest
     {
         return [
             'warehouse_id' => 'required|exists:warehouses,id',
+            'store_name' => 'nullable|string',
+            'total_price' => 'nullable|numeric|min:0',
+            'store_location' => 'nullable|string',
             'requested_stock' => 'required|array|min:1',
             'requested_stock.*.product_id' => 'nullable|string',
             'requested_stock.*.variant_id' => 'required|uuid|exists:product_details,id',
