@@ -37,27 +37,27 @@ class Product extends Model
      */
     public function details(): HasMany
     {
-        return $this->hasMany(ProductDetail::class)->where('is_delete',0);
+        return $this->hasMany(ProductDetail::class)->where('is_delete', 0);
     }
 
     public function category(): BelongsTo
     {
-        return $this->belongsTo(Category::class)->where('is_delete',0);
+        return $this->belongsTo(Category::class)->where('is_delete', 0);
     }
 
     public function active_details(): HasMany
     {
-        return $this->hasMany(ProductDetail::class)->where('is_delete',0);
+        return $this->hasMany(ProductDetail::class)->where('is_delete', 0);
     }
 
     public function discountVoucher(): HasMany
     {
-        return $this->hasMany(DiscountVoucher::class)->where('is_delete',0);
+        return $this->hasMany(DiscountVoucher::class)->where('is_delete', 0);
     }
 
     public function discountVoucherActive(): HasMany
     {
-        return $this->where('is_delete',0)->where('is_active',1)->hasMany(DiscountVoucher::class);
+        return $this->where('is_delete', 0)->where('is_active', 1)->hasMany(DiscountVoucher::class);
     }
 
     /**
@@ -66,5 +66,10 @@ class Product extends Model
     public function productBundling(): HasOne
     {
         return $this->hasOne(ProductBundling::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

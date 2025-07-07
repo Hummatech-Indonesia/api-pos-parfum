@@ -20,6 +20,7 @@ class ProductBundling extends Model
         'stock',
         'price',
         'bundling_code',
+        'user_id'
     ];
 
     public $incrementing = false;
@@ -38,6 +39,11 @@ class ProductBundling extends Model
     public function details()
     {
         return $this->hasMany(ProductBundlingDetail::class, 'product_bundling_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
 

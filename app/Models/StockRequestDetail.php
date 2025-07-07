@@ -20,4 +20,9 @@ class StockRequestDetail extends Model
     {
         return $this->belongsTo(ProductDetail::class, 'product_detail_id');
     }
+
+    public function unitRelation(): BelongsTo
+    {
+        return $this->belongsTo(Unit::class, 'unit_id');
+    }
 }

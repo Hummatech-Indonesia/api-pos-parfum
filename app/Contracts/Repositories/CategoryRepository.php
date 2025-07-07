@@ -61,7 +61,7 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
                     $query->where($index, $value);
                 }
             })
-            ->select('id','name', 'created_at')
+            ->select('id', 'name', 'created_at')
             ->addSelect(DB::raw("(select count(*) from products where products.category_id = categories.id and is_delete = 0) as products_count"))
             ->orderBy($sorting['column'] ?? "created_at", $sorting['order'] ?? "ASC");
     }
@@ -75,7 +75,12 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
             unset($data['sorting']);
         }
 
+        $storeId = $data['store_id'] ?? auth()->user()?->store_id ?? auth()->user()?->store?->id;
+
         return $this->model->query()
+            ->when($storeId, function ($query) use ($storeId) {
+                $query->where('store_id', $storeId);
+            })
             ->when($data, function ($query) use ($data) {
                 if (!empty($data["search"])) {
                     $query->where(function ($query2) use ($data) {
@@ -89,6 +94,10 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
 
                 if (!empty($data["end_date"])) {
                     $query->whereDate('created_at', '<=', $data["end_date"]);
+                }
+
+                if (isset($data['is_delete'])) {
+                    $query->where('is_delete', $data['is_delete']);
                 }
             })
             ->select('id', 'name', 'created_at')

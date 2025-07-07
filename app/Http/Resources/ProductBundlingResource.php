@@ -16,6 +16,7 @@ class ProductBundlingResource extends JsonResource
             'stock' => $this->stock ?? 0,
             'status' => ($this->stock ?? 0) > 0 ? 'active' : 'non-active',
             'category' => $this->category->name ?? '-',
+            'created_by' => $this->getCreatedBy(),
             'bundling_material_count' => $this->details->count(),
             'bundling_material' => $this->details->map(function ($detail) {
                 $user = auth()->user();
@@ -26,8 +27,22 @@ class ProductBundlingResource extends JsonResource
                     ? optional($detail->productDetail->productStockOutlet) ?? 0 
                     : optional($detail->productDetail->productStockWarehouse) ?? 0,
                     'image' => $this->product->image ?? null,
+                    'unit_id' => $detail->unitRelation->id,
+                    'unit' => $detail->unitRelation->name ?? null,
+                    'unit_code' => $detail->unitRelation->code ?? null
                 ];
             }),
         ];
     }
+
+    private function getCreatedBy(): ?string
+    {
+        if (!$this->user) return null;
+
+        if ($this->user->hasRole('outlet')) return 'retail';
+        if ($this->user->hasRole('warehouse')) return 'warehouse';
+
+        return 'Unknown';
+    }
+
 }

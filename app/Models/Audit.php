@@ -17,7 +17,7 @@ class Audit extends Model
     public $incrementing = false;
     protected $table = 'audits';
     protected $primaryKey = 'id';
-    public $timestamps = false;
+    public $timestamps = true;
 
     public function productDetail()
     {

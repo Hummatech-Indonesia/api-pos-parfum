@@ -15,6 +15,9 @@ class StockRequestDetailResource extends JsonResource
             'requested_stock' => $this->requested_stock,
             'kategori' => optional($this->detailProduct->product->category)->name,
             'variant_code' => optional($this->detailProduct)->product_code,
+            'unit_id' => $this->unitRelation->id,
+            'unit' => $this->unitRelation->name,
+            'unit_code' => $this->unitRelation->code
         ];
     }
 }

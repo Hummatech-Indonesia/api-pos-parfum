@@ -73,19 +73,13 @@ class ProductBlendController extends Controller
         try {
             $data = $request->validated();
 
-            foreach ($data['product_blend'] as $blend) {
-                $totalUsed = collect($blend['product_blend_details'])->sum('used_stock');
-                if ($totalUsed > $blend['result_stock']) {
-                    return BaseResponse::Custom(false, "Total used stock melebihi result stock", null, 422);
-                }
-            }
-
             $productBlends = [];
 
             foreach ($data['product_blend'] as $productBlend) {
                 $storeBlend = [
                     'store_id' => auth()->user()->store_id,
                     'warehouse_id' => auth()->user()->warehouse_id,
+                    'unit_id' => $productBlend['unit_id'],
                     'result_stock' => $productBlend['result_stock'],
                     'product_detail_id' => $productBlend['product_detail_id'],
                     'product_id' => null,
@@ -127,7 +121,6 @@ class ProductBlendController extends Controller
 
                 $detail = $this->productDetail->find($productBlend['product_detail_id']);
 
-                // Tambahkan stok hasil blending ke detail produk baru
                 $stock = $this->productStock->getFromProductDetail($productBlend['product_detail_id']);
 
                 if (!$stock) {

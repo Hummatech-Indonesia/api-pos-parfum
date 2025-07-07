@@ -28,9 +28,9 @@ class ProductBundlingDetail extends Model
         return $this->belongsTo(ProductBundling::class, 'product_bundling_id');
     }
 
-    public function unit()
+    public function unitRelation()
     {
-        return $this->belongsTo(Unit::class);
+        return $this->belongsTo(Unit::class, 'unit_id');
     }
 
 }
