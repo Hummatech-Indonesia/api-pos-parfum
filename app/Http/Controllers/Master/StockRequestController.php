@@ -256,6 +256,8 @@ class StockRequestController extends Controller
                         "product_detail_id" => $detail->product_detail_id
                     ])->first();
 
+                    if(!$warehouseStock)return BaseResponse::Error('stock kosong', null);
+
                     if ($warehouseStock->stock < $detail->sended_stock) {
                         return BaseResponse::Error("Stok gudang tidak mencukupi", 400);
                     }

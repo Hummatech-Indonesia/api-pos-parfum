@@ -307,4 +307,36 @@ class ProductController extends Controller
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
+
+    public function listProductWithoutBundling(Request $request)
+    {
+        try {
+            $payload = [
+                'is_delete' => $request->get('is_delete', 0),
+                'search' => $request->get('search'),
+                'sort_by' => in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null,
+                'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
+            ];
+
+            $user = auth()->user();
+
+            if ($user->hasRole('warehouse')) {
+                $payload["warehouse_id"] = $user->warehouse_id;
+            }
+
+            if ($user->hasRole('outlet')) {
+                $payload["outlet_id"] = $user->outlet_id;
+            }
+
+            if ($user->store?->id || $user->store_id) {
+                $payload['store_id'] = $user->store?->id ?? $user->store_id;
+            }
+
+            $products = $this->product->getListProductWithoutBundling($payload);
+
+            return BaseResponse::Ok("Berhasil mengambil data product non-bundling", ProductResource::collection($products));
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
 }
