@@ -15,6 +15,8 @@ use App\Contracts\Interfaces\Master\WarehouseInterface;
 use App\Contracts\Interfaces\Master\ProductStockInterface;
 use App\Contracts\Interfaces\Master\ProductDetailInterface;
 use App\Contracts\Interfaces\Master\WarehouseStockInterface;
+use App\Helpers\PaginationHelper;
+use App\Http\Resources\RestockWarehouseResource;
 
 class WarehouseController extends Controller
 {
@@ -26,16 +28,20 @@ class WarehouseController extends Controller
     private WarehouseService $warehouseService;
     private UserService $userService;
 
-    public function __construct(WarehouseInterface $warehouse, UserInterface $user, 
-    WarehouseStockInterface $warehouseStock, ProductDetailInterface $productDetail,
-    ProductStockInterface $productStock, WarehouseService $warehouseService, UserService $userService
-    )
-    {
-        $this->warehouse = $warehouse; 
-        $this->user = $user; 
-        $this->warehouseStock = $warehouseStock; 
-        $this->productDetail = $productDetail; 
-        $this->productStock = $productStock; 
+    public function __construct(
+        WarehouseInterface $warehouse,
+        UserInterface $user,
+        WarehouseStockInterface $warehouseStock,
+        ProductDetailInterface $productDetail,
+        ProductStockInterface $productStock,
+        WarehouseService $warehouseService,
+        UserService $userService
+    ) {
+        $this->warehouse = $warehouse;
+        $this->user = $user;
+        $this->warehouseStock = $warehouseStock;
+        $this->productDetail = $productDetail;
+        $this->productStock = $productStock;
         $this->warehouseService = $warehouseService;
         $this->userService = $userService;
     }
@@ -52,9 +58,9 @@ class WarehouseController extends Controller
         ];
 
         // check query filter
-        if($request->search) $payload["search"] = $request->search;
-        if($request->is_delete) $payload["is_delete"] = $request->is_delete;
-        if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+        if ($request->search) $payload["search"] = $request->search;
+        if ($request->is_delete) $payload["is_delete"] = $request->is_delete;
+        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
         $data = $this->warehouse->customPaginate($per_page, $page, $payload)->toArray();
 
@@ -72,10 +78,7 @@ class WarehouseController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
@@ -92,7 +95,7 @@ class WarehouseController extends Controller
 
             // cek apakah ada menginputkan user baru
             $userCreate = [];
-            if(isset($data["users"])){
+            if (isset($data["users"])) {
                 $userCreate = $data["users"];
                 unset($data["users"]);
             }
@@ -101,31 +104,31 @@ class WarehouseController extends Controller
             $mapWarehouse = $this->warehouseService->dataWarehouse($data);
             $result_warehouse = $this->warehouse->store($mapWarehouse);
 
-            if($user){
+            if ($user) {
                 $result_user = $this->user->customQuery(["user_id" => $user])->get();
-                foreach($result_user as $dataUser) $dataUser->update(["warehouse_id" => $result_warehouse->id]);
+                foreach ($result_user as $dataUser) $dataUser->update(["warehouse_id" => $result_warehouse->id]);
             }
 
             // cek apakah ada user dan apakah user create tersebut adalah array
-            if($userCreate && is_array($userCreate) && !empty($userCreate) && count($userCreate) > 0) {
+            if ($userCreate && is_array($userCreate) && !empty($userCreate) && count($userCreate) > 0) {
                 // jika ada maka tambahkan user tersebut ke database
-                foreach($userCreate as $userData) {
+                foreach ($userCreate as $userData) {
                     $mapping = $this->userService->mappingDataUser($userData);
                     $mapping["warehouse_id"] = $result_warehouse->id;
-                    if($userLogin && $userLogin->outlet_id) {
+                    if ($userLogin && $userLogin->outlet_id) {
                         $mapping['outlet_id'] = $userLogin->outlet_id;
                     }
-                    if($userLogin && $userLogin->store_id) {
+                    if ($userLogin && $userLogin->store_id) {
                         $mapping['store_id'] = $userLogin->store_id;
                     }
                     $createUser = $this->user->store($mapping);
                     $createUser->syncRoles(['warehouse']);
                 }
             }
-    
+
             DB::commit();
             return BaseResponse::Ok('Berhasil membuat warehouse', $result_warehouse);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -137,7 +140,7 @@ class WarehouseController extends Controller
     public function show(string $id)
     {
         $check_warehouse = $this->warehouse->show($id);
-        if(!$check_warehouse) {
+        if (!$check_warehouse) {
             return BaseResponse::Notfound("Tidak dapat menemukan data warehouse!");
         }
 
@@ -151,7 +154,6 @@ class WarehouseController extends Controller
             "product_count" => $productStocks->total(),
             "product_stocks" => $productStocks
         ]);
-
     }
 
     /**
@@ -170,7 +172,7 @@ class WarehouseController extends Controller
         $data = $request->validated();
 
         $check = $this->warehouse->checkActive($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data warehouse!");
+        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data warehouse!");
 
         DB::beginTransaction();
         try {
@@ -181,14 +183,14 @@ class WarehouseController extends Controller
             $mapWarehouse = $this->warehouseService->dataWarehouseUpdate($data, $check);
             $result_outlet = $this->warehouse->update($id, $mapWarehouse);
 
-            if($user){
+            if ($user) {
                 $result_user = $this->user->customQuery(["user_id" => $user])->get();
-                foreach($result_user as $dataUser) $dataUser->update(["warehouse_id" => $result_outlet->id]);
+                foreach ($result_user as $dataUser) $dataUser->update(["warehouse_id" => $result_outlet->id]);
             }
-    
+
             DB::commit();
             return BaseResponse::Ok('Berhasil update data warehouse', $result_outlet);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -199,9 +201,9 @@ class WarehouseController extends Controller
      */
     public function destroy(string $id)
     {
-        
+
         $check = $this->warehouse->checkActive($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data warehouse!");
+        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data warehouse!");
 
         DB::beginTransaction();
         try {
@@ -210,7 +212,7 @@ class WarehouseController extends Controller
 
             DB::commit();
             return BaseResponse::Ok('Berhasil menghapus data', null);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -218,15 +220,15 @@ class WarehouseController extends Controller
 
     public function listWarehouse(Request $request)
     {
-        try{
+        try {
             $payload = [];
 
-            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             $data = $this->warehouse->customQuery($payload)->get();
 
             return BaseResponse::Ok("Berhasil mengambil data warehouse", $data);
-        }catch(\Throwable $th) {
-          return BaseResponse::Error($th->getMessage(), null);  
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
         }
     }
 
@@ -236,20 +238,19 @@ class WarehouseController extends Controller
         $page = $request->page ?? 1;
         $payload = [];
 
-        if($request->date) $payload["date"] = $request->date;
+        if ($request->date) $payload["date"] = $request->date;
 
         try {
-            $result = $this->warehouseStock->customPaginate($per_page, $page, $payload)->toArray();
-
-            $data = $result["data"];
-            unset($result["data"]);
+            $result = $this->warehouseStock->customPaginate($per_page, $page, $payload);
+            $resource = RestockWarehouseResource::collection($result);
+            $meta = PaginationHelper::meta($result);
 
             return BaseResponse::Paginate(
-                "Berhasil menampilkan riwayat stock", 
-                $data,
-                $result
+                "Berhasil menampilkan riwayat stock",
+                $resource,
+                $meta
             );
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
@@ -257,29 +258,42 @@ class WarehouseController extends Controller
     public function warehouseStock(WarehouseStockRequest $request)
     {
         $data = $request->validated();
+        $user = auth()->user();
 
         DB::beginTransaction();
         try {
-            $data["user_id"] = auth()->user()->id;
-            $stock = $this->warehouseStock->store($data);
-            $product = $this->productStock->customQuery(["warehouse_id" => auth()->user()->warehouse_id, "product_detail_id" => $request->product_detail_id])->first();
-            if($product) {
-                $product->stock += $request->stock;
-                $product->save();
-            } else {
-                $this->productStock->store([
-                    "warehouse_id" => auth()->user()->warehouse_id,
-                    "stock" => $request->stock,
-                    "product_detail_id" => $request->product_detail_id,
-                    "outlet_id" => auth()->user()->outlet_id
+            foreach ($data['restock'] as $item) {
+
+                $this->warehouseStock->store([
+                    'user_id' => $user->id,
+                    'product_detail_id' => $item['variant_id'],
+                    'stock' => $item['requested_stock'],
+                    'unit_id' => $item['unit_id'],
+                    'reason' => '-',
                 ]);
+
+                $productStock = $this->productStock->customQuery([
+                    'warehouse_id' => $user->warehouse_id,
+                    'product_detail_id' => $item['variant_id']
+                ])->first();
+
+                if ($productStock) {
+                    $productStock->stock += $item['requested_stock'];
+                    $productStock->save();
+                } else {
+                    $this->productStock->store([
+                        'warehouse_id' => $user->warehouse_id,
+                        'product_detail_id' => $item['variant_id'],
+                        'stock' => $item['requested_stock'],
+                    ]);
+                }
             }
-            // $this->productDetail->update($request->product_detail_id, ["stock" => $request->stock]);
+
             DB::commit();
-            return BaseResponse::Ok("Berhasil menambahkan stock warehouse", $stock);
-        } catch(\Throwable $th) {
+            return BaseResponse::Create("Berhasil memproses restock", null);
+        } catch (\Throwable $th) {
             DB::rollBack();
-            return BaseResponse::Error($th->getMessage(), null);  
+            return BaseResponse::Error('Gagal menambah stock', $th->getMessage());
         }
     }
 }
