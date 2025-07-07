@@ -33,9 +33,9 @@ class ProductResource extends JsonResource
                         if (!$productDetail) return null;
 
                         return [
-                            'product_name' => $productDetail->product->name,
-                            'category_id' => $productDetail->category->id,
-                            'category' => $productDetail->category->name,
+                            'product_name' => $productDetail->product?->name,
+                            'category_id' => $productDetail->category?->id,
+                            'category' => $productDetail->category?->name,
                             'product_detail_id' => $productDetail->id,
                             'product_code' => $productDetail->product_code,
                             'variant_name' => $productDetail->variant_name,
