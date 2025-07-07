@@ -114,7 +114,7 @@ class ProductBlendRepository extends BaseRepository implements ProductBlendInter
                 'productBlendDetails',
                 'productBlendDetails.productStock',
                 'productBlendDetails.productDetail',
-                'productBlendDetails.productDetail.product',
+                'productBlendDetails.productDetail.productAll',
             ])
             ->withCount('productBlendDetails as used_product_count')
             ->where('store_id', auth()->user()->store_id)

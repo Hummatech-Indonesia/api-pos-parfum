@@ -89,4 +89,13 @@ class ProductDetail extends Model
         return $this->belongsTo(Unit::class, 'unit_id', 'id');
     }
 
+    /**
+     * Get the user that owns the ProductDetail
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function productAll(): BelongsTo
+    {
+        return $this->belongsTo(Product::class, 'product_id');
+    }
 }

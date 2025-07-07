@@ -20,7 +20,7 @@ class ProductBlendResource extends JsonResource
             'unit_id' => $this->unit_id,
             'unit_code' => $this->unit?->code ?? null,
             'product_image' => $this->productDetail?->product_image ?? null,
-            'product_name' => $this->productDetail?->product?->name ?? null,
+            'product_name' => $this->productDetail?->productAll?->name ?? null,
             'variant_blending' => $this->productDetail?->variant_name ?? null,
             'quantity' => $this->result_stock,
             'description' => $this->description,
@@ -30,7 +30,7 @@ class ProductBlendResource extends JsonResource
             'used_products' => $this->productBlendDetails->map(function ($detail) {
                 return [
                     'product_detail_id' => $detail->product_detail_id,
-                    'product_name' => $detail->productDetail?->product->name ?? null,
+                    'product_name' => $detail->productDetail?->productAll?->name ?? null,
                     'variant_name' => $detail->productDetail?->variant_name ?? null,
                     'unit_id' => $detail->unit_id,
                     'unit_code' => $detail->unit?->code ?? null,
