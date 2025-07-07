@@ -29,7 +29,6 @@ class ProductBundlingDetailResource extends JsonResource
                         'variant_name' => $detail->productDetail->variant_name ?? '-',
                         'quantity' => $detail->quantity ?? null,
                         'unit_id' => $detail->unitRelation->id,
-                        'unit' => $detail->unitRelation->name ?? null,
                         'unit_code' => $detail->unitRelation->code ?? null,
                         'sum_stock' => $user->hasRole('outlet')
                             ? optional($detail->productDetail->productStockOutlet)->stock ?? 0
