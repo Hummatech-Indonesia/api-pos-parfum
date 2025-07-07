@@ -111,7 +111,7 @@ class AuthController extends Controller
         $user->product_count = $this->product->customQuery(["store_id" => $user?->store_id ?? $user?->store?->id, "is_delete" => 0])->count();
         $user->category_count = $this->category->customQuery(["store_id" => $user?->store_id ?? $user?->store?->id, "is_delete" => 0])->count();
         $user->discount_count = $this->discount->customQuery(["store_id" => $user?->store_id ?? $user?->store?->id, "is_delete" => 0])->count();
-        $user->role = auth()->user()->roles;
+        $user->role = auth()->user()->roles->pluck("name");
         $user->token = request()->bearerToken();
 
         return BaseResponse::Ok('Berhasil mengambil data diri', $user);

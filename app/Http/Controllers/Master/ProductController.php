@@ -119,7 +119,7 @@ class ProductController extends Controller
             foreach ($data["product_details"] as $detail) {
                 $detail["product_id"] = $result_product->id;
                 $detail["category_id"] = $data["category_id"];
-                $detail["unit_id"] = $data["unit_id"];
+                $detail["unit_id"] = $data["unit_id"] ?? null;
                 $detail["variant"] = $detail["variant"] ?? null;
                 $detail["density"] = $detail["density"] ?? null;
                 $detail["opsi"] = $detail["opsi"] ?? null;
@@ -184,13 +184,15 @@ class ProductController extends Controller
         try {
 
             $data = $this->productService->injectDensityToDetails($data);
+            if (auth()->user()->hasRole('warehouse')) $data["warehouse_id"] = auth()->user()->warehouse_id;
+            if (auth()->user()->hasRole('outlet')) $data["outlet_id"] = auth()->user()->outlet_id;
 
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $data["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             $select_product = $this->product->show($id);
 
             if (!$select_product) {
                 DB::rollBack();
-                return BaseResponse::Notfound("Produk dengan ID {$id} tidak ditemukan");
+                return BaseResponse::Notfound("Produk tidak ditemukan");
             }
 
             $mapProduct = $this->productService->dataProductUpdate($data, $select_product);
@@ -200,7 +202,7 @@ class ProductController extends Controller
             foreach ($data["product_details"] as $detail) {
                 $detail["product_id"] = $id;
                 $detail["category_id"] = $data["category_id"];
-                $detail["unit_id"] = $data["unit_id"];
+                $detail["unit_id"] = $data["unit_id"] ?? null;
 
                 /**
                  * Pengecekan apakah data varian yang dikirim sudah ada atau belum
@@ -291,9 +293,13 @@ class ProductController extends Controller
                 'sort_by' => in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null,
                 'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
             ];
-            
+
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
                 $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+            }
+
+            if (auth()?->user()?->outlet_id) {
+                $payload['outlet_id'] = auth()?->user()?->outlet_id;
             }
 
             $products = $this->product->customQuery($payload)->get();

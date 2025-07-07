@@ -133,7 +133,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::middleware('role:outlet|admin|warehouse')->group(function () {
-        Route::resource('expenditure', ExpenditureController::class);
+        // Route::resource('expenditure', ExpenditureController::class);
     });
 
     Route::middleware('role:auditor|admin|owner')->group(function () {
