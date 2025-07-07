@@ -292,6 +292,9 @@ class ProductController extends Controller
                 'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
             ];
 
+            if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
+            if (auth()->user()->hasRole('outlet')) $payload["outlet_id"] = auth()->user()->outlet_id;
+
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
                 $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             }
