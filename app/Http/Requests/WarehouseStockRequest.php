@@ -26,8 +26,11 @@ class WarehouseStockRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'store_name' => 'nullable|string',
+            'total_price' => 'nullable|numeric|min:0',
+            'store_location' => 'nullable|string',
             'restock' => 'required|array|min:1',
-            'restock.*.variant_id' => 'required|uuid|exists:product_details,id', 
+            'restock.*.variant_id' => 'required|uuid|exists:product_details,id',
             'restock.*.requested_stock' => 'required|integer|min:1',
             'restock.*.unit_id' => 'required|uuid|exists:units,id',
         ];

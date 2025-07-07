@@ -17,12 +17,19 @@ class RestockWarehouseCollection extends ResourceCollection
         return $this->collection
             ->groupBy(fn($item) => optional($item->created_at)?->format('Y-m-d H:i:s'))
             ->map(function ($itemsByTime, $createdTime) {
+
+                $firstItem = $itemsByTime->first() ?? null;
+
                 return [
                     'created_at' => $createdTime,
+                    'store_name' => $firstItem->store_name,
+                    'total_price' => $firstItem->total_price,
+                    'store_location' => $firstItem->store_location,
                     'products' => $itemsByTime
                         ->groupBy(fn($item) => $item->productDetail?->product?->name ?? 'unknown')
                         ->map(function ($itemsByProduct, $productName) {
                             $firstProduct = $itemsByProduct->first()?->productDetail?->product;
+
                             $variants = $itemsByProduct->map(function ($item) {
                                 return [
                                     'variant_id' => $item->productDetail->id,
