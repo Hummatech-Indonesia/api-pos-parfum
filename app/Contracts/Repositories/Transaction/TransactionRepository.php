@@ -37,6 +37,7 @@ class TransactionRepository extends BaseRepository implements TransactionInterfa
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
+            ->withCount('transaction_details as quantity')
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (!empty($data["search"])) {
                     $query->where(function ($query2) use ($data) {
@@ -60,8 +61,15 @@ class TransactionRepository extends BaseRepository implements TransactionInterfa
                 if (!empty($data['end_date'])) {
                     $query->whereDate('payment_time', '<=', $data['end_date']);
                 }
+
+                if (!empty($data['min_quantity'])) {
+                    $query->having('quantity', '>=', $data['min_quantity']);
+                }
+
+                if (!empty($data['max_quantity'])) {
+                    $query->having('quantity', '<=', $data['max_quantity']);
+                }
             })
-            ->withCount('transaction_details as quantity')
             ->paginate($pagination, ['*'], 'page', $page);
         // ->appends(['search' => $request->search, 'year' => $request->year]);
     }
