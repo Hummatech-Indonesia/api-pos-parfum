@@ -114,6 +114,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('roles/{id}/restore', [RoleController::class, 'restore']);
         Route::delete('roles/{role}/users/{user}', [RoleController::class, 'detachUser']);
         Route::resource("stock-request", StockRequestController::class)->only(['index', 'show']);
+        Route::get('/stock-requests/by-warehouse', [StockRequestController::class, 'listByWarehouse']);
     });
 
     // API FOR ROLE OUTLET & OWNER
