@@ -49,12 +49,13 @@ class UserController extends Controller
         if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $request->merge(['store_id' => auth()?->user()?->store?->id ?? auth()?->user()?->store_id]);
         $role_user_outlet = ["owner", "cashier", "employee"];
         $role_user_warehouse = ["warehouse", "cashier", "employee"];
-        $role = auth()->user()->roles()->pluck("name")->first();
-        if (auth()?->user()?->outlet_id && in_array($role, $role_user_outlet)) {
+        $userRoles = auth()->user()->roles()->pluck("name")->toArray();
+
+        if (auth()?->user()?->outlet_id && array_intersect($userRoles, $role_user_outlet)) {
             $request->merge(['outlet_id' => auth()->user()->outlet_id]);
         }
 
-        if (auth()?->user()?->warehouse_id && in_array($role, $role_user_warehouse)) {
+        if (auth()?->user()?->warehouse_id && array_intersect($userRoles, $role_user_warehouse)) {
             $request->merge(['warehouse_id' => auth()->user()->warehouse_id]);
         }
 
