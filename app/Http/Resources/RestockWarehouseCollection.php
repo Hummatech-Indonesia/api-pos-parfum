@@ -22,6 +22,7 @@ class RestockWarehouseCollection extends ResourceCollection
                     'products' => $itemsByTime
                         ->groupBy(fn($item) => $item->productDetail?->product?->name ?? 'unknown')
                         ->map(function ($itemsByProduct, $productName) {
+                            $firstProduct = $itemsByProduct->first()->productDetail?->product;
                             $variants = $itemsByProduct->map(function ($item) {
                                 return [
                                     'variant_id' => $item->productDetail->id,
@@ -36,6 +37,8 @@ class RestockWarehouseCollection extends ResourceCollection
                             return [
                                 'product_name' => $productName,
                                 'variant_count' => $variants->count(),
+                                'image' => $firstProduct?->image ?? null,
+                                'category_name' => $firstProduct?->category?->name ?? null,
                                 'variants' => $variants,
                             ];
                         })->values(),
