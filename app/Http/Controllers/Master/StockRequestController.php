@@ -194,7 +194,16 @@ class StockRequestController extends Controller
                     'telp' => optional($stockRequest->warehouse)->telp,
                     'image' => optional($stockRequest->warehouse)->image,
                 ],
+                'store' => [],
             ];
+
+            if($stockRequest->store_name) {
+                $data["store"] = [
+                    'store_name' => $stockRequest->store_name,
+                    'store_address' => $stockRequest->store_location,
+                    'price' => $stockRequest->total_price
+                ];
+            }
 
             return BaseResponse::Ok("Berhasil mengambil detail stock request !", [$data]);
         } catch (\Throwable $th) {
