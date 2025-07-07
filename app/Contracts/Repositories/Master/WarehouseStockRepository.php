@@ -39,6 +39,11 @@ class WarehouseStockRepository extends BaseRepository implements WarehouseStockI
     {
         return $this->model->query()
             ->with('productDetail.product')
+            ->when(auth()->user()?->warehouse_id, function ($query) {
+                $query->whereHas('user', function ($q) {
+                    $q->where('warehouse_id', auth()->user()->warehouse_id);
+                });
+            })
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (isset($data["search"])) {
                     $query->where(function ($query2) use ($data) {
