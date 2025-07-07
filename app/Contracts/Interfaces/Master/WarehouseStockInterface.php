@@ -15,5 +15,6 @@ use Illuminate\Support\Collection;
 interface WarehouseStockInterface extends GetInterface, StoreInterface, CustomQueryInterface, CustomPaginateInterface, ShowInterface, UpdateInterface, DeleteInterface
 {
     public function checkActive(mixed $id): mixed;
-    public function getAll(): Collection;
+        public function getAll(?string $date = null): Collection;
+
 }
