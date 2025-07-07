@@ -75,9 +75,9 @@ class ProductBundlingController extends Controller
 
             // Simpan ke tabel products
             $productData = $this->service->mapProductData($validated);
-            $product = $this->productRepo->store($productData);
             if(auth()->user()->hasRole('warehouse')) $productData['warehouse_id'] = auth()->user()->warehouse_id;
             if(auth()->user()->hasRole('outlet')) $productData['outlet_id'] = auth()->user()->outlet_id;
+            $product = $this->productRepo->store($productData);
 
             // Simpan ke product_details (tanpa stok)
             $productDetail = $this->productDetailRepo->store([

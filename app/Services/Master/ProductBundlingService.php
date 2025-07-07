@@ -29,8 +29,8 @@ class ProductBundlingService
             'description' => $data['deskripsi'] ?? null,
             'is_delete' => 0,
             'category_id' => $data['category_id'] ?? null,
-            // 'warehouse_id' => $data['warehouse_id'] ?? null,
-            // 'outlet_id' => $data['outlet_id'] ?? null,
+            'warehouse_id' => $data['warehouse_id'] ?? null,
+            'outlet_id' => $data['outlet_id'] ?? null,
         ];
     }
 
