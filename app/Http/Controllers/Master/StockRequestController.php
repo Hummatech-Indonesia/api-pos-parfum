@@ -126,7 +126,8 @@ class StockRequestController extends Controller
                     'product_detail_id' => $productDetailId,
                     'requested_stock' => $item['requested_stock'],
                     'unit_id' => $item['unit_id'] ?? null,
-                    'unit' => $unitName
+                    'unit' => $unitName,
+                    'price' => $item['requested_stock'] * $check->price
                 ];
             }
 
@@ -145,7 +146,8 @@ class StockRequestController extends Controller
                     'product_detail_id' => $detail['product_detail_id'],
                     'requested_stock' => $detail['requested_stock'],
                     'unit_id' => $detail['unit_id'],
-                    'unit' => $detail['unit']
+                    'unit' => $detail['unit'],
+                    'price' => $detail['price'],
                 ]);
             }
 
