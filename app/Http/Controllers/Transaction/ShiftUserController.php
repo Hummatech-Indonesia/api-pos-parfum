@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Transaction;
 
 use App\Contracts\Interfaces\Transaction\ShiftUserInterface;
 use App\Helpers\BaseResponse;
+use App\Helpers\PaginationHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Transaction\ShiftUserRequest;
 use App\Http\Requests\Transaction\ShiftUserSyncRequest;
+use App\Http\Resources\ShiftResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -44,12 +46,14 @@ class ShiftUserController extends Controller
         if (auth()?->user()?->outlet?->id || auth()?->user()?->outlet_id) $payload['outlet_id'] = auth()?->user()?->outlet?->id ?? auth()?->user()?->outlet_id;
 
         try {
-            $data = $this->shiftUser->customPaginate($per_page, $page, $payload)->toArray();
-
+            $data = $this->shiftUser->customPaginate($per_page, $page, $payload);
+            $resource = ShiftResource::collection($data);
+            $meta = PaginationHelper::meta($data);
+ 
             $result = $data["data"];
             unset($data["data"]);
 
-            return BaseResponse::Paginate('Berhasil mengambil list data shift!', $result, $data);
+            return BaseResponse::Paginate('Berhasil mengambil list data shift!', $resource, $meta);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
