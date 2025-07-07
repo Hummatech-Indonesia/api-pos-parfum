@@ -41,7 +41,7 @@ class UserController extends Controller
 
         if (!$request->role && $request->role == "") {
             $request->merge([
-                "role" => ['manager', 'auditor', 'warehouse', 'outlet', 'cashier'],
+                "role" => ['manager', 'auditor', 'warehouse', 'outlet', 'cashier', 'employee'],
             ]);
         }
 
