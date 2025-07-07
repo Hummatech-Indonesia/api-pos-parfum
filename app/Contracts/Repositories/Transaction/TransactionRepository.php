@@ -38,17 +38,30 @@ class TransactionRepository extends BaseRepository implements TransactionInterfa
     {
         return $this->model->query()
             ->when(count($data) > 0, function ($query) use ($data) {
-                if (isset($data["search"])) {
+                if (!empty($data["search"])) {
                     $query->where(function ($query2) use ($data) {
                         $query2->where('transaction_code', 'like', '%' . $data["search"] . '%');
                     });
                     unset($data["search"]);
                 }
 
-                foreach ($data as $index => $value) {
-                    $query->where($index, $value);
+                if (!empty($data['min_price'])) {
+                    $query->where('amount_price', '>=', $data['min_price']);
+                }
+
+                if (!empty($data['max_price'])) {
+                    $query->where('amount_price', '<=', $data['max_price']);
+                }
+
+                if (!empty($data['start_date'])) {
+                    $query->whereDate('payment_time', '>=', $data['start_date']);
+                }
+
+                if (!empty($data['end_date'])) {
+                    $query->whereDate('payment_time', '<=', $data['end_date']);
                 }
             })
+            ->withCount('transaction_details as quantity')
             ->paginate($pagination, ['*'], 'page', $page);
         // ->appends(['search' => $request->search, 'year' => $request->year]);
     }
