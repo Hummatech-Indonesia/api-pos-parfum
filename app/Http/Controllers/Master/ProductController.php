@@ -103,6 +103,8 @@ class ProductController extends Controller
 
         DB::beginTransaction();
         try {
+            $data = $this->productService->injectDensityToDetails($data);
+
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $data["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             $mapProduct = $this->productService->dataProduct($data);
 
@@ -112,6 +114,7 @@ class ProductController extends Controller
                 $detail["product_id"] = $result_product->id;
                 $detail["category_id"] = $data["category_id"];
                 $detail["variant"] = $detail["variant"] ?? null;
+                $detail["density"] = $detail["density"] ?? null;
                 $detail["opsi"] = $detail["opsi"] ?? null;
                 $mappingDetail = $this->productDetailService->dataProductDetail($detail);
                 $storedDetail = $this->productDetail->store($mappingDetail);
@@ -172,6 +175,9 @@ class ProductController extends Controller
         $data = $request->validated();
         DB::beginTransaction();
         try {
+
+            $data = $this->productService->injectDensityToDetails($data);
+
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $data["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             $select_product = $this->product->show($id);
 

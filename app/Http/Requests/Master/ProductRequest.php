@@ -31,6 +31,7 @@ class ProductRequest extends FormRequest
             "image" => "nullable|image|mimes:png,jpg,jpeg|max:2048",
             "unit_type" => "nullable|in:weight,volume,unit",
             "qr_code" => "nullable|string",
+            "density" => "nullable|numeric|min:0",
             "category_id" => "required|exists:categories,id",
 
             "product_details" => "sometimes|array",

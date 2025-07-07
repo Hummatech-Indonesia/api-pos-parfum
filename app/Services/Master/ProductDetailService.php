@@ -43,7 +43,7 @@ class ProductDetailService
                 "variant_name" => isset($data["variant"], $data["opsi"]) && $data["variant"] !== '' && $data["opsi"] !== ''
                     ? $data["variant"] . '-' . $data["opsi"]
                     : ($data['variant'] ?? null),
-                "unit_id" => $data["unit_id"],
+                "unit_id" => $data["unit_id"] ?? null,
             ];
             return $result;
         } catch (\Throwable $th) {
@@ -79,7 +79,7 @@ class ProductDetailService
                 "price" => $data["price"] ?? 0,
                 "price_discount" => $data["price_discount"] ?? 0,
                 "product_code" => $data["product_code"] ?? null,
-                "unit_id" => $data["unit_id"],
+                "unit_id" => $data["unit_id"] ?? null,
             ];
         } catch (\Throwable $th) {
             Log::error($th->getMessage());

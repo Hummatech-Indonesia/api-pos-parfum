@@ -69,6 +69,7 @@ class ProductResource extends JsonResource
                             'price' => $detail->price,
                             'variant_name' => $detail->variant_name,
                             'product_code' => $detail->product_code,
+                            'density' => $detail->density,
                             'product_image' => $detail->image,
                             'transaction_details_count' => $detail->transaction_details_count ?? 0,
                             'stock' => $user->hasRole('outlet')
