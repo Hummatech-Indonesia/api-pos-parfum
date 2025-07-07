@@ -106,9 +106,9 @@ class ProductController extends Controller
 
         DB::beginTransaction();
         try {
-            $data = $this->productService->injectDensityToDetails($data);
             if (auth()->user()->hasRole('warehouse')) $data["warehouse_id"] = auth()->user()->warehouse_id;
             if (auth()->user()->hasRole('outlet')) $data["outlet_id"] = auth()->user()->outlet_id;
+            $data = $this->productService->injectDensityToDetails($data);
 
 
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $data["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
@@ -183,9 +183,9 @@ class ProductController extends Controller
         DB::beginTransaction();
         try {
 
-            $data = $this->productService->injectDensityToDetails($data);
-            if (auth()->user()->hasRole('warehouse')) $data["warehouse_id"] = auth()->user()->warehouse_id;
             if (auth()->user()->hasRole('outlet')) $data["outlet_id"] = auth()->user()->outlet_id;
+            else if (auth()->user()->hasRole('warehouse')) $data["warehouse_id"] = auth()->user()->warehouse_id;
+            $data = $this->productService->injectDensityToDetails($data);
 
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $data["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             $select_product = $this->product->show($id);
