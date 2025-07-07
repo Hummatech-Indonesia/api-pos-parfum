@@ -20,6 +20,8 @@ class TransactionService
             return [
                 'transaction_code' => date('Ymdhms'),
                 'store_id' => auth()->user()?->store_id ?? auth()->user()?->store?->id,
+                'outlet_id' => auth()->user()?->outlet_id ?? auth()->user()?->outlet?->id,
+                'warehouse_id' => auth()->user()?->warehouse_id ?? auth()->user()?->warehouse?->id,
                 'transaction_status' => "Success",
                 'user_id' => isset($data["user_id"]) ? $data["user_id"] : null,
                 'user_name' => isset($data["user_name"]) ? $data["user_name"] : null,

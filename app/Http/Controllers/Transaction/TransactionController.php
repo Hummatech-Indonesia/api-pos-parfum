@@ -49,9 +49,14 @@ class TransactionController extends Controller
         try{
             $payload = [];
 
-            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+            if(auth()?->user()?->outlet?->id || auth()?->user()?->outlet_id) $payload['outlet_id'] = auth()?->user()?->outlet?->id ?? auth()?->user()?->outlet_id;
+            if(auth()?->user()?->warehouse?->id || auth()?->user()?->warehouse_id) $payload['warehouse_id'] = auth()?->user()?->warehouse?->id ?? auth()?->user()?->warehouse_id;  
 
-            $transaction = $this->transaction->customPaginate($request->per_page, $request->page, $payload)->toArray();
+            $perPage = (int) ($request->per_page ?? 10);
+            $page = (int) ($request->page ?? 1);
+
+            $transaction = $this->transaction->customPaginate($perPage, $page, $payload)->toArray();
 
             $result = $transaction["data"];
             unset($transaction["data"]);
@@ -80,6 +85,8 @@ class TransactionController extends Controller
         DB::beginTransaction();
         try {
 
+            if(auth()->user()?->outlet_id) $data['outlet_id'] = auth()->user()->outlet_id;
+            else if(auth()->user()?->warehouse_id) $data['warehouse_id'] = auth()->user()->warehouse_id;
             $transaction = $this->transaction->store($this->transactionService->store($data));
 
             // use discount
@@ -196,6 +203,8 @@ class TransactionController extends Controller
         try {
 
             foreach($data['transaction'] as $trans) {
+                if(auth()->user()?->outlet_id) $trans['outlet_id'] = auth()->user()->outlet_id;
+                else if(auth()->user()?->warehouse_id) $trans['warehouse_id'] = auth()->user()->warehouse_id;
                 $transaction = $this->transaction->store($this->transactionService->store($trans));
     
                 // use discount

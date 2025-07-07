@@ -291,7 +291,7 @@ class ProductController extends Controller
                 'sort_by' => in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null,
                 'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
             ];
-
+            
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
                 $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             }
