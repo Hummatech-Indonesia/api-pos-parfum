@@ -9,9 +9,11 @@ use App\Contracts\Interfaces\Transaction\TransactionDetailInterface;
 use App\Contracts\Interfaces\Transaction\TransactionInterface;
 use App\Contracts\Interfaces\Transaction\VoucherUsedInterface;
 use App\Helpers\BaseResponse;
+use App\Helpers\PaginationHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Transaction\TransactionRequest;
 use App\Http\Requests\Transaction\TransactionSyncRequest;
+use App\Http\Resources\TransactionResource;
 use App\Services\Transaction\TransactionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -56,12 +58,13 @@ class TransactionController extends Controller
             $perPage = (int) ($request->per_page ?? 10);
             $page = (int) ($request->page ?? 1);
 
-            $transaction = $this->transaction->customPaginate($perPage, $page, $payload)->toArray();
+            $transaction = $this->transaction->customPaginate($perPage, $page, $payload);
 
-            $result = $transaction["data"];
-            unset($transaction["data"]);
+            $resource = TransactionResource::collection($transaction);
+            $result = $resource->collection->values();
+            $meta = PaginationHelper::meta($transaction);
     
-            return BaseResponse::Paginate('Berhasil mengambil list data shift!', $result, $transaction);
+            return BaseResponse::Paginate('Berhasil mengambil list data shift!', $result, $meta);
         } catch(\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }

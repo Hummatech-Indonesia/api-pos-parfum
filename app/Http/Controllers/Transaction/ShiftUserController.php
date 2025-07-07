@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 class ShiftUserController extends Controller
 {
     private ShiftUserInterface $shiftUser;
-    
+
     public function __construct(ShiftUserInterface $shiftUser)
     {
         $this->shiftUser = $shiftUser;
@@ -26,20 +26,29 @@ class ShiftUserController extends Controller
     {
         $per_page = $request->per_page ?? 10;
         $page = $request->page ?? 1;
-        $payload = [
+        $payload = [];
 
-        ];
+        if ($request->has('from_date')) {
+            $payload["from_date"] = $request->from_date;
+        }
+        if ($request->has('until_date')) {
+            $payload["until_date"] = $request->until_date;
+        }
+        if ($request->has('date')) {
+            $payload["from_date"] = $request->date;
+            $payload["until_date"] = $request->date;
+        }
 
         // check query filter
-        if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
-        if(auth()?->user()?->outlet?->id || auth()?->user()?->outlet_id) $payload['outlet_id'] = auth()?->user()?->outlet?->id ?? auth()?->user()?->outlet_id;  
+        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+        if (auth()?->user()?->outlet?->id || auth()?->user()?->outlet_id) $payload['outlet_id'] = auth()?->user()?->outlet?->id ?? auth()?->user()?->outlet_id;
 
         try {
             $data = $this->shiftUser->customPaginate($per_page, $page, $payload)->toArray();
-    
+
             $result = $data["data"];
             unset($data["data"]);
-    
+
             return BaseResponse::Paginate('Berhasil mengambil list data shift!', $result, $data);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
@@ -49,10 +58,7 @@ class ShiftUserController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
@@ -71,7 +77,7 @@ class ShiftUserController extends Controller
 
             DB::commit();
             return BaseResponse::Ok('Berhasil membuat warehouse', $result);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -83,8 +89,8 @@ class ShiftUserController extends Controller
     public function show(string $id)
     {
         $check = $this->shiftUser->show($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data warehouse!");
-        
+        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data warehouse!");
+
         return BaseResponse::Ok("Berhasil mengambil detail warehouse!", $check);
     }
 
@@ -104,16 +110,16 @@ class ShiftUserController extends Controller
         $data = $request->validated();
 
         $check = $this->shiftUser->show($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data warehouse!");
+        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data warehouse!");
 
         DB::beginTransaction();
         try {
             $data["user_id"] = auth()->user()->id;
             $result = $check->update($data);
-    
+
             DB::commit();
             return BaseResponse::Ok('Berhasil update data warehouse', $result);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -122,33 +128,28 @@ class ShiftUserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
+    public function destroy(string $id) {}
 
-    }
-
-     /**
+    /**
      * Display a listing of the resource.
      */
     public function getData(Request $request)
     {
-        $payload = [
-
-        ];
+        $payload = [];
 
         // check query filter
-        if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
         try {
             $data = $this->shiftUser->customQuery($payload)->get();
-    
+
             return BaseResponse::Ok("Berhasil mengambil data shift", $data);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
 
-      /**
+    /**
      * Store a newly created resource in storage.
      */
     public function syncStoreData(ShiftUserSyncRequest $request)
@@ -158,15 +159,15 @@ class ShiftUserController extends Controller
         DB::beginTransaction();
         try {
             // check has data user or not
-            foreach($data["shift"] as $item) {
+            foreach ($data["shift"] as $item) {
                 $item["store_id"] = auth()->user()?->store?->id ?? auth()->user()?->store_id;
                 $item["outlet_id"] = auth()->user()?->outlet?->id ?? auth()->user()?->outlet_id;
                 $this->shiftUser->store($item);
-            } 
+            }
 
             DB::commit();
             return BaseResponse::Ok('Berhasil sinkronisasi data shift', null);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }

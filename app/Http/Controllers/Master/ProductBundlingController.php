@@ -86,7 +86,7 @@ class ProductBundlingController extends Controller
                 'product_code' => $validated['kode_Blend'] ?? $this->service->generateBundlingCode($validated['name']),
                 'stock' => 0, // stok tidak diatur
                 'unit' => 'pcs',
-                'price' => $validated['harga'],
+                'price' => $validated['harga'] ?? 0,
                 'product_image' => $product->image,
                 'is_delete' => 0
             ]);
@@ -168,7 +168,7 @@ class ProductBundlingController extends Controller
                 'name' => $validated['name'] ?? $bundling->name,
                 'category_id' => $validated['category_id'] ?? $bundling->category_id,
                 'stock' => null,
-                'price' => $validated['harga'] ?? $bundling->price,
+                'price' => array_key_exists('harga', $validated) ? $validated['harga'] : $bundling->price,
                 'bundling_code' => $validated['kode_Blend'] ?? $bundling->bundling_code,
             ];
             $this->repository->update($bundling->id, $bundlingData);

@@ -26,20 +26,54 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
 
     public function customQuery(array $data): mixed
     {
+        $user = auth()->user();
+
         return $this->model->query()
             ->withCount('product')
+            ->with('product.productBundling.details', 'category', 'productStockOutlet', 'productStockWarehouse')
             ->with('product.productBundling.details', 'category', 'productStockOutlet', 'productStockWarehouse', 'unitRelation:id,name')
             ->when(isset($data['store_id']), function ($query) use ($data) {
-                $query->whereHas('product', function ($q) use ($data) {
-                    $q->where('store_id', $data['store_id']);
-                });
+                $query->whereHas('product', fn($q) => $q->where('store_id', $data['store_id']));
             })
             ->when(isset($data['product_id']), function ($query) use ($data) {
                 $query->where('product_id', $data['product_id']);
             })
-            ->where('is_delete', 0)
-            ->orderBy('updated_at', 'desc');;
+            ->when($user->hasRole('outlet'), function ($query) use ($user) {
+                $query->whereHas('product', fn($q) => $q->where('outlet_id', $user->outlet_id));
+            })
+            ->when($user->hasRole('warehouse'), function ($query) use ($user) {
+                $query->whereHas('product', fn($q) => $q->where('warehouse_id', $user->warehouse_id));
+            })
+
+            ->when(isset($data['search']), function ($query) use ($data) {
+                $query->where(function ($q) use ($data) {
+                    $q->where('name', 'like', '%' . $data["search"] . '%');
+                });
+            })
+
+            ->when(!empty($data['sort_by']) && !empty($data['sort_direction']), function ($query) use ($data) {
+                $allowedSorts = ['name', 'category', 'created_at', 'updated_at'];
+                $allowedDirections = ['asc', 'desc'];
+
+                $sortBy = in_array($data['sort_by'], $allowedSorts) ? $data['sort_by'] : 'updated_at';
+                $sortDir = in_array(strtolower($data['sort_direction']), $allowedDirections) ? strtolower($data['sort_direction']) : 'desc';
+
+                $query->orderBy($sortBy, $sortDir);
+            }, function ($query) {
+                $query->orderBy('updated_at', 'desc');
+            })
+
+            ->when(count($data) > 0, function ($query) use ($data) {
+                foreach ($data as $key => $value) {
+                    if (!in_array($key, ['search', 'sort_by', 'sort_direction', 'store_id', 'warehouse_id', 'outlet_id', 'product_id'])) {
+                        $query->where($key, $value);
+                    }
+                }
+            })
+
+            ->where('is_delete', 0);
     }
+
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
@@ -53,6 +87,18 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
                         $query2->where('name', 'like', '%' . $data["search"] . '%');
                     });
                     unset($data["search"]);
+                }
+
+                $user = auth()->user();
+
+                if ($user->hasRole('outlet')) {
+                    $query->whereHas('product', function ($q) use ($user) {
+                        $q->where('outlet_id', $user->outlet_id);
+                    });
+                } elseif ($user->hasRole('warehouse')) {
+                    $query->whereHas('product', function ($q) use ($user) {
+                        $q->where('warehouse_id', $user->warehouse_id);
+                    });
                 }
 
                 if (isset($data['store_id'])) {
@@ -76,7 +122,7 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
                 }
 
                 foreach ($data as $index => $value) {
-                    if (!in_array($index, ['search', 'sort_by', 'sort_direction', 'store_id'])) {
+                    if (!in_array($index, ['search', 'sort_by', 'sort_direction', 'store_id', 'warehouse_id', 'outlet_id', 'product_id'])) {
                         $query->where($index, $value);
                     }
                 }
