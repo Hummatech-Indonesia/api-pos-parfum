@@ -60,6 +60,7 @@ class ProductRepository extends BaseRepository implements ProductInterface
                             'productStockWarehouse',
                             'productBundlingDetail.productDetail.productStockOutlet',
                             'productBundlingDetail.productDetail.productStockWarehouse',
+                            'unitRelation',
                         ]);
                 }
             ])

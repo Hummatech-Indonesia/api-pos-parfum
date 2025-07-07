@@ -49,6 +49,7 @@ class ProductRequest extends FormRequest
             'description' => 'nullable|string',
             "product_details.*.variant" => "nullable|string",
             "product_details.*.opsi" => "nullable|string",
+            "product_details.*.unit_id" => "nullable|exists:units,id",
         ];
     }
 
@@ -73,6 +74,7 @@ class ProductRequest extends FormRequest
             'description.string' => 'Deskripsi produk harus berupa teks!',
             "product_details.*.variant" => "nullable|string",   
             "product_details.*.opsi" => "nullable|string",      
+            'product_details.*.unit_id.exists' => 'Unit yang dipilih tidak valid.',
             // 'product_details.*.product_varian_id.unique' => 'Varian ini telah ada, silahkan pilih varian tanpa memembuat ulang!',
             // 'product_details.*.category_id.unique' => 'Kategori ini telah ada, silahkan pilih kategori tanpa memembuat ulang!'
         ];

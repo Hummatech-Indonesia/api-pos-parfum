@@ -39,6 +39,7 @@ class ProductDetailRequest extends FormRequest
             "price_discount" => "nullable|numeric|min:0",
             "product_code" => "required|string",
             "product_image" => "nullable|image|mimes:png,jpg,jpeg|max:2048",
+            "unit_id" => "nullable|exists:units,id",
         ];
     }
 
@@ -61,6 +62,8 @@ class ProductDetailRequest extends FormRequest
             'variant_name.required' => 'Nama varian harus diisi!',
             'stock.required' => 'Stok harus diisi!',
             'product_code.required' => 'Kode produk harus diisi!',
+
+            'unit_id.exists' => 'Unit yang dipilih tidak valid.',
         ];
     }
 

@@ -57,6 +57,8 @@ class ProductResource extends JsonResource
                             'id' => $detail->id,
                             'category' => $detail->category?->name,
                             'category_id' => $detail->category?->id,
+                            'unit_id' => $detail->unit_id,
+                            'unit_code' => $detail->unitRelation?->code ?? null,
                             'price' => $detail->price,
                             'variant_name' => $detail->variant_name,
                             'product_code' => $detail->product_code,
