@@ -210,6 +210,12 @@ class UserRepository extends BaseRepository implements UserInterface
             ->when(isset($data['store_id']), function ($q) use ($data) {
                 $q->where('store_id', $data['store_id']);
             })
+            ->when(isset($data['warehouse_id']), function ($q) use ($data) {
+                $q->where('warehouse_id', $data['warehouse_id']);
+            })
+            ->when(isset($data['outlet_id']), function ($q) use ($data) {
+                $q->where('outlet_id', $data['outlet_id']);
+            })
             ->with([
                 'roles',
             ])
