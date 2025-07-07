@@ -61,6 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource("stock-request", StockRequestController::class)->only(['update']);
         Route::get('product-details/stock', [ProductDetailController::class, 'stockProduct']);
         Route::post('warehouses/add/stock', [WarehouseController::class, 'warehouseStock']);
+        Route::get('restock/by-period', [WarehouseController::class, 'restockByPeriod']);
         Route::get('warehouses/history/stock', [WarehouseController::class, 'listWarehouseStock']);
     });
 
