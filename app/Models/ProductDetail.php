@@ -79,4 +79,14 @@ class ProductDetail extends Model
         return $this->hasMany(AuditDetail::class, 'product_detail_id');
     }
 
+    /**
+     * Get the user that owns the ProductDetail
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function unitRelation(): BelongsTo
+    {
+        return $this->belongsTo(Unit::class, 'unit_id', 'id');
+    }
+
 }

@@ -16,6 +16,7 @@ use App\Contracts\Interfaces\Master\ProductStockInterface;
 use App\Contracts\Interfaces\Master\ProductDetailInterface;
 use App\Contracts\Interfaces\Master\WarehouseStockInterface;
 use App\Helpers\PaginationHelper;
+use App\Http\Resources\RestockWarehouseCollection;
 use App\Http\Resources\RestockWarehouseResource;
 
 class WarehouseController extends Controller
@@ -242,7 +243,7 @@ class WarehouseController extends Controller
 
         try {
             $result = $this->warehouseStock->customPaginate($per_page, $page, $payload);
-            $resource = RestockWarehouseResource::collection($result);
+            $resource = new RestockWarehouseCollection($result);
             $meta = PaginationHelper::meta($result);
 
             return BaseResponse::Paginate(
@@ -294,6 +295,22 @@ class WarehouseController extends Controller
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error('Gagal menambah stock', $th->getMessage());
+        }
+    }
+
+    public function restockByPeriod(Request $request)
+    {
+        try {
+            $date = $request->query('date'); 
+
+            $data = $this->warehouseStock->getAll($date);
+
+            return BaseResponse::Ok(
+                'Berhasil menampilkan restock',
+                new RestockWarehouseCollection($data)
+            );
+        } catch (\Throwable $th) {
+            return BaseResponse::Error('Gagal menampilkan data restock', $th->getMessage());
         }
     }
 }

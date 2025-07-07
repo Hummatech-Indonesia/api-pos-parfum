@@ -11,17 +11,24 @@ class ProductResource extends JsonResource
 {
     public function toArray($request)
     {
+        $isBundling = $this->relationLoaded('productBundling')
+            ? $this->productBundling !== null
+            : $this->productBundling()->exists();
         return [
-            'id' => $this->id,
+            'id' => $isBundling
+                ? $this->productBundling?->id
+                : $this->id,
             'name' => $this->name,
             'image' => $this->image,
             'details_sum_stock' => $this->details_sum_stock,
             'category' => $this->category?->name,
             'created_by' => $this->getCreatedBy(),
             'description' => $this->description,
-            'is_bundling' => $this->relationLoaded('productBundling')
-                ? $this->productBundling !== null
-                : $this->productBundling()->exists(),
+            'is_bundling' => $isBundling,
+            'bundling_price' => $this->when(
+                $isBundling,
+                fn() => $this->productBundling?->price
+            ),
             'bundling_detail' => $this->when(
                 $this->relationLoaded('productBundling') && $this->productBundling,
                 function () {
@@ -57,9 +64,12 @@ class ProductResource extends JsonResource
                             'id' => $detail->id,
                             'category' => $detail->category?->name,
                             'category_id' => $detail->category?->id,
+                            'unit_id' => $detail->unit_id,
+                            'unit_code' => $detail->unitRelation?->code ?? null,
                             'price' => $detail->price,
                             'variant_name' => $detail->variant_name,
                             'product_code' => $detail->product_code,
+                            'density' => $detail->density,
                             'product_image' => $detail->image,
                             'transaction_details_count' => $detail->transaction_details_count ?? 0,
                             'stock' => $user->hasRole('outlet')

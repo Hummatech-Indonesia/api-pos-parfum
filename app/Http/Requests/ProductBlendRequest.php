@@ -27,13 +27,14 @@ class ProductBlendRequest extends FormRequest
         return [
             'product_blend' => 'required|array',
             'product_blend.*.product_detail_id' => 'required|exists:product_details,id',
-            'product_blend.*.unit_id' => 'required|exists:units,id',
+            'product_blend.*.unit_id' => 'nullable|exists:units,id',
             'product_blend.*.result_stock' => 'required|numeric|min:1',
             'product_blend.*.description' => 'nullable|string|max:255',
 
             'product_blend.*.product_blend_details' => 'required|array|min:1',
             'product_blend.*.product_blend_details.*.product_detail_id' => 'required|exists:product_details,id',
             'product_blend.*.product_blend_details.*.used_stock' => 'required|numeric|min:1',
+            'product_blend.*.product_blend_details.*.unit_id' => 'nullable|exists:units,id',
         ];
     }
 
@@ -45,9 +46,8 @@ class ProductBlendRequest extends FormRequest
 
             'product_blend.*.product_detail_id.required' => 'Produk detail wajib dipilih.',
             'product_blend.*.product_detail_id.exists' => 'Produk detail yang dipilih tidak valid.',
-            'product_blend.*.unit_id.required' => 'Unit wajib dipilih.',
-            'product_blend.*.unit_id.exists' => 'Unit yang dipilih tidak valid.',
             'product_blend.*.description' => 'Deskripsi wajib diisi',
+            'product_blend.*.unit_id.exists' => 'Unit yang dipilih tidak valid.',
 
             'product_blend.*.result_stock.required' => 'Stok hasil wajib diisi.',
             'product_blend.*.result_stock.numeric' => 'Stok hasil harus berupa angka.',
@@ -61,6 +61,8 @@ class ProductBlendRequest extends FormRequest
             'product_blend.*.product_blend_details.*.used_stock.required' => 'Jumlah stok bahan wajib diisi.',
             'product_blend.*.product_blend_details.*.used_stock.numeric' => 'Jumlah stok bahan harus berupa angka.',
             'product_blend.*.product_blend_details.*.used_stock.min' => 'Jumlah stok bahan minimal 1.',
+
+            'product_blend.*.product_blend_details.*.unit_id.exists' => 'Unit yang dipilih tidak valid.',
         ];
     }
 

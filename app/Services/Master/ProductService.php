@@ -71,4 +71,15 @@ class ProductService
             throw new Error($th->getMessage(), 400);
         }
     }
+    public function injectDensityToDetails(array $data): array
+    {
+        if (isset($data['density']) && isset($data['product_details'])) {
+            $data['product_details'] = collect($data['product_details'])->map(function ($detail) use ($data) {
+                $detail['density'] = $data['density'];
+                return $detail;
+            })->toArray();
+        }
+
+        return $data;
+    }
 }

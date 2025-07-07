@@ -17,19 +17,43 @@ class StockRequestResource extends JsonResource
             'variant_chose' => $this->detailRequestStock->count(),
             'requested_stock_count' => $this->detailRequestStock->sum('requested_stock'),
             'requested_at' => $this->created_at,
+            'note' => $this->note,
             'requested_stock' => $this->detailRequestStock->map(function ($detail) {
                 return [
                     'product_name' => optional($detail->detailProduct->product)->name,
                     'variant_name' => optional($detail->detailProduct)->variant_name,
                     'requested_stock' => $detail->requested_stock,
-                    'unit_id' => $detail->unitRelation->id,
-                    'unit_code' => $detail->unitRelation->code
+                    'unit_id' => $detail->unitRelation?->id,
+                    'unit_code' => $detail->unitRelation?->code
                 ];
             }),
             'warehouse' => [
                 'id' => optional($this->warehouse)->id,
                 'name' => optional($this->warehouse)->name,
                 'image' => optional($this->warehouse)->image,
+                'address' => optional($this->warehouse)->address,
+
+                'products' => $this->detailRequestStock->map(function ($detail) {
+                    $product = optional($detail->detailProduct->product);
+                    $variant = optional($detail->detailProduct);
+
+                    $requestedStock = $detail->requested_stock;
+                    $unitCode = optional($detail->unitRelation)->code;
+                    $price = $detail->price ?? 0;
+
+                    $stock = optional($variant->productStockWarehouse)->stock ?? 0;
+
+                    return [
+                        'product_name' => $product->name,
+                        'product_description' => $product->description,
+                        'variant_name' => $variant->variant_name,
+                        'variant_code' => $variant->product_code,
+                        'unit_code' => $unitCode,
+                        'requested_stock' => $requestedStock,
+                        'available_stock' => $stock,
+                        'total_price' => $requestedStock * $price,
+                    ];
+                })->values(),
             ],
         ];
     }

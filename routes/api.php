@@ -61,6 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource("stock-request", StockRequestController::class)->only(['update']);
         Route::get('product-details/stock', [ProductDetailController::class, 'stockProduct']);
         Route::post('warehouses/add/stock', [WarehouseController::class, 'warehouseStock']);
+        Route::get('restock/by-period', [WarehouseController::class, 'restockByPeriod']);
         Route::get('warehouses/history/stock', [WarehouseController::class, 'listWarehouseStock']);
     });
 
@@ -114,6 +115,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('roles/{id}/restore', [RoleController::class, 'restore']);
         Route::delete('roles/{role}/users/{user}', [RoleController::class, 'detachUser']);
         Route::resource("stock-request", StockRequestController::class)->only(['index', 'show']);
+        Route::get('/stock-requests/by-warehouse', [StockRequestController::class, 'listByWarehouse']);
     });
 
     // API FOR ROLE OUTLET & OWNER

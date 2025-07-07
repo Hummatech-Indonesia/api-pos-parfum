@@ -46,7 +46,7 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
         return $this->model->query()
             ->withCount('transactionDetails')
             ->withCount('product')
-            ->with('product.productBundling.details', 'category', 'productStockOutlet', 'productStockWarehouse', 'product')
+            ->with('product.productBundling.details', 'category', 'productStockOutlet', 'productStockWarehouse', 'product', 'unitRelation')
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (isset($data["search"])) {
                     $query->where(function ($query2) use ($data) {

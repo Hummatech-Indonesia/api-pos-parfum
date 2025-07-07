@@ -18,6 +18,8 @@ class ProductBlendDetailResource extends JsonResource
             'product_detail_id' => $this->product_detail_id,
             'product_name' => $this->productDetail?->product?->name ?? null,
             'variant_name' => $this->productDetail?->variant_name ?? null,
+            'unit_id' => $this->unit_id,
+            'unit_code' => $this->unit?->code ?? null,
             'quantity' => $this->used_stock,
             'stock' => $this->productStock?->stock ?? 0,
         ];
