@@ -84,7 +84,8 @@ class DiscountVoucherController extends Controller
         $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
         $validator["store_id"] = $store_id;
 
-
+        if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
+        if (auth()->user()->hasRole('outlet')) $payload["outlet_id"] = auth()->user()->outlet_id;
 
         DB::beginTransaction();
         try {
