@@ -294,6 +294,10 @@ class ProductController extends Controller
                 $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             }
 
+            if (auth()?->user()?->outlet_id) {
+                $payload['outlet_id'] = auth()?->user()?->outlet_id;
+            }
+
             $products = $this->product->customQuery($payload)->get();
 
             return BaseResponse::Ok("Berhasil mengambil data product", $products);
