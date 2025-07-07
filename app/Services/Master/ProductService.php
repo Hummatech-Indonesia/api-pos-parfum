@@ -34,6 +34,8 @@ class ProductService
                 "qr_code" => $data["qr_code"],
                 "category_id" => $data["category_id"],
                 "description" => $data["description"] ?? null,
+                "warehouse_id" => $data["warehouse_id"] ?? null,
+                "outlet_id" => $data["outlet_id"] ?? null,
 
             ];
             return $result;
@@ -65,6 +67,8 @@ class ProductService
                 "qr_code" => $data["qr_code"],
                 "category_id" => $data["category_id"],
                 "description" => $data["description"] ?? null,
+                "warehouse_id" => $data["warehouse_id"] ?? null,
+                "outlet_id" => $data["outlet_id"] ?? null,
             ];
         } catch (\Throwable $th) {
             Log::error($th->getMessage());
