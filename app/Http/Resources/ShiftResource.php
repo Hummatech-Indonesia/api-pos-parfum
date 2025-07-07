@@ -16,6 +16,7 @@ class ShiftResource extends JsonResource
     {
         return [
             'user' => $this->user?->name,
+            'user_image' => $this->user?->image,
             'time' => $this->time,
             'date' => $this->date,
             'start_price' => $this->start_price,
