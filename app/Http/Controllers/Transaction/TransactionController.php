@@ -53,7 +53,10 @@ class TransactionController extends Controller
             if(auth()?->user()?->outlet?->id || auth()?->user()?->outlet_id) $payload['outlet_id'] = auth()?->user()?->outlet?->id ?? auth()?->user()?->outlet_id;
             if(auth()?->user()?->warehouse?->id || auth()?->user()?->warehouse_id) $payload['warehouse_id'] = auth()?->user()?->warehouse?->id ?? auth()?->user()?->warehouse_id;  
 
-            $transaction = $this->transaction->customPaginate($request->per_page, $request->page, $payload)->toArray();
+            $perPage = (int) ($request->per_page ?? 10);
+            $page = (int) ($request->page ?? 1);
+
+            $transaction = $this->transaction->customPaginate($perPage, $page, $payload)->toArray();
 
             $result = $transaction["data"];
             unset($transaction["data"]);
