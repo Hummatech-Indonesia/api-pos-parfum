@@ -71,14 +71,18 @@ class ProductBundlingController extends Controller
             $validated = $request->validated();
 
             // Simpan ke tabel products
-            $productData = $this->service->mapProductData($validated);
+            $imagePath = null;
+            if ($request->hasFile('image')) {
+                $imagePath = $request->file('image')->store('products', 'public');
+            }
+            $productData = $this->service->mapProductData($validated, $imagePath);
             $product = $this->productRepo->store($productData);
 
             // Simpan ke product_details (tanpa stok)
             $productDetail = $this->productDetailRepo->store([
                 'id' => uuid_create(),
                 'product_id' => $product->id,
-                'product_code' => $validated['kode_Blend'],
+                'product_code' => $validated['kode_Blend'] ?? $this->service->generateBundlingCode($validated['name']),
                 'stock' => 0, // stok tidak diatur
                 'unit' => 'pcs',
                 'price' => $validated['harga'],

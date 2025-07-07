@@ -23,7 +23,7 @@ class ProductBundlingRequest extends FormRequest
             'kode_Blend' => 'nullable|string|max:100',
             'deskripsi' => 'nullable|string|max:1000',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
 
             'details' => 'required|array|min:1',
             'details.*.product_bundling_material' => 'required|array|min:1',
