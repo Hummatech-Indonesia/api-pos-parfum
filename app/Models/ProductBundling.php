@@ -20,7 +20,9 @@ class ProductBundling extends Model
         'stock',
         'price',
         'bundling_code',
-        'user_id'
+        'user_id',
+        'warehouse_id',
+        'outlet_id'
     ];
 
     public $incrementing = false;

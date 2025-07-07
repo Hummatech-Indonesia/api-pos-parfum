@@ -56,8 +56,14 @@ class ProductBundlingRepository extends BaseRepository implements ProductBundlin
     {
         return $this->model->query()
             ->with(['product', 'category', 'details.unitRelation'])
-            ->when(auth()->check() && auth()->user()->hasRole(['outlet', 'warehouse']), function ($query) {
-                $query->where('user_id', auth()->id());
+            ->when(auth()->check(), function ($query) {
+                $user = auth()->user();
+
+                if ($user->hasRole('outlet')) {
+                    $query->where('outlet_id', $user->outlet_id);
+                } elseif ($user->hasRole('warehouse')) {
+                    $query->where('warehouse_id', $user->warehouse_id);
+                }
             })
             ->when(!empty($data), function ($query) use ($data) {
                 if (!empty($data['search'])) {
