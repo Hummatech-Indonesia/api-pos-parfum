@@ -85,9 +85,9 @@ class TransactionController extends Controller
         DB::beginTransaction();
         try {
 
+            if(auth()->user()?->outlet_id) $data['outlet_id'] = auth()->user()->outlet_id;
+            else if(auth()->user()?->warehouse_id) $data['warehouse_id'] = auth()->user()->warehouse_id;
             $transaction = $this->transaction->store($this->transactionService->store($data));
-            if(auth()->user()?->warehouse_id) $transaction['warehouse_id'] = auth()->user()->warehouse_id;
-            if(auth()->user()?->outlet_id) $transaction['outlet_id'] = auth()->user()->outlet_id;
 
             // use discount
             foreach($data["discounts"] as $item => $value) {
@@ -203,9 +203,9 @@ class TransactionController extends Controller
         try {
 
             foreach($data['transaction'] as $trans) {
+                if(auth()->user()?->outlet_id) $trans['outlet_id'] = auth()->user()->outlet_id;
+                else if(auth()->user()?->warehouse_id) $trans['warehouse_id'] = auth()->user()->warehouse_id;
                 $transaction = $this->transaction->store($this->transactionService->store($trans));
-                if(auth()->user()?->warehouse_id) $transaction['warehouse_id'] = auth()->user()->warehouse_id;
-                if(auth()->user()?->outlet_id) $transaction['outlet_id'] = auth()->user()->outlet_id;
     
                 // use discount
                 foreach($trans["discounts"] as $item => $value) {
