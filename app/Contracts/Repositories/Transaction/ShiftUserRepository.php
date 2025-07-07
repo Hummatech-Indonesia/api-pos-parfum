@@ -27,30 +27,39 @@ class ShiftUserRepository extends BaseRepository implements ShiftUserInterface
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
-        ->when(count($data) > 0, function ($query) use ($data){
-            foreach ($data as $index => $value){
-                $query->where($index, $value);
-            }
-        });
+            ->when(count($data) > 0, function ($query) use ($data) {
+                foreach ($data as $index => $value) {
+                    $query->where($index, $value);
+                }
+            });
     }
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-        ->with('store')
-        ->when(count($data) > 0, function ($query) use ($data){
-            if(isset($data["search"])){
-                $query->where(function ($query2) use ($data) {
-                    $query2->where('name', 'like', '%' . $data["search"] . '%');
-                });
-                unset($data["search"]);
-            }
+            ->with('store')
+            ->when(count($data) > 0, function ($query) use ($data) {
+                if (isset($data["search"])) {
+                    $query->where(function ($query2) use ($data) {
+                        $query2->where('name', 'like', '%' . $data["search"] . '%');
+                    });
+                    unset($data["search"]);
+                }
 
-            foreach ($data as $index => $value){
-                $query->where($index, $value);
-            }
-        })
-        ->paginate($pagination, ['*'], 'page', $page);
+                if (!empty($data["from_date"])) {
+                    $query->where('date', '>=', $data["from_date"]);
+                }
+
+                if (!empty($data["until_date"])) {
+                    $query->where('date', '<=', $data["until_date"]);
+                }
+                foreach ($data as $index => $value) {
+                    if (in_array($index, ['from_date', 'until_date'])) continue;
+                    $query->where($index, $value);
+                }
+            })
+            ->orderBy('updated_at', 'desc')
+            ->paginate($pagination, ['*'], 'page', $page);
         // ->appends(['search' => $request->search, 'year' => $request->year]);
     }
 
