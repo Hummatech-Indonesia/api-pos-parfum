@@ -24,6 +24,7 @@ class ProductResource extends JsonResource
             'category' => $this->category?->name,
             'created_by' => $this->getCreatedBy(),
             'description' => $this->description,
+            'sum_purchase' => $this->details?->sum('transaction_details_count'),
             'is_bundling' => $isBundling,
             'bundling_price' => $this->when(
                 $isBundling,

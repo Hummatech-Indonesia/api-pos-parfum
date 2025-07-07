@@ -2,17 +2,29 @@
 
 namespace App\Services\Master;
 
+use App\Traits\UploadTrait;
+
 class ProductBundlingService
 {
+    use UploadTrait;
 
     public function mapProductData(array $data): array
     {
+        $image = null;
+
+        try {
+            if(isset($data["image"])) {
+                $image = $this->upload("products", $data["image"]);
+            }
+        } catch (\Throwable $th) {
+
+        }
         return [
             'id' => uuid_create(),
             'store_id' => $data['store_id'] ?? auth()->user()->store_id,
             'name' => $data['name'],
             'unit_type' => 'unit',
-            'image' => $data['image'] ?? 'default/Default.jpeg',
+            'image' => $image ?? 'default/Default.jpeg',
             // 'qr_code' => $data['kode_Blend'] ?? null,
             'description' => $data['deskripsi'] ?? null,
             'is_delete' => 0,
@@ -23,14 +35,17 @@ class ProductBundlingService
 
     public function mapBundlingData(array $data, string $productId, int $categoryId): array
     {
+        $name = $data['name'];
+        $generatedCode = $this->generateBundlingCode($name);
+
         return [
             'id' => $data['id'] ?? uuid_create(),
             'product_id' => $productId,
-            'name' => $data['name'],
+            'name' => $name,
             'category_id' => $categoryId,
-            'stock' => null, // JANGAN ambil dari $data['quantity']
+            'stock' => null,
             'price' => $data['harga'] ?? 0,
-            'bundling_code' => $data['kode_Blend'] ?? null,
+            'bundling_code' => $data['kode_Blend'] ?? $generatedCode,
             'user_id' => auth()->user()?->id
         ];
     }
@@ -54,4 +69,17 @@ class ProductBundlingService
     {
         return $details;
     }
+
+    public function generateBundlingCode(string $name): string
+    {
+        $words = explode(' ', strtoupper($name));
+        $initials = '';
+
+        foreach ($words as $word) {
+            $initials .= substr($word, 0, 1);
+        }
+
+        return 'BNDL-' . $initials;
+    }
+
 }

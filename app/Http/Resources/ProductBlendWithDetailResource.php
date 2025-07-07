@@ -20,7 +20,7 @@ class ProductBlendWithDetailResource extends JsonResource
             'unit_id' => $this->unit_id,
             'unit_code' => $this->unit?->code ?? null,
             'product_image' => $this->productDetail?->product_image ?? null,
-            'product_name' => $this->productDetail?->product?->name ?? null,
+            'product_name' => $this->productDetail?->productAll?->name ?? null,
             'variant_blending' => $this->productDetail?->variant_name ?? null,
             'Quantity' => $this->result_stock,
             'description' => $this->description,

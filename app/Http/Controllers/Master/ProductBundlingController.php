@@ -78,7 +78,7 @@ class ProductBundlingController extends Controller
             $productDetail = $this->productDetailRepo->store([
                 'id' => uuid_create(),
                 'product_id' => $product->id,
-                'product_code' => $validated['kode_Blend'],
+                'product_code' => $validated['kode_Blend'] ?? $this->service->generateBundlingCode($validated['name']),
                 'stock' => 0, // stok tidak diatur
                 'unit' => 'pcs',
                 'price' => $validated['harga'],
