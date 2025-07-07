@@ -19,7 +19,7 @@ class ProductBundlingRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'harga' => 'required|numeric|min:0',
+            'harga' => 'nullable|numeric|min:0',
             'kode_Blend' => 'nullable|string|max:100',
             'deskripsi' => 'nullable|string|max:1000',
             'category_id' => 'required|exists:categories,id',
@@ -42,7 +42,6 @@ class ProductBundlingRequest extends FormRequest
         return [
             'name.required' => 'Nama bundling harus diisi.',
 
-            'harga.required' => 'Harga bundling harus diisi.',
             'harga.numeric' => 'Harga harus berupa angka.',
             'harga.min' => 'Harga tidak boleh negatif.',
 
