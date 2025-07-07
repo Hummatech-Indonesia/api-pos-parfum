@@ -56,6 +56,8 @@ class RestockWarehouseCollection extends ResourceCollection
                         'store_location' => $firstItem->store_location,
                     ];
                 }
+                
+                return $data;
             })->values()->toArray();
     }
 }
