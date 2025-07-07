@@ -16,6 +16,7 @@ use App\Contracts\Interfaces\Master\ProductStockInterface;
 use App\Contracts\Interfaces\Master\ProductDetailInterface;
 use App\Contracts\Interfaces\Master\WarehouseStockInterface;
 use App\Helpers\PaginationHelper;
+use App\Http\Resources\RestockWarehouseCollection;
 use App\Http\Resources\RestockWarehouseResource;
 
 class WarehouseController extends Controller
@@ -242,7 +243,7 @@ class WarehouseController extends Controller
 
         try {
             $result = $this->warehouseStock->customPaginate($per_page, $page, $payload);
-            $resource = RestockWarehouseResource::collection($result);
+            $resource = new RestockWarehouseCollection($result);
             $meta = PaginationHelper::meta($result);
 
             return BaseResponse::Paginate(
