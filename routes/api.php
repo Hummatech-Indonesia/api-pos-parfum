@@ -110,7 +110,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource("discount-vouchers", DiscountVoucherController::class)->only(['store', 'destroy', 'update']);
     });
 
-    Route::middleware(['auth:sanctum', 'role:admin|warehouse'])->group(function () {
+    Route::middleware(['auth:sanctum', 'role:admin|warehouse|outlet'])->group(function () {
         Route::apiResource('roles', RoleController::class);
         Route::post('roles/{id}/restore', [RoleController::class, 'restore']);
         Route::delete('roles/{role}/users/{user}', [RoleController::class, 'detachUser']);
