@@ -26,6 +26,7 @@ class ShiftUserRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'time' => 'nullable|string',
             'outlet_id' => 'required|exists:outlets,id',
             'start_price' => 'sometimes|min:0',
             'end_price' => 'required|min:1',

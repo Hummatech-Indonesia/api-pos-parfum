@@ -28,6 +28,7 @@ class ShiftUserSyncRequest extends FormRequest
         return [
             'shift' => 'required|array',
             'shift.*.outlet_id' => 'required|exists:outlets,id',
+            'shift.*.time' => 'nullable|string',
             'shift.*.user_id' => 'required|exists:users,id',
             'shift.*.start_price' => 'sometimes|min:0',
             'shift.*.end_price' => 'required|min:1',
@@ -57,8 +58,5 @@ class ShiftUserSyncRequest extends FormRequest
         throw new HttpResponseException(BaseResponse::Error("Kesalahan dalam validasi", $validator->errors()));
     }
 
-    public function prepareForValidation()
-    {
-
-    }
+    public function prepareForValidation() {}
 }
