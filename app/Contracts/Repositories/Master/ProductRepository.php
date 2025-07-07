@@ -47,6 +47,7 @@ class ProductRepository extends BaseRepository implements ProductInterface
     {
         $query = $this->model->query()
             ->with([
+                'productBundling.details',
                 'productBundling',
                 'store',
                 'user',
