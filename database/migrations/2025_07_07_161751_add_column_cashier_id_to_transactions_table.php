@@ -13,7 +13,7 @@ return new class extends Migration
     {
         if (!Schema::hasColumn('transactions', 'cashier_id')) {
             Schema::table('transactions', function (Blueprint $table) {
-                $table->foreignUuid('cashier_id')->nullable()->constrained();
+                $table->foreignUuid('cashier_id')->nullable()->constrained('users');
             });
         }
     }
