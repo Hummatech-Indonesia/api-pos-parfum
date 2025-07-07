@@ -297,4 +297,20 @@ class WarehouseController extends Controller
             return BaseResponse::Error('Gagal menambah stock', $th->getMessage());
         }
     }
+
+    public function restockByPeriod(Request $request)
+    {
+        try {
+            $date = $request->query('date'); 
+
+            $data = $this->warehouseStock->getAll($date);
+
+            return BaseResponse::Ok(
+                'Berhasil menampilkan restock',
+                new RestockWarehouseCollection($data)
+            );
+        } catch (\Throwable $th) {
+            return BaseResponse::Error('Gagal menampilkan data restock', $th->getMessage());
+        }
+    }
 }
