@@ -49,7 +49,9 @@ class TransactionController extends Controller
         try{
             $payload = [];
 
-            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+            if(auth()?->user()?->outlet?->id || auth()?->user()?->outlet_id) $payload['outlet_id'] = auth()?->user()?->outlet?->id ?? auth()?->user()?->outlet_id;
+            if(auth()?->user()?->warehouse?->id || auth()?->user()?->warehouse_id) $payload['warehouse_id'] = auth()?->user()?->warehouse?->id ?? auth()?->user()?->warehouse_id;  
 
             $transaction = $this->transaction->customPaginate($request->per_page, $request->page, $payload)->toArray();
 
@@ -81,6 +83,8 @@ class TransactionController extends Controller
         try {
 
             $transaction = $this->transaction->store($this->transactionService->store($data));
+            if(auth()->user()?->warehouse_id) $transaction['warehouse_id'] = auth()->user()->warehouse_id;
+            if(auth()->user()?->outlet_id) $transaction['outlet_id'] = auth()->user()->outlet_id;
 
             // use discount
             foreach($data["discounts"] as $item => $value) {
@@ -197,6 +201,8 @@ class TransactionController extends Controller
 
             foreach($data['transaction'] as $trans) {
                 $transaction = $this->transaction->store($this->transactionService->store($trans));
+                if(auth()->user()?->warehouse_id) $transaction['warehouse_id'] = auth()->user()->warehouse_id;
+                if(auth()->user()?->outlet_id) $transaction['outlet_id'] = auth()->user()->outlet_id;
     
                 // use discount
                 foreach($trans["discounts"] as $item => $value) {
