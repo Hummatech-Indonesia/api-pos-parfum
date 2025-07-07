@@ -106,8 +106,8 @@ class ProductController extends Controller
 
         DB::beginTransaction();
         try {
-            if (auth()->user()->hasRole('warehouse')) $data["warehouse_id"] = auth()->user()->warehouse_id;
             if (auth()->user()->hasRole('outlet')) $data["outlet_id"] = auth()->user()->outlet_id;
+            else if (auth()->user()->hasRole('warehouse')) $data["warehouse_id"] = auth()->user()->warehouse_id;
             $data = $this->productService->injectDensityToDetails($data);
 
 
