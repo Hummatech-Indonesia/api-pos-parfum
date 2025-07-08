@@ -94,6 +94,10 @@ class AuditRepository extends BaseRepository implements AuditInterface
                     $query->where('status', $data['status']);
                 }
 
+                if (isset($data['outlet_id'])) {
+                    $query->where('outlet_id', $data['outlet_id']);
+                }
+
                 if (!empty($data["from_date"])) {
                     $query->where('date', '>=', $data["from_date"]);
                 }

@@ -35,6 +35,7 @@ class AuditController extends Controller
         $payload['user_id'] = auth()?->user()?->id;
 
         if ($request->search) $payload["search"] = $request->search;
+        if ($request->outlet_id) $payload["outlet_id"] = $request->outlet_id;
 
         if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
             $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
