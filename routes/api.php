@@ -124,7 +124,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource("stock-request", StockRequestController::class)->only(['store', 'destroy']);
     });
 
-    Route::middleware('role:outlet|admin|warehouse|auditor')->group(function () {
+    Route::middleware('role:outlet|admin|warehouse|auditor|owner')->group(function () {
         Route::post('audit/{id}/restore', [AuditController::class, 'restore']);
         Route::get("audit/no-paginate", [AuditController::class, 'list']);
         Route::get("audit/alltrashed", [AuditController::class, 'trashed']);
