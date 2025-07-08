@@ -14,6 +14,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Transaction\TransactionRequest;
 use App\Http\Requests\Transaction\TransactionSyncRequest;
 use App\Http\Resources\TransactionResource;
+use App\Http\Resources\TransactionDetailResource;
 use App\Services\Transaction\TransactionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -165,8 +166,49 @@ class TransactionController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $transaction = $this->transaction->show($id);
+
+            if (!$transaction) {
+                return BaseResponse::NotFound("Transaksi tidak ditemukan", null);
+            }
+
+            $details = $this->transactionDetail->customQuery([
+                'transaction_id' => $id
+            ])->with(['product.product', 'product.unit'])->get();
+
+            $vouchers = $this->voucherUsed->customQuery([
+                'store_id' => $transaction->store_id,
+            ])->where('description', 'like', "%{$transaction->created_at->format('d-m-Y')}%")->get();
+
+            // Total harga barang sebelum diskon
+            $totalHargaBarang = $details->sum(function ($item) {
+                return $item->price * $item->quantity;
+            });
+
+            // Total diskon dari voucher
+            $totalDiskon = $vouchers->sum('discount_value'); // pastikan ada kolom ini
+
+            // Pajak dari transaksi
+            $pajak = $transaction->amount_tax;
+
+            return BaseResponse::Ok("Berhasil mengambil detail transaksi", [
+                'transaction_code' => $transaction->transaction_code,
+                'created_at' => $transaction->created_at->format('d F Y, H:i'),
+                'kasir_name' => $transaction->cashier?->name ?? '-',
+                'buyer_name' => $transaction->user_name,
+                'payment_method' => $transaction->payment_method,
+                'total_price' => $transaction->total_price,
+                'total_tax' => $pajak,
+                'total_discount' => $totalDiskon,
+                'total_barang' => $totalHargaBarang,
+                'details' => TransactionDetailResource::collection($details),
+            ]);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
     }
+
 
     /**
      * Show the form for editing the specified resource.
