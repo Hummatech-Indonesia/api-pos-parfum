@@ -195,8 +195,9 @@ class TransactionController extends Controller
             return BaseResponse::Ok("Berhasil mengambil detail transaksi", [
                 'transaction_code' => $transaction->transaction_code,
                 'created_at' => $transaction->created_at->format('d F Y, H:i'),
-                'kasir_name' => $transaction->cashier?->name ?? '-',
-                'buyer_name' => $transaction->user_name,
+                'kasir_name' => $transaction->cashier?->name ?? 'Kasir',
+                'buyer_name' => $transaction->user?->name ?? $transaction->user_name,
+                'is_member' => $transaction->user_id ? true : false,
                 'payment_method' => $transaction->payment_method,
                 'total_price' => $transaction->total_price,
                 'total_tax' => $pajak,

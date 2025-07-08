@@ -18,6 +18,7 @@ class TransactionResource extends JsonResource
             'id' => $this->id,
             'cashier_name' => $this->user?->name,
             'buyer_name' => $this->user_id ? $this->user?->name : $this->user_name,
+            'is_member' => $this->user_id ? true : false,
             'quantity' => $this->quantity,
             'amount_price' => $this->amount_price,
             'payment_time' => $this->payment_time,
