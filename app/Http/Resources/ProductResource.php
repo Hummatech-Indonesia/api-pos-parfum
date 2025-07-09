@@ -59,16 +59,18 @@ class ProductResource extends JsonResource
             ),
 
             'product_detail' => $this->when(
+
                 !$this->relationLoaded('productBundling') || is_null($this->productBundling),
                 function () {
                     return $this->details->map(function ($detail) {
                         $user = auth()->user();
+
                         return [
                             'id' => $detail->id,
                             'category' => $detail->category?->name,
                             'category_id' => $detail->category?->id,
                             'unit_id' => $detail->unit_id,
-                            'unit_code' => $detail->unitRelation?->code ?? null,
+                            'unit_code' => optional($detail->unitRelasi)->code,
                             'price' => $detail->price,
                             'variant_name' => $detail->variant_name,
                             'product_code' => $detail->product_code,

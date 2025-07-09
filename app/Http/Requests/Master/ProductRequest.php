@@ -39,7 +39,7 @@ class ProductRequest extends FormRequest
             "product_details.*.category_id" => "required|exists:categories,id",
             "product_details.*.material" => "nullable|string",
             "product_details.*.unit" => "nullable|string",
-            "product_details.*.stock" => "required|numeric|min:0",
+            "product_details.*.stock" => "nullable|numeric|min:0",
             "product_details.*.capacity" => "nullable|numeric|min:0",
             "product_details.*.weight" => "nullable|numeric|min:0",
             "product_details.*.density" => "nullable|numeric|min:0",

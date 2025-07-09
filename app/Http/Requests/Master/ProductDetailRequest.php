@@ -35,7 +35,7 @@ class ProductDetailRequest extends FormRequest
             "weight" => "nullable|numeric|min:0",
             "density" => "nullable|numeric|min:0",
             "price" => "required|numeric|min:0",
-            "stock" => "required|numeric|min:0",
+            "stock" => "nullable|numeric|min:0",
             "price_discount" => "nullable|numeric|min:0",
             "product_code" => "required|string",
             "product_image" => "nullable|image|mimes:png,jpg,jpeg|max:2048",
