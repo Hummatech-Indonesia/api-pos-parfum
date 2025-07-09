@@ -58,6 +58,9 @@ class DiscountVoucherRequest extends FormRequest
 
             'nominal.required_if' => 'Field nominal wajib diisi jika tipe diskon adalah nominal.',
             'nominal.prohibited_if' => 'Field nominal tidak boleh diisi jika tipe diskon adalah percentage.',
+
+            'start_date.date' => 'tanggal mulai harus merupakan tanggal yang valid',
+            'end_date.date' => 'tanggal selesai harus merupakan tanggal yang valid',
         ];
     }
 
