@@ -29,11 +29,6 @@ class ProductImportService
 
     public function mapProductDetail(array $row, string $productId): array
     {
-        $unit = Unit::where('code', $row['unit'] ?? null)->first();
-
-        if (!$unit) {
-            throw new \Exception("Unit dengan kode '{$row['unit']}' tidak ditemukan.");
-        }
         return [
             'product_id' => $productId,
             'material' => $row['material'] ?? null,
