@@ -61,7 +61,7 @@ class ProductRepository extends BaseRepository implements ProductInterface
                             'productStockWarehouse',
                             'productBundlingDetail.productDetail.productStockOutlet',
                             'productBundlingDetail.productDetail.productStockWarehouse',
-                            'unitRelation',
+                            'unitRelasi'
                         ]);
                 }
             ])
@@ -247,7 +247,7 @@ class ProductRepository extends BaseRepository implements ProductInterface
             ->with(['details' => function ($q) {
                 $q->where('is_delete', 0)
                     ->withCount('transactionDetails')
-                    ->with(['category'])
+                    ->with(['category', 'unitRelasi'])
                     ->withSum('productStockOutlet', 'stock')
                     ->withSum('productStockWarehouse', 'stock');
             }])
