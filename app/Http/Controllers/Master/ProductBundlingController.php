@@ -98,7 +98,7 @@ class ProductBundlingController extends Controller
             $bundling = $this->repository->store($bundlingData);
 
             // Mapping & simpan ke product_bundling_details
-            $details = collect($validated['details'][0]['product_bundling_material'])
+            $details = collect($validated['details'])
                 ->map(function ($item) {
                     $unit = Unit::find($item['unit_id']);
                     if (!$unit) {
