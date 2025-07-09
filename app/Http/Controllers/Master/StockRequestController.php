@@ -107,11 +107,6 @@ class StockRequestController extends Controller
             $productDetails = [];
             foreach ($data['requested_stock'] as $item) {
                 $productDetailId = $item['variant_id'];
-                $check = $this->productDetail->show($productDetailId);
-
-                if (!$check) {
-                    return BaseResponse::Notfound("Product detail dengan ID {$productDetailId} tidak ditemukan!");
-                }
 
                 $unitName = null;
                 if (!empty($item['unit_id'])) {
@@ -127,7 +122,7 @@ class StockRequestController extends Controller
                     'requested_stock' => $item['requested_stock'],
                     'unit_id' => $item['unit_id'] ?? null,
                     'unit' => $unitName,
-                    'price' => $item['requested_stock'] * $check->price
+                    'price' => $item['price'] ?? null
                 ];
             }
 
@@ -197,7 +192,7 @@ class StockRequestController extends Controller
                 'store' => [],
             ];
 
-            if($stockRequest->store_name) {
+            if ($stockRequest->store_name) {
                 $data["store"] = [
                     'store_name' => $stockRequest->store_name,
                     'store_address' => $stockRequest->store_location,
@@ -248,15 +243,18 @@ class StockRequestController extends Controller
             ]);
 
             if ($data['status'] === 'approved') {
-                $details = $stockRequest->detailRequestStock;
-
+                $details = $stockRequest->detailRequestStock()->with('detailProduct')->get();
+                $stockRequested = collect($data["stock_requested"] ?? []);
                 foreach ($details as $detail) {
+                    $checkData = $stockRequested
+                        ->firstWhere('product_detail_id', $detail->product_detail_id)
+                        ?? $stockRequested->firstWhere('variant_id', $detail->product_detail_id);
 
-                    if ($detail->sended_stock == 0) {
-                        $detail->sended_stock = $detail->requested_stock;
+                    if ($checkData && isset($checkData['sended_stock'])) {
+                        $detail->sended_stock = $checkData['sended_stock'];
+                        $detail->price = $checkData['price'] ?? 0;
                         $detail->save();
                     }
-
                     $price = $detail->price ?? 0;
                     $newTotal += $detail->sended_stock * $price;
 
@@ -265,17 +263,6 @@ class StockRequestController extends Controller
                         "product_detail_id" => $detail->product_detail_id
                     ])->first();
 
-                    if(!$warehouseStock)return BaseResponse::Error('stock kosong', null);
-
-                    if ($warehouseStock->stock < $detail->sended_stock) {
-                        return BaseResponse::Error("Stok gudang tidak mencukupi", 400);
-                    }
-
-
-                    if ($warehouseStock) {
-                        $warehouseStock->stock -= $detail->sended_stock;
-                        $warehouseStock->save();
-                    }
 
                     $outletStock = $this->productStock->customQuery([
                         "outlet_id" => $stockRequest->outlet_id,
