@@ -30,7 +30,7 @@ class RestockWarehouseCollection extends ResourceCollection
 
                             $variants = $itemsByProduct->map(function ($item) {
                                 return [
-                                    'variant_id' => $item->productDetail->id,
+                                    'variant_id' => $item->productDetail?->id,
                                     'variant_name' => $item->productDetail?->variant_name,
                                     'requested_stock' => $item->stock,
                                     'unit_id' => $item->unit_id,
