@@ -37,7 +37,7 @@ class ProductImportService
             'weight' => $row['weight'] ?? 0,
             'density' => $row['density'] ?? 0,
             'price' => $row['price'] ?? 0,
-            'unit_id' => $unit?->id,
+            'unit_id' => $row['unit'],
             'price_discount' => $row['price_discount'] ?? null,
             'variant_name' => $row['variant_name'] ?? null,
             'product_code' => $row['product_code'] ?? null,
