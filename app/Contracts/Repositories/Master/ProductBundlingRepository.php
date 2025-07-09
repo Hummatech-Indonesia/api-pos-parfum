@@ -57,7 +57,7 @@ class ProductBundlingRepository extends BaseRepository implements ProductBundlin
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-            ->with(['product', 'category', 'details.unitRelasi'])
+            ->with(['product', 'category', 'details.unitRelation'])
             ->when(auth()->check(), function ($query) {
                 $user = auth()->user();
 
@@ -142,7 +142,7 @@ class ProductBundlingRepository extends BaseRepository implements ProductBundlin
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
-            ->with('product', 'category', 'details',  'details.unitRelasi')
+            ->with('product', 'category', 'details',  'details.unitRelation')
             ->when(count($data) > 0, function ($query) use ($data) {
                 foreach ($data as $index => $value) {
                     $query->where($index, $value);

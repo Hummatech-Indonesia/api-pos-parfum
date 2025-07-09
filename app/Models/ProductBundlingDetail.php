@@ -30,7 +30,7 @@ class ProductBundlingDetail extends Model
 
     public function unitRelation()
     {
-        return $this->belongsTo(Unit::class, 'unit_id');
+        return $this->belongsTo(Unit::class, 'unit_id')->withTrashed();
     }
 
 }
