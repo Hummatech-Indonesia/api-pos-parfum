@@ -246,10 +246,6 @@ class StockRequestController extends Controller
                 $details = $stockRequest->detailRequestStock()->with('detailProduct')->get();
                 $stockRequested = collect($data["stock_requested"] ?? []);
                 foreach ($details as $detail) {
-                    $checkData = $stockRequested
-                        ->firstWhere('product_detail_id', $detail->product_detail_id)
-                        ?? $stockRequested->firstWhere('variant_id', $detail->product_detail_id);
-
                     if ($checkData && isset($checkData['sended_stock'])) {
                         $detail->sended_stock = $checkData['sended_stock'];
                         $detail->price = $checkData['price'] ?? 0;

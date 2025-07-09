@@ -44,6 +44,17 @@ class AuthController extends Controller
         $credentials = $request->validated();
 
         if (auth()->attempt($credentials)) {
+
+            $userRoles = auth()->user()?->roles?->pluck('name')->toArray();
+            $userAllowLogin = [
+                'warehouse',
+                'outlet',
+                'cashier',
+                'auditor',
+                'owner'
+            ];
+            if(!array_intersect($userRoles, $userAllowLogin)) return BaseResponse::Custom(false, 'Akun anda tidak mendapatkan akses buat login!, silahkan hubungi admin!', null, 401);
+
             $token = auth()->user()->createToken('authToken')->plainTextToken;
             $user = $this->user->checkUserActive(auth()->user()->id);
 
@@ -108,9 +119,9 @@ class AuthController extends Controller
             return BaseResponse::Notfound('Data diri tidak ditemukan, silahkan login ulang!');
         }
 
-        $user->product_count = $this->product->customQuery(["store_id" => $user?->store_id ?? $user?->store?->id, "is_delete" => 0])->count();
-        $user->category_count = $this->category->customQuery(["store_id" => $user?->store_id ?? $user?->store?->id, "is_delete" => 0])->count();
-        $user->discount_count = $this->discount->customQuery(["store_id" => $user?->store_id ?? $user?->store?->id, "is_delete" => 0])->count();
+        $user->product_count = $this->product->customQuery(["store_id" => $user?->store_id ?? $user?->store?->id, "is_delete" => 0, "outlet_id" => auth()->user()?->outlet_id])->count();
+        $user->category_count = $this->category->customQuery(["store_id" => $user?->store_id ?? $user?->store?->id, "is_delete" => 0, "outlet_id" => auth()->user()?->outlet_id])->count();
+        $user->discount_count = $this->discount->customQuery(["store_id" => $user?->store_id ?? $user?->store?->id, "is_delete" => 0, "outlet_id" => auth()->user()?->outlet_id])->count();
         $user->role = auth()->user()->roles->pluck("name");
         $user->token = request()->bearerToken();
 

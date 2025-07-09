@@ -97,6 +97,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('products/without-bundling', [ProductController::class, 'listProductWithoutBundling']);
         Route::get('products/no-paginate', [ProductController::class, 'listProduct'])->name('list-products-no-paginate');
         Route::get('products/v2/no-paginate', [ProductController::class, 'listProductV2'])->name('v2.list-products-no-paginate');
+        Route::get('products/sync-list-data', [ProductController::class, 'syncListProduct'])->name('sync-list-products');
         Route::resource("products", ProductController::class)->only(['store', 'destroy', 'update']);
         Route::post('product/import', [ProductExportImportController::class, 'import']);
         // API FOR DATA PRODUCT DETAIL

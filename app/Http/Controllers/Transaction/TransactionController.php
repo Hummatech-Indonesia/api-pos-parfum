@@ -210,6 +210,8 @@ class TransactionController extends Controller
                 'total_tax' => $pajak,
                 'total_discount' => $totalDiskon,
                 'total_barang' => $totalHargaBarang,
+                'outlet' => $transaction->outlet,
+                'warehouse' => $transaction->warehouse,
                 'details' => TransactionDetailResource::collection($details),
             ]);
         } catch (\Throwable $th) {
