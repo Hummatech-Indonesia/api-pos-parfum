@@ -15,6 +15,7 @@ class ProductImportService
         $data = [
             'name' => $firstRow['name'],
             'store_id' => $user->store_id,
+            'category_id' => $firstRow['category_id']
         ];
 
         if ($user->hasRole('warehouse')) {
