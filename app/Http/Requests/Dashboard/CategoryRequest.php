@@ -19,19 +19,34 @@ class CategoryRequest extends FormRequest
 
     public function rules(): array
     {
+        $user = auth()->user();
         $id = $this->route('category') ?? null;
         $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
-        return [
-            'name' => [
-                'required',
-                'max:255',
-                Rule::unique('categories','name')->where(function ($query) use ($store_id) {
-                    return $query->where('store_id', $store_id)
+
+        $uniqueRule = Rule::unique('categories', 'name')
+            ->where(function ($query) use ($store_id, $user) {
+                $query->where('store_id', $store_id)
                     ->where('is_delete', 0);
-                })->ignore($id),
-            ],
+
+                if ($user->hasRole('warehouse')) {
+                    $query->where('warehouse_id', $user->warehouse_id);
+                } elseif ($user->hasRole('outlet')) {
+                    $query->where('outlet_id', $user->outlet_id);
+                }
+            });
+
+        if ($id) {
+            $uniqueRule->ignore($id);
+        }
+
+        return [
+            'name' => ['required', 'max:255', $uniqueRule],
+            'store_id' => ['required', 'uuid'],
+            'outlet_id' => ['nullable', 'uuid'],
+            'warehouse_id' => ['nullable', 'uuid'],
         ];
     }
+
 
     /**
      * Custom Validation Messages
@@ -51,5 +66,24 @@ class CategoryRequest extends FormRequest
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(BaseResponse::error("Kesalahan dalam validasi!", $validator->errors()));
+    }
+
+    protected function prepareForValidation()
+    {
+        if (auth()->check()) {
+            if (auth()->user()->hasRole('outlet')) {
+                $this->merge([
+                    'outlet_id' => auth()->user()->outlet_id,
+                ]);
+            } elseif (auth()->user()->hasRole('warehouse')) {
+                $this->merge([
+                    'warehouse_id' => auth()->user()->warehouse_id,
+                ]);
+            }
+
+            $this->merge([
+                'store_id' => auth()->user()->store_id ?? auth()->user()->store?->id,
+            ]);
+        }
     }
 }

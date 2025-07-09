@@ -31,9 +31,14 @@ class UnitController extends Controller
         $payload = [];
 
         // check query filter
+        if (auth()->user()->store_id) {
+            $payload['store_id'] = auth()->user()->store_id;    
+        }
         if ($request->search) $payload["search"] = $request->search;
         if ($request->start_date) $payload["start_date"] = $request->start_date;
         if ($request->end_date) $payload["end_date"] = $request->end_date;
+        if ($request->min_products_count) $payload["min_products_count"] = $request->min_products_count;
+        if ($request->max_products_count) $payload["max_products_count"] = $request->max_products_count;
 
         try {
             $data = $this->unit->customPaginate($per_page, $page, $payload)->toArray();
@@ -149,10 +154,14 @@ class UnitController extends Controller
     {
         try {
             $payload = [];
+
+            if (auth()->user()->store_id) {
+                $payload['store_id'] = auth()->user()->store_id;
+            }
             if ($request->search) $payload['search'] = $request->search;
             $data = $this->unit->customQuery($payload)
-            ->withCount('productDetails')
-            ->get();
+                ->withCount('productDetails')
+                ->get();
 
 
             return BaseResponse::Ok("Berhasil mengambil data unit", $data);

@@ -31,12 +31,12 @@ class DiscountVoucherResource extends JsonResource
 
             'product_detail' => $this->whenLoaded('details', function () {
                 return [
-                    'id' => $this->details->id,
-                    'variant_name' => $this->details->variant_name,
-                    'variant_code' => $this->details->product_code,
-                    'product_image' => $this->details->product->image,
-                    'product_name' => $this->details->product->name,
-                    'product_category' => $this->details->first()?->category?->name,
+                    'id' => $this->details?->id,
+                    'variant_name' => $this->details?->variant_name,
+                    'variant_code' => $this->details?->product_code,
+                    'product_image' => $this->details?->product?->image,
+                    'product_name' => $this->details?->product?->name,
+                    'product_category' => $this->details?->first()?->category?->name,
                 ];
             }),
         ];

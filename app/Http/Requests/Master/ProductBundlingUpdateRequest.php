@@ -25,7 +25,7 @@ class ProductBundlingUpdateRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string|max:255',
-            'harga' => 'sometimes|required|numeric',
+            'harga' => 'sometimes|required|numeric|min:0',
             'kode_Blend' => 'sometimes|required|string',
             'category_id' => 'sometimes|required|exists:categories,id',
             'quantity' => 'sometimes|required|numeric|min:0',
@@ -50,6 +50,8 @@ class ProductBundlingUpdateRequest extends FormRequest
             'name.required' => 'Nama bundling harus diisi.',
             'name.string' => 'Nama bundling harus berupa teks.',
             'name.max' => 'Nama bundling tidak boleh lebih dari 255 karakter.',
+            
+            'harga.min' => 'Harga tidak boleh negatif.',
 
             'description.required' => 'Deskripsi bundling harus diisi.',
             'description.string' => 'Deskripsi bundling harus berupa teks.',

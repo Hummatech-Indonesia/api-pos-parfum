@@ -42,6 +42,8 @@ class CategoryController extends Controller
         if ($request->start_date) $payload["start_date"] = $request->start_date;
         if ($request->end_date) $payload["end_date"] = $request->end_date;
         if ($request->is_delete) $payload["is_delete"] = $request->is_delete;
+        if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
+        if (auth()->user()->hasRole('outlet')) $payload["outlet_id"] = auth()->user()->outlet_id;
 
         // add sorting
         $sorting = $this->category->sorted($sort, $order);
@@ -67,14 +69,13 @@ class CategoryController extends Controller
      */
     public function store(CategoryRequest $request)
     {
+        $validate = $request->validated();
+
         DB::beginTransaction();
         try {
             $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
-            $result_category = $this->category->store([
-                "name" => $request->name,
-                "store_id" => $store_id
-            ]);
+            $result_category = $this->category->store($validate);
 
             DB::commit();
             return BaseResponse::Ok('Berhasil membuat category', $result_category);
@@ -83,6 +84,7 @@ class CategoryController extends Controller
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
+
 
     /**
      * Display the specified resource.
@@ -111,12 +113,20 @@ class CategoryController extends Controller
         $check = $this->category->checkActive($id);
         if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data category!");
 
+        $validate = $request->validated();
+
+        if (auth()->user()->hasRole('outlet')) {
+            $validate["outlet_id"] = auth()->user()->outlet_id;
+        } else if (auth()->user()->hasRole('warehouse')) {
+            $validate["warehouse_id"] = auth()->user()->warehouse_id;
+        }
+
         DB::beginTransaction();
         try {
-            $this->category->update($id, ["name" => $request->name]);
+            $this->category->update($id, $validate);
 
             DB::commit();
-            return BaseResponse::Ok('Berhasil update data category', ["name" => $request->name]);
+            return BaseResponse::Ok('Berhasil update data category', $validate);
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
@@ -154,7 +164,8 @@ class CategoryController extends Controller
             $payload = [
                 "is_delete" => 0
             ];
-
+            if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
+            if (auth()->user()->hasRole('outlet')) $payload["outlet_id"] = auth()->user()->outlet_id;
             $sorting = $this->category->sorted($sort, $order);
             $payload['sorting'] = $sorting;
 

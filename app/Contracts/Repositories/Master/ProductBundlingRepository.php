@@ -6,6 +6,8 @@ use App\Contracts\Interfaces\Master\ProductBundlingInterface;
 use App\Contracts\Repositories\BaseRepository;
 use App\Models\ProductBundling;
 
+use function PHPUnit\Framework\isEmpty;
+
 class ProductBundlingRepository extends BaseRepository implements ProductBundlingInterface
 {
     public function __construct(ProductBundling $model)
@@ -112,7 +114,7 @@ class ProductBundlingRepository extends BaseRepository implements ProductBundlin
                     $query->where('price', '>=', $data['min_price']);
                 }
 
-                if (!empty($data['max_price'])) {
+                if (isset($data['max_price'])) {
                     $query->where('price', '<=', $data['max_price']);
                 }
 
@@ -124,12 +126,12 @@ class ProductBundlingRepository extends BaseRepository implements ProductBundlin
                     }
                 }
 
-                if (!empty($data['min_material']) || !empty($data['max_material'])) {
+                if (isset($data['min_material']) || isset($data['max_material'])) {
                     $query->withCount('details');
-                    if (!empty($data['min_material'])) {
+                    if (isset($data['min_material'])) {
                         $query->having('details_count', '>=', $data['min_material']);
                     }
-                    if (!empty($data['max_material'])) {
+                    if (isset($data['max_material'])) {
                         $query->having('details_count', '<=', $data['max_material']);
                     }
                 }

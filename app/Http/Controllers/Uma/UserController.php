@@ -32,24 +32,36 @@ class UserController extends Controller
     {
         $per_page = $request->per_page ?? 10;
         $page = $request->page ?? 1;
-        $request->merge([]);
         $payload = [];
 
         if ($request->search) $payload["search"] = $request->search;
         if ($request->start_date) $payload["start_date"] = $request->start_date;
         if ($request->end_date) $payload["end_date"] = $request->end_date;
 
-        if (!$request->role && $request->role == "") {
+        // Ambil role dari user login
+        $userRoles = auth()->user()->roles()->pluck('name')->toArray();
+
+        // Role khusus outlet
+        $role_user_outlet = ["outlet", "cashier", "employee"];
+        // Role khusus warehouse
+        $role_user_warehouse = ["warehouse", "cashier", "employee"];
+
+        // Filter otomatis berdasarkan role login
+        if (in_array('outlet', $userRoles)) {
+            $request->merge(['role' => $role_user_outlet]);
+        } elseif (in_array('warehouse', $userRoles)) {
+            $request->merge(['role' => $role_user_warehouse]);
+        } elseif (!$request->has('role')) {
+            // Jika tidak ada role tertentu dikirim dan bukan outlet/warehouse
             $request->merge([
                 "role" => ['owner','manager', 'auditor', 'warehouse', 'outlet', 'cashier', 'employee'],
             ]);
         }
 
-        // check if have store_id
-        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $request->merge(['store_id' => auth()?->user()?->store?->id ?? auth()?->user()?->store_id]);
-        $role_user_outlet = ["owner", "cashier", "employee"];
-        $role_user_warehouse = ["warehouse", "cashier", "employee"];
-        $userRoles = auth()->user()->roles()->pluck("name")->toArray();
+        // Filter tambahan berdasarkan store/outlet/warehouse
+        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
+            $request->merge(['store_id' => auth()?->user()?->store?->id ?? auth()?->user()?->store_id]);
+        }
 
         if (auth()?->user()?->outlet_id && array_intersect($userRoles, $role_user_outlet)) {
             $request->merge(['outlet_id' => auth()->user()->outlet_id]);
@@ -70,6 +82,7 @@ class UserController extends Controller
             return BaseResponse::Error("Gagal dalam mengambil list paginate user!", $th->getMessage());
         }
     }
+
 
     /**
      * Show the form for creating a new resource.

@@ -16,7 +16,7 @@ class RestockWarehouseResource extends JsonResource
     {
         return [
             'product_name' => $this->productDetail?->product?->name,
-            'variant_id' => $this->productDetail->id,
+            'variant_id' => $this->productDetail?->id,
             'variant_name' => $this->productDetail?->variant_name,
             'requested_stock' => $this->stock,
             'unit_id' => $this->unit_id,

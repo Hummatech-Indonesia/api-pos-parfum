@@ -7,6 +7,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\Rule;
 
 class UnitRequest extends FormRequest
 {
@@ -27,7 +28,11 @@ class UnitRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
-            'code' => 'required|string|unique:units,code'
+            'code' => [
+                'required',
+                'string',
+                Rule::unique('units', 'code')->ignore($this->route('unit'))->whereNull('deleted_at')
+            ]
         ];
     }
 
