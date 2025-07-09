@@ -86,26 +86,28 @@ class ProductRepository extends BaseRepository implements ProductInterface
             $query->whereHas('details', fn($q) => $q->where('price', '>=', $data["min_price"]));
         }
 
-        if (!empty($data["max_price"])) {
-            $filteredByDetails = true;
-            $query->whereHas('details', fn($q) => $q->where('price', '<=', $data["max_price"]));
-        }
+
 
         if (!empty($data['min_sales'])) {
-            $filteredByDetails = true;
-            $query->whereHas('details.transactionDetails', function ($q) use ($data) {
-                $q->select('product_detail_id')
-                    ->groupBy('product_detail_id')
-                    ->havingRaw('COUNT(*) >= ?', [$data['min_sales']]);
+            $query->whereHas('details', function ($q) use ($data) {
+                $q->whereIn('id', function ($sub) use ($data) {
+                    $sub->select('product_detail_id')
+                        ->from('transaction_details')
+                        ->groupBy('product_detail_id')
+                        ->havingRaw('COUNT(*) >= ?', [$data['min_sales']]);
+                });
             });
         }
 
-        if (!empty($data['max_sales'])) {
+        if (isset($data['max_sales'])) {
             $filteredByDetails = true;
-            $query->whereHas('details.transactionDetails', function ($q) use ($data) {
-                $q->select('product_detail_id')
-                    ->groupBy('product_detail_id')
-                    ->havingRaw('COUNT(*) <= ?', [$data['max_sales']]);
+            $query->whereDoesntHave('details', function ($q) use ($data) {
+                $q->whereIn('id', function ($sub) use ($data) {
+                    $sub->select('product_detail_id')
+                        ->from('transaction_details')
+                        ->groupBy('product_detail_id')
+                        ->havingRaw('COUNT(*) > ?', [$data['max_sales']]);
+                });
             });
         }
 
