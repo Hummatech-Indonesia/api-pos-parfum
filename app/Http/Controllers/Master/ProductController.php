@@ -356,4 +356,32 @@ class ProductController extends Controller
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         ]);
     }
+
+    public function syncListProduct(Request $request)
+    {
+        try {
+            $payload = [
+                'is_delete' => $request->get('is_delete', 0),
+                'search' => $request->get('search'),
+                'sort_by' => in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null,
+                'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
+            ];
+
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
+                $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+            }
+
+            if (auth()?->user()?->outlet_id) {
+                $payload['outlet_id'] = auth()?->user()?->outlet_id;
+            }
+
+            $products = $this->product->customQuery($payload)->paginate($request->page ?? 100);
+
+            $meta = PaginationHelper::meta($products);
+
+            return BaseResponse::Paginate("Berhasil sync list product", $products["data"], $meta);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
 }

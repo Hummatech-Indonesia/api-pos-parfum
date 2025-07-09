@@ -251,9 +251,11 @@ class StockRequestController extends Controller
                 $details = $stockRequest->detailRequestStock;
 
                 foreach ($details as $detail) {
+                    $checkData = collect($data["stock_requested"])->filter(fn($q) => $q->product_detail_id == $detail->id)->first();
 
-                    if ($detail->sended_stock == 0) {
-                        $detail->sended_stock = $detail->requested_stock;
+                    if ($checkData && $checkData?->sended_stock) {
+                        $detail->sended_stock = $checkData->sended_stock;
+                        $detail->price = $checkData->price;
                         $detail->save();
                     }
 
