@@ -54,6 +54,9 @@ class ProductBundlingRequest extends FormRequest
             'category_id.exists' => 'Kategori tidak ditemukan.',
 
             'image.string' => 'URL gambar harus berupa teks.',
+            'image.image' => 'File valid hanya berupa image!',
+            'image.max' => 'Max file 2mb!',
+            'image.mimes' => 'Gambar hanya boleh berupa jpg, png, jpeg',
 
             'details.required' => 'Detail bundling harus diisi.',
             'details.*.product_bundling_material.required' => 'Daftar bahan wajib diisi.',

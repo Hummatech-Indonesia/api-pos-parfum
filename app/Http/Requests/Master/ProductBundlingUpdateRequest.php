@@ -29,7 +29,8 @@ class ProductBundlingUpdateRequest extends FormRequest
             'kode_Blend' => 'sometimes|required|string',
             'category_id' => 'sometimes|required|exists:categories,id',
             'quantity' => 'sometimes|required|numeric|min:0',
-
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            
             'details' => 'array|min:1',
             'details.*.product_detail_id' => 'uuid|exists:product_details,id',
 
@@ -58,6 +59,10 @@ class ProductBundlingUpdateRequest extends FormRequest
 
             'category_id.required' => 'Kategori harus dipilih.',
             'category_id.exists' => 'Kategori tidak ditemukan di database.',
+
+            'image.image' => 'File valid hanya berupa image!',
+            'image.max' => 'Max file 2mb!',
+            'image.mimes' => 'Gambar hanya boleh berupa jpg, png, jpeg',
 
             'details.required' => 'Detail produk bundling harus diisi.',
             'details.array' => 'Format detail produk bundling tidak valid.',

@@ -173,6 +173,15 @@ class ProductBundlingController extends Controller
             ];
             $this->repository->update($bundling->id, $bundlingData);
 
+            if($request->hasFile('image')) {
+                $product = $this->productRepo->show($bundling->product_id);
+                if($product) {
+                    $productData = $this->service->mapProductImage($validated);
+                    $product->image = $productData["image"];
+                    $product->save();
+                }
+            }
+
             foreach ($validated['details'] as $inputDetail) {
                 $unitName = null;
                 if (!empty($inputDetail['unit_id'])) {
