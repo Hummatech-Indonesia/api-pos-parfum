@@ -31,7 +31,10 @@ class UnitRequest extends FormRequest
             'code' => [
                 'required',
                 'string',
-                Rule::unique('units', 'code')->ignore($this->route('unit'))->whereNull('deleted_at')
+                Rule::unique('units', 'code')->ignore($this->route('unit'))->where(function ($query) {
+                    return $query->where('store_id', auth()->user()->store_id)
+                        ->whereNull('deleted_at');
+                }),
             ]
         ];
     }
