@@ -31,6 +31,9 @@ class UnitController extends Controller
         $payload = [];
 
         // check query filter
+        if (auth()->user()->store_id) {
+            $payload['store_id'] = auth()->user()->store_id;    
+        }
         if ($request->search) $payload["search"] = $request->search;
         if ($request->start_date) $payload["start_date"] = $request->start_date;
         if ($request->end_date) $payload["end_date"] = $request->end_date;
@@ -151,10 +154,14 @@ class UnitController extends Controller
     {
         try {
             $payload = [];
+
+            if (auth()->user()->store_id) {
+                $payload['store_id'] = auth()->user()->store_id;
+            }
             if ($request->search) $payload['search'] = $request->search;
             $data = $this->unit->customQuery($payload)
-            ->withCount('productDetails')
-            ->get();
+                ->withCount('productDetails')
+                ->get();
 
 
             return BaseResponse::Ok("Berhasil mengambil data unit", $data);

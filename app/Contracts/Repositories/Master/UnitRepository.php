@@ -32,9 +32,16 @@ class UnitRepository extends BaseRepository implements UnitInterface
         unset($data['min_products_count'], $data['max_products_count']);
 
         return $this->model->query()
-            ->withCount(['productDetails' => function ($q) {
+            ->withCount(['productDetails as product_details_count' => function ($q) use ($data) {
                 $q->where('is_delete', 0);
+
+                if (isset($data['store_id'])) {
+                    $q->whereHas('product', function ($subQuery) use ($data) {
+                        $subQuery->where('store_id', $data['store_id']);
+                    });
+                }
             }])
+
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (isset($data["search"])) {
                     $query->where(function ($query2) use ($data) {
@@ -65,9 +72,16 @@ class UnitRepository extends BaseRepository implements UnitInterface
         unset($data['min_products_count'], $data['max_products_count']);
 
         return $this->model->query()
-            ->withCount(['productDetails' => function ($q) {
+            ->withCount(['productDetails as product_details_count' => function ($q) use ($data) {
                 $q->where('is_delete', 0);
+
+                if (isset($data['store_id'])) {
+                    $q->whereHas('product', function ($subQuery) use ($data) {
+                        $subQuery->where('store_id', $data['store_id']);
+                    });
+                }
             }])
+
             ->when($data, function ($query) use ($data) {
                 if (!empty($data["search"])) {
                     $query->where(function ($query2) use ($data) {
