@@ -76,7 +76,7 @@ class ProductRepository extends BaseRepository implements ProductInterface
         }
 
         if (isset($data["category"])) {
-            $query->where('category', $data["category"]);
+            $query->where('category_id', $data["category"]);
         }
 
         $filteredByDetails = false;
@@ -152,7 +152,7 @@ class ProductRepository extends BaseRepository implements ProductInterface
         }
 
         $filteredData = array_filter($data, fn($value) => !is_null($value) && $value !== '');
-        $allowedWhereFields = ['store_id', 'category', 'is_delete'];
+        $allowedWhereFields = ['store_id', 'category_id', 'is_delete'];
         foreach ($filteredData as $index => $value) {
             if (in_array($index, $allowedWhereFields)) {
                 $query->where($index, $value);

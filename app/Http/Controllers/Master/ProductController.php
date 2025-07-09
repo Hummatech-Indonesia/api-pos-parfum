@@ -64,6 +64,7 @@ class ProductController extends Controller
             'max_sales'    => $request->get('max_sales'),
             'min_stock'    => $request->get('min_stock'),
             'max_stock'    => $request->get('max_stock'),
+            'category'    => $request->get('category'),
         ];
 
         if ($request->search) {
