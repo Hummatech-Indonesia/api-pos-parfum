@@ -44,6 +44,17 @@ class AuthController extends Controller
         $credentials = $request->validated();
 
         if (auth()->attempt($credentials)) {
+
+            $userRoles = auth()->user()?->roles?->pluck('name');
+            $userAllowLogin = [
+                'warehouse',
+                'outlet',
+                'cashier',
+                'auditor',
+                'owner'
+            ];
+            if(!array_intersect($userRoles, $userAllowLogin)) return BaseResponse::error('Akun anda tidak mendapatkan akses buat login!, silahkan hubungi admin!', false);
+
             $token = auth()->user()->createToken('authToken')->plainTextToken;
             $user = $this->user->checkUserActive(auth()->user()->id);
 
