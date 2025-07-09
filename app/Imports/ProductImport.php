@@ -52,7 +52,7 @@ class ProductImport implements ToCollection, WithHeadingRow, WithValidation
             DB::commit();
         } catch (Throwable $th) {
             DB::rollBack();
-            throw $th; 
+            throw new \Exception("Gagal import produk: " . $th->getMessage());
         }
     }
 

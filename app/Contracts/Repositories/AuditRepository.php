@@ -211,4 +211,9 @@ class AuditRepository extends BaseRepository implements AuditInterface
 
         return $audit;
     }
+
+    public function findTrashed(string $id): ?Audit
+    {
+        return Audit::withTrashed()->find($id);
+    }
 }

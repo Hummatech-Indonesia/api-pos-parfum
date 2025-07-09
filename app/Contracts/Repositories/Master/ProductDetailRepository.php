@@ -173,4 +173,9 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailInt
     {
         return ProductDetail::find($id);
     }
+
+    public function findWithProduct(string $id)
+    {
+        return ProductDetail::with('product')->find($id);
+    }
 }
