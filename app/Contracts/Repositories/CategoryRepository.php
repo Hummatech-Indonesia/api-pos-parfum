@@ -57,6 +57,13 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
                 $q->where('is_delete', 0);
             }])
             ->when(count($data) > 0, function ($query) use ($data) {
+                $user = auth()->user();
+
+                if ($user->hasRole('outlet')) {
+                    $query->where('outlet_id', $user->outlet_id);
+                } elseif ($user->hasRole('warehouse')) {
+                    $query->where('warehouse_id', $user->warehouse_id);
+                }
                 foreach ($data as $index => $value) {
                     $query->where($index, $value);
                 }
@@ -86,6 +93,14 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
                     $query->where(function ($query2) use ($data) {
                         $query2->where('name', 'like', '%' . $data["search"] . '%');
                     });
+                }
+
+                $user = auth()->user();
+
+                if ($user->hasRole('outlet')) {
+                    $query->where('outlet_id', $user->outlet_id);
+                } elseif ($user->hasRole('warehouse')) {
+                    $query->where('warehouse_id', $user->warehouse_id);
                 }
 
                 if (!empty($data["start_date"])) {

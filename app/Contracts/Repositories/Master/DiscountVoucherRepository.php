@@ -40,6 +40,14 @@ class DiscountVoucherRepository extends BaseRepository implements DiscountVouche
                     });
                 }
 
+                $user = auth()->user();
+
+                if ($user->hasRole('outlet')) {
+                    $query->where('outlet_id', $user->outlet_id);
+                } elseif ($user->hasRole('warehouse')) {
+                    $query->where('warehouse_id', $user->warehouse_id);
+                }
+
                 if (!empty($data["name"])) {
                     $query->where('name', 'like', '%' . $data["name"] . '%');
                 }
@@ -140,6 +148,14 @@ class DiscountVoucherRepository extends BaseRepository implements DiscountVouche
                     $query->where(function ($q) use ($data) {
                         $q->where('name', 'like', '%' . $data["search"] . '%');
                     });
+                }
+
+                $user = auth()->user();
+
+                if ($user->hasRole('outlet')) {
+                    $query->where('outlet_id', $user->outlet_id);
+                } elseif ($user->hasRole('warehouse')) {
+                    $query->where('warehouse_id', $user->warehouse_id);
                 }
 
                 if (!empty($data["name"])) {

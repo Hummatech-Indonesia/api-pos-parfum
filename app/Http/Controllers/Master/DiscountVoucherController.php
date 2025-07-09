@@ -56,6 +56,8 @@ class DiscountVoucherController extends Controller
             $payload["is_member"] = $request->is_member;
         }
 
+        if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
+        if (auth()->user()->hasRole('outlet')) $payload["outlet_id"] = auth()->user()->outlet_id;
         if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
         $collection = $this->discountVoucher->customPaginate($per_page, $page, $payload);
@@ -84,8 +86,8 @@ class DiscountVoucherController extends Controller
         $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
         $validator["store_id"] = $store_id;
 
-        if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
-        if (auth()->user()->hasRole('outlet')) $payload["outlet_id"] = auth()->user()->outlet_id;
+        if (auth()->user()->hasRole('warehouse')) $validator["warehouse_id"] = auth()->user()->warehouse_id;
+        if (auth()->user()->hasRole('outlet')) $validator["outlet_id"] = auth()->user()->outlet_id;
 
         DB::beginTransaction();
         try {
@@ -216,6 +218,8 @@ class DiscountVoucherController extends Controller
             if ($request->is_member !== null) {
                 $payload["is_member"] = $request->is_member;
             }
+            if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
+            if (auth()->user()->hasRole('outlet')) $payload["outlet_id"] = auth()->user()->outlet_id;
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             $collection = $this->discountVoucher->customQuery($payload)->get();
 
