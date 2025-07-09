@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Contracts\Interfaces\ArticleInterface;
+use App\Contracts\Interfaces\AuditDetailInterface;
 use App\Contracts\Interfaces\SettingInterface;
 use App\Contracts\Interfaces\CategoryInterface;
 use App\Contracts\Interfaces\Auth\UserInterface;
@@ -55,6 +56,7 @@ use App\Contracts\Repositories\ProductBlendRepository;
 use App\Contracts\Repositories\Transaction\TransactionDetailRepository;
 use App\Models\ProductBundling;
 use App\Models\ProductBundlingDetail;
+use App\Contracts\Repositories\AuditDetailRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -86,6 +88,8 @@ class AppServiceProvider extends ServiceProvider
         ProductBundlingDetailInterface::class => ProductBundlingDetailRepository::class,
         ProductBlendInterface::class => ProductBlendRepository::class,
         ProductBlendDetailInterface::class => ProductBlendDetailRepository::class,
+        AuditDetailInterface::class => AuditDetailRepository::class,
+
     ];
 
     /**
