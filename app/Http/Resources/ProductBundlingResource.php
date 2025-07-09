@@ -27,8 +27,8 @@ class ProductBundlingResource extends JsonResource
                     ? optional($detail->productDetail->productStockOutlet) ?? 0 
                     : optional($detail->productDetail->productStockWarehouse) ?? 0,
                     'image' => $this->product->image ?? null,
-                    'unit_id' => $detail->unitRelation?->id,
-                    'unit_code' => $detail->unitRelation->code ?? null
+                    'unit_id' => $detail->unitRelasi?->id,
+                    'unit_code' => $detail->unitRelasi?->code ?? null
                 ];
             }),
         ];
