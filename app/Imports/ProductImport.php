@@ -4,7 +4,6 @@ namespace App\Imports;
 
 use App\Contracts\Repositories\Master\ProductStockRepository;
 use App\Imports\Rules\ProductImportRules;
-use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductDetail;
 use Illuminate\Support\Collection;
@@ -13,6 +12,7 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use App\Services\ProductImportService;
+use Throwable;
 
 class ProductImport implements ToCollection, WithHeadingRow, WithValidation
 {
@@ -29,31 +29,31 @@ class ProductImport implements ToCollection, WithHeadingRow, WithValidation
     {
         DB::beginTransaction();
 
-        $grouped = $rows->groupBy('name');
+        try {
+            $grouped = $rows->groupBy('name');
 
-        foreach ($grouped as $name => $groupedRows) {
-            $firstRow = $groupedRows->first()->toArray();
+            foreach ($grouped as $name => $groupedRows) {
+                $firstRow = $groupedRows->first()->toArray();
 
-            $category = Category::where('name', $firstRow['category_name'])->first();
-            if (!$category) {
-                throw new \Exception("Kategori '{$firstRow['category_name']}' tidak ditemukan.");
+                $productData = $this->mappingService->mapProduct($firstRow);
+                $product = Product::create($productData);
+
+                foreach ($groupedRows as $row) {
+                    $rowArray = $row->toArray();
+
+                    $detailData = $this->mappingService->mapProductDetail($rowArray, $product->id);
+                    $detail = ProductDetail::create($detailData);
+
+                    $stockData = $this->mappingService->mapStock($rowArray, $product->id, $detail->id);
+                    $this->productStock->store($stockData);
+                }
             }
 
-            $productData = $this->mappingService->mapProduct($firstRow, $category->id);
-            $product = Product::create($productData);
-
-            foreach ($groupedRows as $row) {
-                $rowArray = $row->toArray();
-
-                $detailData = $this->mappingService->mapProductDetail($rowArray, $product->id, $category->id);
-                $detail = ProductDetail::create($detailData);
-
-                $stockData = $this->mappingService->mapStock($rowArray, $product->id, $detail->id);
-                $this->productStock->store($stockData);
-            }
+            DB::commit();
+        } catch (Throwable $th) {
+            DB::rollBack();
+            throw $th; 
         }
-
-        DB::commit();
     }
 
     public function rules(): array
