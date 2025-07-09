@@ -17,7 +17,8 @@ class UnitService{
         try{
             $result = [
                 "name" => $data["name"],
-                "code" => $data["code"]
+                "code" => $data["code"],
+                "store_id" => auth()->user()->store_id,
             ];
             return $result;
         }catch(\Throwable $th){
