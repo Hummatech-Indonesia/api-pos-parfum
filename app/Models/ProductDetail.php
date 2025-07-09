@@ -79,6 +79,11 @@ class ProductDetail extends Model
         return $this->hasMany(AuditDetail::class, 'product_detail_id');
     }
 
+    public function unitRelasi(): BelongsTo
+    {
+        return $this->belongsTo(Unit::class, 'unit_id', 'id')->withTrashed();
+    }
+
     /**
      * Get the user that owns the ProductDetail
      *

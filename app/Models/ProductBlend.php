@@ -43,9 +43,9 @@ class ProductBlend extends Model
         return $this->belongsTo(Warehouse::class);
     }
 
-    public function unit(): BelongsTo
+    public function unitRelasi(): BelongsTo
     {
-        return $this->belongsTo(Unit::class);
+        return $this->belongsTo(Unit::class)->withTrashed();
     }
 
     /**

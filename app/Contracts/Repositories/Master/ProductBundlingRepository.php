@@ -95,13 +95,12 @@ class ProductBundlingRepository extends BaseRepository implements ProductBundlin
                         $data['created_from'] . ' 00:00:00',
                         $data['created_to'] . ' 23:59:59'
                     ]);
+                } elseif (!empty($data['created_from'])) {
+                    $query->where('created_at', '>=', $data['created_from'] . ' 00:00:00');
+                } elseif (!empty($data['created_to'])) {
+                    $query->where('created_at', '<=', $data['created_to'] . ' 23:59:59');
+                }
 
-                    } elseif (!empty($data['created_from'])) {
-                        $query->where('created_at', '>=', $data['created_from'] . ' 00:00:00');
-                    } elseif (!empty($data['created_to'])) {
-                        $query->where('created_at', '<=', $data['created_to'] . ' 23:59:59');
-                    }
-                
                 if (!empty($data['min_stock'])) {
                     $query->where('stock', '>=', $data['min_stock']);
                 }
@@ -135,7 +134,6 @@ class ProductBundlingRepository extends BaseRepository implements ProductBundlin
                         $query->having('details_count', '<=', $data['max_material']);
                     }
                 }
-
             })
             ->paginate($pagination, ['*'], 'page', $page);
     }
@@ -144,11 +142,11 @@ class ProductBundlingRepository extends BaseRepository implements ProductBundlin
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
-        ->with('product', 'category', 'details')
-        ->when(count($data) > 0, function ($query) use ($data){
-            foreach ($data as $index => $value){
-                $query->where($index, $value);
-            }
-        });
+            ->with('product', 'category', 'details',  'details.unitRelation')
+            ->when(count($data) > 0, function ($query) use ($data) {
+                foreach ($data as $index => $value) {
+                    $query->where($index, $value);
+                }
+            });
     }
 }

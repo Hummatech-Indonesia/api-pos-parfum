@@ -48,6 +48,7 @@ class UserRepository extends BaseRepository implements UserInterface
         unset($data['order_by'], $data['order_direction']);
 
         return $this->model->query()
+            ->where('id', '!=', auth()->id())
             ->select('id', 'name', 'email', 'created_at')
             ->with([
                 'roles:name',
@@ -118,6 +119,7 @@ class UserRepository extends BaseRepository implements UserInterface
         }
 
         return $this->model->query()
+            ->where('id', '!=', auth()->id())
             ->with('store', 'related_store', 'roles', 'warehouse', 'outlet')
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (isset($data["warehouse"])) {
@@ -207,6 +209,7 @@ class UserRepository extends BaseRepository implements UserInterface
         unset($data['is_delete']);
 
         return $this->model->query()
+            ->where('id', '!=', auth()->id())
             ->when(isset($data['store_id']), function ($q) use ($data) {
                 $q->where('store_id', $data['store_id']);
             })
