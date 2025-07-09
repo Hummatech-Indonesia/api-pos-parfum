@@ -64,9 +64,15 @@ class TransactionController extends Controller
             if ($request->min_price) $payload["min_price"] = $request->min_price;
             if ($request->max_price) $payload["max_price"] = $request->max_price;
 
-            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
-            if (auth()?->user()?->outlet?->id || auth()?->user()?->outlet_id) $payload['outlet_id'] = auth()?->user()?->outlet?->id ?? auth()?->user()?->outlet_id;
-            if (auth()?->user()?->warehouse?->id || auth()?->user()?->warehouse_id) $payload['warehouse_id'] = auth()?->user()?->warehouse?->id ?? auth()?->user()?->warehouse_id;
+            if ($storeId = auth()?->user()?->store?->id ?? auth()?->user()?->store_id) {
+                $payload['store_id'] = $storeId;
+            }
+            if ($outletId = auth()?->user()?->outlet?->id ?? auth()?->user()?->outlet_id) {
+                $payload['outlet_id'] = $outletId;
+            }
+            if ($warehouseId = auth()?->user()?->warehouse?->id ?? auth()?->user()?->warehouse_id) {
+                $payload['warehouse_id'] = $warehouseId;
+            }
 
             $perPage = (int) ($request->per_page ?? 10);
             $page = (int) ($request->page ?? 1);
@@ -77,11 +83,12 @@ class TransactionController extends Controller
             $result = $resource->collection->values();
             $meta = PaginationHelper::meta($transaction);
 
-            return BaseResponse::Paginate('Berhasil mengambil list data shift!', $result, $meta);
+            return BaseResponse::Paginate('Berhasil mengambil list data transaksi!', $result, $meta);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -242,15 +249,18 @@ class TransactionController extends Controller
         try {
             $payload = [];
 
-            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+            if ($storeId = auth()?->user()?->store?->id ?? auth()?->user()?->store_id) {
+                $payload['store_id'] = $storeId;
+            }
 
-            $transaction = $this->transaction->customQuery($payload)->get();
+            $transactions = $this->transaction->customQuery($payload)->get();
 
-            return BaseResponse::Ok("Berhasil mengambil data transaction", $transaction);
+            return BaseResponse::Ok("Berhasil mengambil data transaction", $transactions);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
+
 
     /**
      * Store a newly created resource in storage with sync mobile.

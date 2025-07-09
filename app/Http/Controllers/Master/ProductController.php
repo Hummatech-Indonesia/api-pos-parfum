@@ -19,6 +19,7 @@ use App\Contracts\Interfaces\Master\ProductVarianInterface;
 use App\Helpers\PaginationHelper;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use Illuminate\Support\Facades\Response;
 
 class ProductController extends Controller
 {
@@ -341,5 +342,18 @@ class ProductController extends Controller
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
+    }
+
+    public function downloadExample()
+    {
+        $filePath = public_path('ExampleProduct.xlsx');
+
+        if (!file_exists($filePath)) {
+            return BaseResponse::Notfound('File tidak ditemukan.');
+        }
+
+        return Response::download($filePath, 'ExampleProduct.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
     }
 }

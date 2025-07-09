@@ -164,11 +164,12 @@ class SettingController extends Controller
 
     public function restore(string $id)
     {
-        $setting = Setting::withTrashed()->find($id);
-        if (!$setting) return BaseResponse::Notfound("sampah setting tidak ditemukan");
         try {
             $setting = $this->settingRepository->restore($id);
-            return BaseResponse::Ok("setting berhasil dikembalikan", $setting);
+
+            if (!$setting) return BaseResponse::NotFound("Sampah setting tidak ditemukan");
+
+            return BaseResponse::Ok("Setting berhasil dikembalikan", $setting);
         } catch (\Throwable $th) {
             return BaseResponse::Error("Gagal mengembalikan setting: " . $th->getMessage(), null);
         }

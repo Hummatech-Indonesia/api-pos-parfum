@@ -52,8 +52,11 @@ class UnitRepository extends BaseRepository implements UnitInterface
                 }
 
                 foreach ($data as $index => $value) {
-                    $query->where($index, $value);
+                    if (in_array($index, ['name', 'code'])) {
+                        $query->where($index, $value);
+                    }
                 }
+
             })
             ->when(!is_null($minCount), fn($q) => $q->having('product_details_count', '>=', $minCount))
             ->when(!is_null($maxCount), fn($q) => $q->having('product_details_count', '<=', $maxCount));

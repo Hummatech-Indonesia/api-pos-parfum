@@ -2,30 +2,46 @@
 
 namespace App\Services;
 
+use App\Models\Unit;
 use Illuminate\Support\Collection;
 
 class ProductImportService
 {
-    public function mapProduct(array $firstRow, int $categoryId): array
+    public function mapProduct(array $firstRow): array
     {
-        return [
+
+        $user = auth()->user();
+
+        $data = [
             'name' => $firstRow['name'],
-            'category_id' => $categoryId,
-            'store_id' => auth()->user()->store_id,
+            'store_id' => $user->store_id,
         ];
+
+        if ($user->hasRole('warehouse')) {
+            $data['warehouse_id'] = $user->warehouse_id;
+        } elseif ($user->hasRole('outlet')) {
+            $data['outlet_id'] = $user->outlet_id;
+        }
+
+        return $data;
     }
 
-    public function mapProductDetail(array $row, string $productId, int $categoryId): array
+    public function mapProductDetail(array $row, string $productId): array
     {
+        $unit = Unit::where('code', $row['unit'] ?? null)->first();
+
+        if (!$unit) {
+            throw new \Exception("Unit dengan kode '{$row['unit']}' tidak ditemukan.");
+        }
         return [
             'product_id' => $productId,
-            'category_id' => $categoryId,
             'material' => $row['material'] ?? null,
             'unit' => $row['unit'] ?? null,
             'capacity' => $row['capacity'] ?? 0,
             'weight' => $row['weight'] ?? 0,
             'density' => $row['density'] ?? 0,
             'price' => $row['price'] ?? 0,
+            'unit_id' => $unit?->id,
             'price_discount' => $row['price_discount'] ?? null,
             'variant_name' => $row['variant_name'] ?? null,
             'product_code' => $row['product_code'] ?? null,
