@@ -174,6 +174,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // API FOR DATA SETTING
     Route::resource("setting", SettingController::class)->except(['store', 'destroy', 'update']);
 
+    Route::get('/product/download-example', [ProductController::class, 'downloadExample']);
+
     // API FOR DATA TRANSACTION
     Route::get("transactions/no-paginate", [TransactionController::class, 'getData']);
     Route::post("transactions/sync", [TransactionController::class, 'syncStoreData']);
