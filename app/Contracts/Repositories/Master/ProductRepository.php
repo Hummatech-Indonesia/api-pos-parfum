@@ -79,19 +79,20 @@ class ProductRepository extends BaseRepository implements ProductInterface
             $query->where('category', $data["category"]);
         }
 
+        $filteredByDetails = false;
+
         if (!empty($data["min_price"])) {
-            $query->whereHas('details', function ($q) use ($data) {
-                $q->where('price', '>=', $data["min_price"]);
-            });
+            $filteredByDetails = true;
+            $query->whereHas('details', fn($q) => $q->where('price', '>=', $data["min_price"]));
         }
 
         if (!empty($data["max_price"])) {
-            $query->whereHas('details', function ($q) use ($data) {
-                $q->where('price', '<=', $data["max_price"]);
-            });
+            $filteredByDetails = true;
+            $query->whereHas('details', fn($q) => $q->where('price', '<=', $data["max_price"]));
         }
 
         if (!empty($data['min_sales'])) {
+            $filteredByDetails = true;
             $query->whereHas('details.transactionDetails', function ($q) use ($data) {
                 $q->select('product_detail_id')
                     ->groupBy('product_detail_id')
@@ -100,6 +101,7 @@ class ProductRepository extends BaseRepository implements ProductInterface
         }
 
         if (!empty($data['max_sales'])) {
+            $filteredByDetails = true;
             $query->whereHas('details.transactionDetails', function ($q) use ($data) {
                 $q->select('product_detail_id')
                     ->groupBy('product_detail_id')
@@ -108,90 +110,39 @@ class ProductRepository extends BaseRepository implements ProductInterface
         }
 
         if ($user->hasRole('outlet')) {
-            if (
-                array_key_exists('min_stock', $data) &&
-                $data['min_stock'] == 0 &&
-                !empty($data['max_stock']) // min_stock=0 dan ada max_stock
-            ) {
-                $query->whereHas('details', function ($detailQuery) use ($data) {
-                    $detailQuery->where(function ($sub) use ($data) {
-                        $sub->whereHas('productStockOutlet', function ($q) use ($data) {
-                            $q->whereRaw('COALESCE(stock, 0) >= 0')
-                                ->whereRaw('COALESCE(stock, 0) <= ?', [$data['max_stock']]);
-                        })->orWhereDoesntHave('productStockOutlet');
-                    });
-                });
-            } elseif (
-                array_key_exists('min_stock', $data) &&
-                $data['min_stock'] == 0 &&
-                empty($data['max_stock'])
-            ) {
-                $query->whereHas('details', function ($detailQuery) {
-                    $detailQuery->where(function ($sub) {
-                        $sub->whereHas('productStockOutlet', function ($q) {
-                            $q->whereRaw('COALESCE(stock, 0) >= 0');
-                        })->orWhereDoesntHave('productStockOutlet');
-                    });
-                });
-            } elseif (!empty($data['min_stock']) || !empty($data['max_stock'])) {
+            if (isset($data['min_stock']) || isset($data['max_stock'])) {
+                $filteredByDetails = true;
                 $query->whereHas('details.productStockOutlet', function ($q) use ($data) {
-                    if (!empty($data['min_stock'])) {
+                    if (isset($data['min_stock'])) {
                         $q->whereRaw('COALESCE(stock, 0) >= ?', [$data['min_stock']]);
                     }
-                    if (!empty($data['max_stock'])) {
+                    if (isset($data['max_stock'])) {
                         $q->whereRaw('COALESCE(stock, 0) <= ?', [$data['max_stock']]);
                     }
                 });
             }
         }
+
         if ($user->hasRole('warehouse')) {
-            if (
-                array_key_exists('min_stock', $data) &&
-                $data['min_stock'] == 0 &&
-                !empty($data['max_stock'])
-            ) {
-                $query->whereHas('details', function ($detailQuery) use ($data) {
-                    $detailQuery->where(function ($sub) use ($data) {
-                        $sub->whereHas('productStockWarehouse', function ($q) use ($data) {
-                            $q->whereRaw('COALESCE(stock, 0) >= 0')
-                                ->whereRaw('COALESCE(stock, 0) <= ?', [$data['max_stock']]);
-                        })->orWhereDoesntHave('productStockWarehouse');
-                    });
-                });
-            } elseif (
-                array_key_exists('min_stock', $data) &&
-                $data['min_stock'] == 0 &&
-                empty($data['max_stock'])
-            ) {
-                $query->whereHas('details', function ($detailQuery) {
-                    $detailQuery->where(function ($sub) {
-                        $sub->whereHas('productStockWarehouse', function ($q) {
-                            $q->whereRaw('COALESCE(stock, 0) >= 0');
-                        })->orWhereDoesntHave('productStockWarehouse');
-                    });
-                });
-            } elseif (!empty($data['min_stock']) || !empty($data['max_stock'])) {
+            if (isset($data['min_stock']) || isset($data['max_stock'])) {
+                $filteredByDetails = true;
                 $query->whereHas('details.productStockWarehouse', function ($q) use ($data) {
-                    if (!empty($data['min_stock'])) {
+                    if (isset($data['min_stock'])) {
                         $q->whereRaw('COALESCE(stock, 0) >= ?', [$data['min_stock']]);
                     }
-                    if (!empty($data['max_stock'])) {
+                    if (isset($data['max_stock'])) {
                         $q->whereRaw('COALESCE(stock, 0) <= ?', [$data['max_stock']]);
                     }
                 });
             }
         }
-
-
 
         if (!empty($data["search"])) {
             $query->where('name', 'like', '%' . $data["search"] . '%');
-            unset($data["search"]);
         }
 
         if (!empty($data["orderby_total_stock"]) && in_array($data["orderby_total_stock"], ['asc', 'desc'])) {
             $query->orderBy('details_sum_stock', $data["orderby_total_stock"]);
-            unset($data["orderby_total_stock"]);
         }
 
         if (!empty($data["sort_by"]) && in_array($data["sort_by"], ['name', 'created_at'])) {
@@ -200,13 +151,18 @@ class ProductRepository extends BaseRepository implements ProductInterface
             $query->orderBy('created_at', 'desc');
         }
 
-
         $filteredData = array_filter($data, fn($value) => !is_null($value) && $value !== '');
         $allowedWhereFields = ['store_id', 'category', 'is_delete'];
         foreach ($filteredData as $index => $value) {
             if (in_array($index, $allowedWhereFields)) {
                 $query->where($index, $value);
             }
+        }
+
+        if (!$filteredByDetails) {
+            $query->where(function ($q) {
+                $q->whereHas('details')->orWhereDoesntHave('details');
+            });
         }
 
         return $query->paginate($pagination, ['*'], 'page', $page);
@@ -268,7 +224,19 @@ class ProductRepository extends BaseRepository implements ProductInterface
 
     public function countByStore(string $storeId): int
     {
-        return Product::where('store_id', $storeId)->where('is_delete', 0)->count();
+        $query = Product::query()
+            ->where('store_id', $storeId)
+            ->where('is_delete', 0);
+
+        $user = auth()->user();
+
+        if ($user->hasRole('outlet') && $user->outlet_id) {
+            $query->where('outlet_id', $user->outlet_id);
+        } elseif ($user->hasRole('warehouse') && $user->warehouse_id) {
+            $query->where('warehouse_id', $user->warehouse_id);
+        }
+
+        return $query->count();
     }
 
     public function getListProduct(array $filters = []): mixed
