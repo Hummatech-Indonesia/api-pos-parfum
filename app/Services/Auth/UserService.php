@@ -5,7 +5,7 @@ namespace App\Services\Auth;
 use App\Traits\UploadTrait;
 use Spatie\Permission\Models\Role;
 
-class UserService 
+class UserService
 {
     use UploadTrait;
 
@@ -14,11 +14,12 @@ class UserService
         $data = (object)$data;
 
         $image = null;
-        try{
-            if(isset($data->image)) {
+        try {
+            if (isset($data->image)) {
                 $image = $this->upload("users", $data->image);
             }
-        }catch(\Throwable $th){ }
+        } catch (\Throwable $th) {
+        }
 
         $result = [
             "name" => $data->name,
@@ -26,7 +27,7 @@ class UserService
             "password" => bcrypt($data->password)
         ];
 
-        if($image) {
+        if ($image) {
             $result["image"] = $image;
         }
 
@@ -38,22 +39,51 @@ class UserService
         $data = (object)$data;
 
         $image = null;
-        try{
-            if(isset($data->logo)) {
-                $image = $this->upload("users", $data->logo);
+        try {
+            if (isset($data->logo)) {
+                $image = $this->upload("stores", $data->logo);
             }
-        }catch(\Throwable $th){ }
+        } catch (\Throwable $th) {
+        }
 
 
         return [
             "user_id" => $data->user_id,
             "name" => $data->name_store,
             "address" => $data->address_store,
-            "logo" => $image 
+            "logo" => $image
         ];
     }
 
-    public function mapRole () {
+    public function mapRole()
+    {
         return Role::all();
+    }
+    public function prepareUserCreationData(array $data, array $requestedRoles): array
+    {
+        $user = auth()->user();
+        $userRole = $user->getRoleNames()->first();
+
+        $allowedRoles = match ($userRole) {
+            'owner' => ['owner', 'outlet', 'employee', 'warehouse', 'auditor', 'manager', 'cashier', 'admin'],
+            'outlet' => ['outlet', 'employee', 'cashier'],
+            'warehouse' => ['warehouse', 'employee', 'cashier'],
+            default => [],
+        };
+
+        $invalidRoles = array_diff($requestedRoles, $allowedRoles);
+
+        if (count($invalidRoles) > 0) {
+            $invalidList = implode(', ', $invalidRoles);
+            throw new \Exception("Role '{$invalidList}' tidak diizinkan untuk dibuat oleh '{$userRole}'");
+        }
+
+        return [
+            ...$this->mappingDataUser($data),
+            'store_id' => $user->store->id ?? $user->store_id,
+            'outlet_id' => $user->outlet->id ?? null,
+            'warehouse_id' => $user->warehouse->id ?? null,
+            'is_delete' => 0,
+        ];
     }
 }

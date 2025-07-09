@@ -48,4 +48,14 @@ class Category extends Model implements HasArticles
     {
         return $this->hasMany(Product::class)->where('is_delete',0);
     }
+
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Product::class)->where('is_delete',0);
+    }
+
+    public function outlet(): BelongsTo
+    {
+        return $this->belongsTo(Product::class)->where('is_delete',0);
+    }
 }

@@ -2,9 +2,11 @@
 
 namespace App\Contracts\Repositories;
 
-use App\Contracts\Interfaces\CategoryInterface;
 use App\Models\Category;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\QueryException;
+use App\Contracts\Interfaces\CategoryInterface;
 
 class CategoryRepository extends BaseRepository implements CategoryInterface
 {
@@ -23,60 +25,130 @@ class CategoryRepository extends BaseRepository implements CategoryInterface
         return $this->model->create($data);
     }
 
+    public function sorted($column, $order)
+    {
+        $data = [
+            "column" => "created_at",
+            "order" => "ASC",
+        ];
+
+        $validColumns = Schema::getColumnListing($this->model->getTable());
+        if (in_array($column, $validColumns)) {
+            $data['column'] = $column;
+        }
+
+        if (in_array($order, ["ASC", "DESC"])) {
+            $data['order'] = $order;
+        }
+
+        return $data;
+    }
+
     public function customQuery(array $data): mixed
     {
+        $sorting = $data['sorting'] ?? [];
+        if (isset($data['sorting'])) {
+            unset($data['sorting']);
+        }
+
         return $this->model->query()
-        ->with('store')
-        ->withCount(['products' => function ($q) {
-            $q->where('is_delete',0);
-        }])
-        ->when(count($data) > 0, function ($query) use ($data){
-            foreach ($data as $index => $value){
-                $query->where($index, $value);
-            }
-        });
+            // ->with('store')
+            ->withCount(['products' => function ($q) {
+                $q->where('is_delete', 0);
+            }])
+            ->when(count($data) > 0, function ($query) use ($data) {
+                $user = auth()->user();
+
+                if ($user->hasRole('outlet')) {
+                    $query->where('outlet_id', $user->outlet_id);
+                } elseif ($user->hasRole('warehouse')) {
+                    $query->where('warehouse_id', $user->warehouse_id);
+                }
+                foreach ($data as $index => $value) {
+                    $query->where($index, $value);
+                }
+            })
+            ->select('id', 'name', 'created_at')
+            ->addSelect(DB::raw("(select count(*) from products where products.category_id = categories.id and is_delete = 0) as products_count"))
+            ->orderBy($sorting['column'] ?? "created_at", $sorting['order'] ?? "ASC");
     }
+
+
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
-        return $this->model->query()
-        ->with('store')
-        ->withCount(['products' => function ($q) {
-            $q->where('is_delete',0);
-        }])
-        ->when(count($data) > 0, function ($query) use ($data){
-            if(isset($data["search"])){
-                $query->where(function ($query2) use ($data) {
-                    $query2->where('name', 'like', '%' . $data["search"] . '%');
-                });
-                unset($data["search"]);
-            }
+        $sorting = $data['sorting'] ?? [];
+        if (isset($data['sorting'])) {
+            unset($data['sorting']);
+        }
 
-            foreach ($data as $index => $value){
-                $query->where($index, $value);
-            }
-        })
-        ->paginate($pagination, ['*'], 'page', $page);
+        $storeId = $data['store_id'] ?? auth()->user()?->store_id ?? auth()->user()?->store?->id;
+
+        return $this->model->query()
+            ->when($storeId, function ($query) use ($storeId) {
+                $query->where('store_id', $storeId);
+            })
+            ->when($data, function ($query) use ($data) {
+                if (!empty($data["search"])) {
+                    $query->where(function ($query2) use ($data) {
+                        $query2->where('name', 'like', '%' . $data["search"] . '%');
+                    });
+                }
+
+                $user = auth()->user();
+
+                if ($user->hasRole('outlet')) {
+                    $query->where('outlet_id', $user->outlet_id);
+                } elseif ($user->hasRole('warehouse')) {
+                    $query->where('warehouse_id', $user->warehouse_id);
+                }
+
+                if (!empty($data["start_date"])) {
+                    $query->whereDate('created_at', '>=', $data["start_date"]);
+                }
+
+                if (!empty($data["end_date"])) {
+                    $query->whereDate('created_at', '<=', $data["end_date"]);
+                }
+
+                if (isset($data['is_delete'])) {
+                    $query->where('is_delete', $data['is_delete']);
+                }
+            })
+            ->select('id', 'name', 'created_at')
+            ->addSelect(DB::raw("(select count(*) from products where products.category_id = categories.id and is_delete = 0) as products_count"))
+            ->orderBy($sorting['column'] ?? "created_at", $sorting['order'] ?? "ASC")
+            ->paginate($pagination, ['*'], 'page', $page);
         // ->appends(['search' => $request->search, 'year' => $request->year]);
     }
 
     public function show(mixed $id): mixed
     {
-        return $this->model->with('store')->withCount('products')->find($id);
+        return $this->model->with('store:id,name')->withCount('products')->find($id);
     }
 
     public function checkActive(mixed $id): mixed
     {
-        return $this->model->with('store')->withCount('products')->where('is_delete',0)->find($id);
+        return $this->model->with('store:id,name')->withCount('products')->where('is_delete', 0)->find($id);
     }
 
     public function update(mixed $id, array $data): mixed
     {
-        return $this->show($id)->update($data);
+        $model = $this->model->select('id', 'is_delete')->findOrFail($id);
+
+        if ($model->is_delete) {
+            return null;
+        }
+
+        $model->update($data);
+        return $model->fresh();
     }
 
     public function delete(mixed $id): mixed
     {
-        return $this->show($id)->update(["is_delete" => 1]);
+        $model = $this->model->select('id')->findOrFail($id);
+        $model->update(['is_delete' => 1]);
+
+        return $model->fresh();
     }
 }

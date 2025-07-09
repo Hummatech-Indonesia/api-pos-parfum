@@ -5,19 +5,26 @@ namespace App\Http\Controllers\Master;
 use App\Contracts\Interfaces\Master\DiscountVoucherInterface;
 use App\Enums\UploadDiskEnum;
 use App\Helpers\BaseResponse;
+use App\Helpers\PaginationHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\DiscountVoucherRequest;
+use App\Http\Resources\DiscountVoucherResource;
+use App\Models\ProductDetail;
+use App\Services\DiscountVoucherService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use SebastianBergmann\CodeCoverage\Util\Percentage;
 
 class DiscountVoucherController extends Controller
 {
     private DiscountVoucherInterface $discountVoucher;
+    private DiscountVoucherService $discountVoucherService;
 
-    public function __construct(DiscountVoucherInterface $discountVoucher)
+    public function __construct(DiscountVoucherInterface $discountVoucher, DiscountVoucherService $discountVoucherService)
     {
         $this->discountVoucher = $discountVoucher;
+        $this->discountVoucherService = $discountVoucherService;
     }
 
     /**
@@ -28,29 +35,43 @@ class DiscountVoucherController extends Controller
         $per_page = $request->per_page ?? 10;
         $page = $request->page ?? 1;
         $payload = [
-            "is_delete" => 0
+            "is_delete" => 0,
+            "sort_by" => $request->sort_by,
+            "sort_direction" => $request->sort_direction
         ];
 
-        // check query filter
-        if($request->search) $payload["search"] = $request->search;
-        if($request->is_delete) $payload["is_delete"] = $request->is_delete;
-        if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+        if ($request->search) $payload["search"] = $request->search;
+        if ($request->name) $payload["name"] = $request->name;
+        if ($request->active !== null) $payload["active"] = $request->active;
+        if ($request->min_discount) $payload["min_discount"] = $request->min_discount;
+        if ($request->max_discount) $payload["max_discount"] = $request->max_discount;
+        if ($request->start_date) $payload["start_date"] = $request->start_date;
+        if ($request->end_date) $payload["end_date"] = $request->end_date;
+        if ($request->amount) $payload["amount"] = $request->amount;
+        if ($request->type) $payload["type"] = $request->type;
+        if ($request->active !== null) {
+            $payload["active"] = $request->active;
+        }
+        if ($request->is_member !== null) {
+            $payload["is_member"] = $request->is_member;
+        }
 
-        $data = $this->discountVoucher->customPaginate($per_page, $page, $payload)->toArray();
+        if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
+        if (auth()->user()->hasRole('outlet')) $payload["outlet_id"] = auth()->user()->outlet_id;
+        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
-        $result = $data["data"];
-        unset($data["data"]);
+        $collection = $this->discountVoucher->customPaginate($per_page, $page, $payload);
 
-        return BaseResponse::Paginate('Berhasil mengambil list data product varian!', $result, $data);
+        $data = DiscountVoucherResource::collection($collection->items());
+        $meta = PaginationHelper::meta($collection);
+
+        return BaseResponse::Paginate('Berhasil mengambil list data!', $data, $meta);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
@@ -58,16 +79,40 @@ class DiscountVoucherController extends Controller
     public function store(DiscountVoucherRequest $request)
     {
         $validator = $request->validated();
+        $validator['expired'] = $request->end_date;
+        $validator['min'] = $request->minimum_purchase;
+        unset($validator['end_date'], $validator['minimum_purchase']);
+
+        $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+        $validator["store_id"] = $store_id;
+
+        if (auth()->user()->hasRole('warehouse')) $validator["warehouse_id"] = auth()->user()->warehouse_id;
+        if (auth()->user()->hasRole('outlet')) $validator["outlet_id"] = auth()->user()->outlet_id;
 
         DB::beginTransaction();
         try {
+            if (isset($validator['product_detail_id'])) {
+                $isValid = ProductDetail::where('id', $validator['product_detail_id'])
+                    ->whereHas('product', function ($query) use ($store_id) {
+                        $query->where('store_id', $store_id);
+                    })
+                    ->exists();
+
+                if (!$isValid) {
+                    return BaseResponse::Error("Produk yang dipilih tidak valid untuk store Anda.", null);
+                }
+            }
             $store_id = null;
-            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $validator["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $validator["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+
+
             $result_product = $this->discountVoucher->store($validator);
 
             DB::commit();
-            return BaseResponse::Ok('Berhasil membuat product varian', $result_product);
-        }catch(\Throwable $th){
+            $result_product->refresh();
+            $result_product->load('details.product');
+            return BaseResponse::Create('Berhasil membuat diskon!', new DiscountVoucherResource($result_product));
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -78,10 +123,14 @@ class DiscountVoucherController extends Controller
      */
     public function show(string $id)
     {
-        $check_product = $this->discountVoucher->show($id);
-        if(!$check_product) return BaseResponse::Notfound("Tidak dapat menemukan data product varian!");
+        try {
+            $check_product = $this->discountVoucher->show($id);
+            if (!$check_product) return BaseResponse::Notfound("Tidak dapat menemukan data dengan ID: " . $id);
 
-        return BaseResponse::Ok("Berhasil mengambil detail product varian!", $check_product);
+            return BaseResponse::Ok("Berhasil mengambil detail!", new DiscountVoucherResource($check_product));
+        } catch (\Throwable $th) {
+            return BaseResponse::Error("Terjadi kesalahan: " . $th->getMessage(), null);
+        }
     }
 
     /**
@@ -98,18 +147,27 @@ class DiscountVoucherController extends Controller
     public function update(DiscountVoucherRequest $request, string $id)
     {
         $validator = $request->validated();
+        $validator['expired'] = $request->end_date;
+        $validator['min'] = $request->minimum_purchase;
+        unset($validator['end_date'], $validator['minimum_purchase']);
+
+        if (isset($validator['type']) && $validator['type'] === 'percentage') {
+            $validator['nominal'] = null;
+        } elseif (isset($validator['type']) && $validator['type'] === 'nominal') {
+            $validator['percentage'] = null;
+        }
 
         $check = $this->discountVoucher->checkActive($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data product varian!");
+        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data!");
 
         DB::beginTransaction();
         try {
-
             $result_product = $this->discountVoucher->update($id, $validator);
-    
+
             DB::commit();
-            return BaseResponse::Ok('Berhasil update data product varian', $result_product);
-        }catch(\Throwable $th){
+            $result_product->load('details.product');
+            return BaseResponse::Ok('Diskon Berhasil Diperbarui!', new DiscountVoucherResource($result_product));
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -120,9 +178,9 @@ class DiscountVoucherController extends Controller
      */
     public function destroy(string $id)
     {
-        
+
         $check = $this->discountVoucher->checkActive($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data product varian!");
+        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data!");
 
         DB::beginTransaction();
         try {
@@ -130,23 +188,46 @@ class DiscountVoucherController extends Controller
 
             DB::commit();
             return BaseResponse::Ok('Berhasil menghapus data', null);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
 
-    public function listDischountVoucher(Request $request)
+    public function listDiscountVoucher(Request $request)
     {
-        try{
-            $payload = [];
+        try {
+            $payload = [
+                "is_delete" => 0,
+                "sort_by" => $request->sort_by,
+                "sort_direction" => $request->sort_direction
+            ];
 
-            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
-            $data = $this->discountVoucher->customQuery($payload)->get();
+            if ($request->search) $payload["search"] = $request->search;
+            if ($request->name) $payload["name"] = $request->name;
+            if ($request->active !== null) $payload["active"] = $request->active;
+            if ($request->min_discount) $payload["min_discount"] = $request->min_discount;
+            if ($request->max_discount) $payload["max_discount"] = $request->max_discount;
+            if ($request->start_date) $payload["start_date"] = $request->start_date;
+            if ($request->end_date) $payload["end_date"] = $request->end_date;
+            if ($request->amount) $payload["amount"] = $request->amount;
+            if ($request->type) $payload["type"] = $request->type;
+            if ($request->active !== null) {
+                $payload["active"] = $request->active;
+            }
+            if ($request->is_member !== null) {
+                $payload["is_member"] = $request->is_member;
+            }
+            if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
+            if (auth()->user()->hasRole('outlet')) $payload["outlet_id"] = auth()->user()->outlet_id;
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+            $collection = $this->discountVoucher->customQuery($payload)->get();
 
-            return BaseResponse::Ok("Berhasil mengambil data product varian", $data);
-        }catch(\Throwable $th) {
-          return BaseResponse::Error($th->getMessage(), null);  
+            $data = DiscountVoucherResource::collection($collection);
+
+            return BaseResponse::Ok("Berhasil mengambil data", $data);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
         }
     }
 }

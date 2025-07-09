@@ -13,4 +13,9 @@ use App\Contracts\Interfaces\Eloquent\UpdateInterface;
 interface WarehouseInterface extends GetInterface, StoreInterface, CustomQueryInterface, CustomPaginateInterface, ShowInterface, UpdateInterface, DeleteInterface
 {
     public function checkActive(mixed $id): mixed;
+
+    public function withProductStocks($warehouseId): mixed;
+
+    public function getProductStocksPaginated($warehouseId, $perPage, $page): mixed;
+
 }

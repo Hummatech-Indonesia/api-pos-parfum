@@ -27,9 +27,10 @@ class StockRequestUpdateRequest extends FormRequest
     {
         return [
             'status' => 'required|string',
-            'product_detail' => 'required|array',
-            'product_detail.*.product_detail_id' => 'required|uuid',
-            'product_detail.*.sended_stock' => 'required|integer|min:0',
+            'stock_requested' => 'sometimes|array',
+            'stock_requested.*.product_detail_id' => 'required_with:stock_requested|uuid',
+            'stock_requested.*.sended_stock' => 'required_with:stock_requested|integer|min:0',
+            'stock_requested.*.price' => 'nullable|numeric|min:0',
         ];
     }
 
@@ -38,12 +39,17 @@ class StockRequestUpdateRequest extends FormRequest
         return [
             'status.required' => 'Status tidak boleh kosong!',
             'status.string' => 'Status harus berupa string!',
-            'product_detail.array' => 'Data produk tidak valid!',
-            // 'product_detail.*.product_detail_id.unique' => 'Produk tidak ada!',            
-            // 'product_detail.*.requested_stock.required' => 'Stock tidak boleh kosong!',
-            'product_detail.*.sended_stock.required' => 'Stock tidak boleh kosong!',
-            'product_detail.*.sended_stock.integer' => 'Stock harus berupa integer!',
-            'product_detail.*.sended_stock.min' => 'Stock minimal adalah 0!',
+
+            'stock_requested.array' => 'Format permintaan stok tidak valid!',
+            'stock_requested.*.product_detail_id.required_with' => 'Produk harus dipilih!',
+            'stock_requested.*.product_detail_id.uuid' => 'ID produk tidak valid!',
+
+            'stock_requested.*.sended_stock.required_with' => 'Jumlah stok yang dikirim harus diisi!',
+            'stock_requested.*.sended_stock.integer' => 'Jumlah stok harus berupa angka!',
+            'stock_requested.*.sended_stock.min' => 'Jumlah stok minimal adalah 0!',
+
+            'stock_requested.*.price.numeric' => 'Harga harus berupa angka!',
+            'stock_requested.*.price.min' => 'Harga minimal adalah 0!',
         ];
     }
 

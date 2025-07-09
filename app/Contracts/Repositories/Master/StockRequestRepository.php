@@ -27,27 +27,68 @@ class StockRequestRepository extends BaseRepository implements StockRequestInter
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
-        ->with(['user', 'detailProduct', 'outlet', 'warehouse'])
-        ->when(count($data) > 0, function ($query) use ($data){
-            foreach ($data as $index => $value){
-                $query->where($index, $value);
-            }
-        });
+            ->with(['user', 'detailProduct', 'outlet', 'warehouse'])
+            ->when(count($data) > 0, function ($query) use ($data) {
+                foreach ($data as $index => $value) {
+                    $query->where($index, $value);
+                }
+            });
     }
 
     public function customPaginate(int $pagination = 10, int $page = 1, ?array $data): mixed
     {
-        $query = $this->model->query()
-            ->with(['user', 'detailRequestStock.detailProduct.product', 'outlet' , 'warehouse']);
+        $user = auth()->user();
+        $warehouseId = $user->warehouse_id ?? null;
+        $outletId = $user->outlet_id ?? null;
 
-        // Filtering berdasarkan parameter lainnya
+        $query = $this->model->query()
+            ->when(
+                isset($data['warehouse_id']) || $warehouseId,
+                fn($q) => $q->where('warehouse_id', $data['warehouse_id'] ?? $warehouseId)
+            )
+            ->when(
+                isset($data['outlet_id']) || $outletId,
+                fn($q) => $q->where('outlet_id', $data['outlet_id'] ?? $outletId)
+            )
+            ->orderBy('updated_at', 'desc')
+            ->with(['user', 'detailRequestStock.detailProduct.product', 'outlet', 'warehouse']);
+
+        if (!empty($data['status'])) {
+            $query->where('status', $data['status']);
+        }
+
+        if (!empty($data['created_at_start']) && !empty($data['created_at_end'])) {
+            $query->whereBetween('created_at', [$data['created_at_start'], $data['created_at_end']]);
+        }
+
+        if (!empty($data['requested_stock_min']) || !empty($data['requested_stock_max'])) {
+            $query->whereHas('detailRequestStock', function ($q) use ($data) {
+                if (!empty($data['requested_stock_min'])) {
+                    $q->havingRaw('SUM(requested_stock) >= ?', [$data['requested_stock_min']]);
+                }
+                if (!empty($data['requested_stock_max'])) {
+                    $q->havingRaw('SUM(requested_stock) <= ?', [$data['requested_stock_max']]);
+                }
+            });
+        }
+
+        if (!empty($data['warehouse_name'])) {
+            $query->whereHas('warehouse', function ($q) use ($data) {
+                $q->where('name', 'like', '%' . $data['warehouse_name'] . '%');
+            });
+        }
+
+        // Filter kolom lainnya (outlet_id, warehouse_id, dll)
         $filteredData = array_filter($data, fn($value) => !is_null($value) && $value !== '');
         foreach ($filteredData as $index => $value) {
-            $query->where($index, $value);
+            if (!in_array($index, ['status', 'created_at_start', 'created_at_end', 'requested_stock_min', 'requested_stock_max', 'warehouse_name', 'warehouse_id', 'outlet_id'])) {
+                $query->where($index, $value);
+            }
         }
 
         return $query->paginate($pagination, ['*'], 'page', $page);
     }
+
 
     public function show(mixed $id): mixed
     {
@@ -63,5 +104,4 @@ class StockRequestRepository extends BaseRepository implements StockRequestInter
     {
         return $this->show($id)->update(["is_delete" => 1]);
     }
-
 }

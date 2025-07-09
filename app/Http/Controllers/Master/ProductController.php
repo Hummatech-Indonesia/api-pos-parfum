@@ -2,18 +2,24 @@
 
 namespace App\Http\Controllers\Master;
 
-use App\Contracts\Interfaces\CategoryInterface;
-use App\Contracts\Interfaces\Master\ProductDetailInterface;
-use App\Contracts\Interfaces\Master\ProductInterface;
-use App\Contracts\Interfaces\Master\ProductVarianInterface;
+use Illuminate\Http\Request;
 use App\Enums\UploadDiskEnum;
 use App\Helpers\BaseResponse;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Master\ProductRequest;
-use App\Services\Master\ProductService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Services\Master\ProductService;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\Master\ProductRequest;
+use App\Services\Master\ProductDetailService;
+use App\Contracts\Interfaces\CategoryInterface;
+use App\Contracts\Interfaces\Master\ProductInterface;
+use App\Contracts\Interfaces\Master\ProductStockInterface;
+use App\Contracts\Interfaces\Master\ProductDetailInterface;
+use App\Contracts\Interfaces\Master\ProductVarianInterface;
+use App\Helpers\PaginationHelper;
+use App\Http\Resources\ProductResource;
+use App\Models\Product;
+use Illuminate\Support\Facades\Response;
 
 class ProductController extends Controller
 {
@@ -22,15 +28,25 @@ class ProductController extends Controller
     private ProductService $productService;
     private ProductVarianInterface $productVarian;
     private CategoryInterface $category;
+    private ProductStockInterface $productStock;
+    private ProductDetailService $productDetailService;
 
-    public function __construct(ProductInterface $product, ProductDetailInterface $productDetail, ProductService $productService,
-    ProductVarianInterface $productVarian, CategoryInterface $category)
-    {
+    public function __construct(
+        ProductInterface $product,
+        ProductDetailInterface $productDetail,
+        ProductService $productService,
+        ProductVarianInterface $productVarian,
+        CategoryInterface $category,
+        ProductStockInterface $productStock,
+        ProductDetailService $productDetailService
+    ) {
         $this->product = $product;
         $this->productDetail = $productDetail;
         $this->productVarian = $productVarian;
         $this->category = $category;
         $this->productService = $productService;
+        $this->productStock = $productStock;
+        $this->productDetailService = $productDetailService;
     }
 
     /**
@@ -38,33 +54,50 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $per_page = $request->per_page ?? 10;
+        $perPage = $request->per_page ?? 10;
         $page = $request->page ?? 1;
+
         $payload = [
-            "is_delete" => 0
+            "is_delete" => $request->get('is_delete', 0),
+            'min_price'    => $request->get('min_price'),
+            'max_price'    => $request->get('max_price'),
+            'min_sales'    => $request->get('min_sales'),
+            'max_sales'    => $request->get('max_sales'),
+            'min_stock'    => $request->get('min_stock'),
+            'max_stock'    => $request->get('max_stock'),
+            'category'    => $request->get('category'),
         ];
 
-        // check query filter
-        if($request->search) $payload["search"] = $request->search;
-        if($request->is_delete) $payload["is_delete"] = $request->is_delete;
-        if($request->orderby_total_stock) $payload["orderby_total_stock"] = $request->orderby_total_stock;
-        if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+        if ($request->search) {
+            $payload["search"] = $request->search;
+        }
 
-        $data = $this->product->customPaginate($per_page, $page, $payload)->toArray();
+        if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
+        if (auth()->user()->hasRole('outlet')) $payload["outlet_id"] = auth()->user()->outlet_id;
 
-        $result = $data["data"];
-        unset($data["data"]);
+        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
+            $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+        }
 
-        return BaseResponse::Paginate('Berhasil mengambil list data product !', $result, $data);
+        $payload["sort_by"] = in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null;
+        $payload["sort_order"] = in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'asc';
+
+        $paginated = $this->product->customPaginate($perPage, $page, $payload);
+
+
+        $resource = ProductResource::collection($paginated);
+        $meta = PaginationHelper::meta($paginated);
+
+
+        return BaseResponse::Paginate('Berhasil mengambil list data product !', $resource->collection, $meta);
     }
+
+
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
@@ -75,42 +108,38 @@ class ProductController extends Controller
 
         DB::beginTransaction();
         try {
-            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $data["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+            if (auth()->user()->hasRole('outlet')) $data["outlet_id"] = auth()->user()->outlet_id;
+            else if (auth()->user()->hasRole('warehouse')) $data["warehouse_id"] = auth()->user()->warehouse_id;
+            $data = $this->productService->injectDensityToDetails($data);
+
+
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $data["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             $mapProduct = $this->productService->dataProduct($data);
-            
+
             $result_product = $this->product->store($mapProduct);
 
-            foreach($data["product_details"] as $detail){
+            foreach ($data["product_details"] as $detail) {
                 $detail["product_id"] = $result_product->id;
                 $detail["category_id"] = $data["category_id"];
-                
-                /**
-                 * Pengecekan apakah data varian yang dikirim sudah ada atau belum
-                 */
-                if(isset($detail["product_varian_id"])) 
-                {
-                    $check_varian = $this->productVarian->customQuery(["id" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
-                    if(!$check_varian) {
-                        /**
-                         * Check varian name has owned in this store
-                         */
-                        $checkVarianName = $this->productVarian->customQuery(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
-                        if(!$checkVarianName){
-                            $this->productVarian->store(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]]);
-                            $store_varian = $this->productVarian->customQuery(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
-                            $detail["product_varian_id"] = $store_varian->id;
-                        } else {
-                            $detail["product_varian_id"] = $checkVarianName?->id;
-                        }
-                    } 
-                }
+                $detail["unit_id"] = $data["unit_id"] ?? null;
+                $detail["variant"] = $detail["variant"] ?? null;
+                $detail["density"] = $detail["density"] ?? null;
+                $detail["opsi"] = $detail["opsi"] ?? null;
+                $mappingDetail = $this->productDetailService->dataProductDetail($detail);
+                $storedDetail = $this->productDetail->store($mappingDetail);
 
-                $this->productDetail->store($detail);
+                $this->productStock->store([
+                    'warehouse_id' => auth()->user()->warehouse_id ?? null,
+                    'outlet_id' => auth()->user()->outlet_id ?? null,
+                    'product_id' => $result_product->id,
+                    'product_detail_id' => $storedDetail->id,
+                    'stock' => $storedDetail->stock ?? 0,
+                ]);
             }
 
             DB::commit();
-            return BaseResponse::Ok('Berhasil membuat product ', $result_product->load(['details']));
-        }catch(\Throwable $th){
+            return BaseResponse::Create('Berhasil membuat product ', new ProductResource($result_product->load(['details'])));
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -121,11 +150,22 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        $check_product = $this->product->checkActiveWithDetailV2($id);
-        if(!$check_product) return BaseResponse::Notfound("Tidak dapat menemukan data product !");
+        $product = $this->product->checkActiveWithDetailV2($id);
 
-        return BaseResponse::Ok("Berhasil mengambil detail product !", $check_product);
+        if (!$product) {
+            return BaseResponse::Notfound("Tidak dapat menemukan data product !");
+        }
+
+        $product->loadMissing([
+            'details.productStockWarehouse',
+            'details.productStockOutlet',
+            'details.category',
+            'productBundling.details.productDetail.product',
+        ]);
+
+        return BaseResponse::Ok("Berhasil mengambil detail product !", new ProductResource($product));
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -140,64 +180,61 @@ class ProductController extends Controller
      */
     public function update(ProductRequest $request, string $id)
     {
-        
+
         $data = $request->validated();
         DB::beginTransaction();
         try {
-            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $data["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+
+            if (auth()->user()->hasRole('outlet')) $data["outlet_id"] = auth()->user()->outlet_id;
+            else if (auth()->user()->hasRole('warehouse')) $data["warehouse_id"] = auth()->user()->warehouse_id;
+            $data = $this->productService->injectDensityToDetails($data);
+
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $data["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             $select_product = $this->product->show($id);
-            
+
+            if (!$select_product) {
+                DB::rollBack();
+                return BaseResponse::Notfound("Produk tidak ditemukan");
+            }
+
             $mapProduct = $this->productService->dataProductUpdate($data, $select_product);
             $this->product->update($id, $mapProduct);
             $products = $select_product->details->where('is_delete', 0);
-        
-            foreach($data["product_details"] as $detail){
+
+            foreach ($data["product_details"] as $detail) {
                 $detail["product_id"] = $id;
                 $detail["category_id"] = $data["category_id"];
+                $detail["unit_id"] = $data["unit_id"] ?? null;
 
                 /**
                  * Pengecekan apakah data varian yang dikirim sudah ada atau belum
                  */
-                if(isset($detail["product_varian_id"])) 
-                {
-                    $check_varian = $this->productVarian->customQuery(["id" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
-                    if(!$check_varian) {
-                        /**
-                         * Check varian name has owned in this store
-                         */
-                        $checkVarianName = $this->productVarian->customQuery(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
-                        if(!$checkVarianName){
-                            $this->productVarian->store(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]]);
-                            $store_varian = $this->productVarian->customQuery(["name" => $detail["product_varian_id"], "store_id" => $data["store_id"]])->first();
-                            $detail["product_varian_id"] = $store_varian->id;
-                        } else {
-                            $detail["product_varian_id"] = $checkVarianName?->id;
-                        }
-                    } 
-                }
-                
-                if(isset($detail["product_detail_id"])){
+
+                if (isset($detail["product_detail_id"])) {
                     $idDetail = $detail["product_detail_id"];
-                    $products = collect($products)->filter(function($item) use ($detail) {
+                    $products = collect($products)->filter(function ($item) use ($detail) {
                         return $item->id != $detail["product_detail_id"];
                     });
-                    
+
                     unset($detail["product_detail_id"]);
-                    $this->productDetail->update($idDetail, $detail);
+                    $productDetailShow = $this->productDetail->show($idDetail);
+                    $mappingDetailUpdate = $this->productDetailService->dataProductDetailUpdate($detail, $productDetailShow);
+                    $this->productDetail->update($idDetail, $mappingDetailUpdate);
                 } else {
-                    $this->productDetail->store($detail);
+                    $mappingDetail = $this->productDetailService->dataProductDetail($detail);
+                    $this->productDetail->store($mappingDetail);
                 }
             }
-            
-            foreach($products as $product_detail){
+
+            foreach ($products as $product_detail) {
                 $product_detail->is_delete = true;
                 $product_detail->save();
-            } 
-            
+            }
+
             $result_product = $this->product->checkActiveWithDetail($id);
             DB::commit();
-            return BaseResponse::Ok('Berhasil update product', $result_product);
-        }catch(\Throwable $th){
+            return BaseResponse::Ok('Berhasil update product', new ProductResource($result_product));
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -208,9 +245,8 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        
         $check = $this->product->checkActive($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data product !");
+        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data product !");
 
         DB::beginTransaction();
         try {
@@ -218,7 +254,7 @@ class ProductController extends Controller
 
             DB::commit();
             return BaseResponse::Ok('Berhasil menghapus data', null);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -226,17 +262,126 @@ class ProductController extends Controller
 
     public function listProduct(Request $request)
     {
-        try{
-            $payload = [];
+        try {
+            $payload = [
+                'is_delete' => $request->get('is_delete', 0),
+                'search' => $request->get('search'),
+                'sort_by' => in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null,
+                'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
+            ];
 
-            if($request->has('is_delete')) $payload["is_delete"] = $request->is_delete;
+            if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
+            if (auth()->user()->hasRole('outlet')) $payload["outlet_id"] = auth()->user()->outlet_id;
 
-            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
-            $data = $this->product->customQuery($payload)->get();
 
-            return BaseResponse::Ok("Berhasil mengambil data product ", $data);
-        }catch(\Throwable $th) {
-          return BaseResponse::Error($th->getMessage(), null);  
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
+                $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+            }
+
+            $products = $this->product->getListProduct($payload);
+
+            return BaseResponse::Ok("Berhasil mengambil data product", ProductResource::collection($products));
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+    public function listProductV2(Request $request)
+    {
+        try {
+            $payload = [
+                'is_delete' => $request->get('is_delete', 0),
+                'search' => $request->get('search'),
+                'sort_by' => in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null,
+                'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
+            ];
+
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
+                $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+            }
+
+            if (auth()?->user()?->outlet_id) {
+                $payload['outlet_id'] = auth()?->user()?->outlet_id;
+            }
+
+            $products = $this->product->customQuery($payload)->get();
+
+            return BaseResponse::Ok("Berhasil mengambil data product", $products);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+    public function listProductWithoutBundling(Request $request)
+    {
+        try {
+            $payload = [
+                'is_delete' => $request->get('is_delete', 0),
+                'search' => $request->get('search'),
+                'sort_by' => in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null,
+                'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
+            ];
+
+            $user = auth()->user();
+
+            if ($user->hasRole('warehouse')) {
+                $payload["warehouse_id"] = $user->warehouse_id;
+            }
+
+            if ($user->hasRole('outlet')) {
+                $payload["outlet_id"] = $user->outlet_id;
+            }
+
+            if ($user->store?->id || $user->store_id) {
+                $payload['store_id'] = $user->store?->id ?? $user->store_id;
+            }
+
+            $products = $this->product->getListProductWithoutBundling($payload);
+
+            return BaseResponse::Ok("Berhasil mengambil data product non-bundling", ProductResource::collection($products));
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+    public function downloadExample()
+    {
+        $filePath = public_path('ExampleProduct.xlsx');
+
+        if (!file_exists($filePath)) {
+            return BaseResponse::Notfound('File tidak ditemukan.');
+        }
+
+        return Response::download($filePath, 'ExampleProduct.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
+    }
+
+    public function syncListProduct(Request $request)
+    {
+        try {
+            $payload = [
+                'is_delete' => $request->get('is_delete', 0),
+                'search' => $request->get('search'),
+                'sort_by' => in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null,
+                'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
+            ];
+
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
+                $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+            }
+
+            if (auth()?->user()?->outlet_id) {
+                $payload['outlet_id'] = auth()?->user()?->outlet_id;
+            }
+
+            $products = $this->product->customQuery($payload)->paginate($request->page ?? 100);
+
+            $meta = PaginationHelper::meta($products);
+
+            return BaseResponse::Paginate("Berhasil sync list product", $products["data"], $meta);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
         }
     }
 }

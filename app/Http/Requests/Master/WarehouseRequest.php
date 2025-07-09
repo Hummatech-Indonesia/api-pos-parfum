@@ -29,8 +29,13 @@ class WarehouseRequest extends FormRequest
             'name' => 'required',
             'address' => 'required',
             'telp' => 'sometimes|nullable|min:10',
+            'person_responsible' => 'nullable|string',
             'user_id' => 'sometimes|nullable|array',
-            'image' => 'nullable|image|max:2048'
+            'image' => 'nullable|image|max:2048',
+            'users' => 'sometimes|array|min:1',
+            'users.*.name' => 'required_with:users|string',
+            'users.*.email' => 'required_with:users|email|unique:users,email',
+            'users.*.password' => 'required_with:users|min:8'
         ];
     }
 

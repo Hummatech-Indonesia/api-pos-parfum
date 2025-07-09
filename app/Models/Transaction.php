@@ -32,4 +32,20 @@ class Transaction extends Model
     {
         return $this->hasMany(TransactionDetail::class);
     }
+
+    public function cashier()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
+
+    public function outlet()
+    {
+        return $this->belongsTo(Outlet::class);
+    }
+
 }

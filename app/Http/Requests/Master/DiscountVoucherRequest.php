@@ -27,14 +27,21 @@ class DiscountVoucherRequest extends FormRequest
         return [
             "store_id" => 'nullable',
             'product_id' => 'nullable',
+            'product_detail_id' => 'nullable',
             'outlet_id' => 'nullable',
             'name' => 'required',
-            'desc' => 'nullable',
-            'max_used' => 'nullable',
-            'min' => 'nullable',
-            'discount' => 'required',
-            'expired' => 'sometimes|after:today',
-            'active' => 'nullable'
+            'desc' => 'sometimes',
+            'minimum_purchase' => 'sometimes',
+            'discount' => 'nullable|integer|min:0',
+            'end_date' => 'sometimes|date',
+            'start_date' => 'sometimes|date',
+            // 'expired' => 'sometimes|after:today',
+            'type' => 'sometimes|in:percentage,nominal',
+            'percentage' => 'nullable|numeric|required_if:type,percentage|prohibited_if:type,nominal',
+            'nominal' => 'nullable|numeric|required_if:type,nominal|prohibited_if:type,percentage',
+            'is_member' => 'nullable|boolean',
+            'active' => 'nullable|boolean',
+
         ];
     }
 
@@ -43,18 +50,46 @@ class DiscountVoucherRequest extends FormRequest
         return [
             'name.required' => 'Nama discount / voucher harus diisi!',
             'discount.required' => 'Jumlah discount harus diisi!',
-            'expired.after' => 'Tenggat discount / voucher harus melebihi dari hari ini!'
+            'expired.after' => 'Tenggat discount / voucher harus melebihi dari hari ini!',
+            'type.in' => 'Tipe diskon harus berupa percentage atau nominal.',
+
+            'percentage.required_if' => 'Field percentage wajib diisi jika tipe diskon adalah percentage.',
+            'percentage.prohibited_if' => 'Field percentage tidak boleh diisi jika tipe diskon adalah nominal.',
+
+            'nominal.required_if' => 'Field nominal wajib diisi jika tipe diskon adalah nominal.',
+            'nominal.prohibited_if' => 'Field nominal tidak boleh diisi jika tipe diskon adalah percentage.',
+
+            'start_date.date' => 'tanggal mulai harus merupakan tanggal yang valid',
+            'end_date.date' => 'tanggal selesai harus merupakan tanggal yang valid',
         ];
     }
 
     public function prepareForValidation()
     {
         // if(!$this->store_id) $this->merge(["store_id" => auth()?->user()?->store?->id || auth()?->user()?->store_id]);
-        if(!$this->min) $this->merge(["min" => 0]);
+        if (!$this->min) $this->merge(["min" => 0]);
     }
 
     public function failedValidation(Validator $validator)
     {
-        return new HttpResponseException(BaseResponse::error("Kesalahan dalam validasi!", $validator->errors()));
+        throw new HttpResponseException(BaseResponse::error("Kesalahan dalam validasi!", $validator->errors()));
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $hasNominal = $this->filled('nominal');
+            $hasPercentage = $this->filled('percentage');
+
+            if (!$hasNominal && !$hasPercentage) {
+                $validator->errors()->add('nominal', 'Isi salah satu: nominal atau percentage.');
+                $validator->errors()->add('percentage', 'Isi salah satu: nominal atau percentage.');
+            }
+
+            if ($hasNominal && $hasPercentage) {
+                $validator->errors()->add('nominal', 'Hanya salah satu yang boleh diisi: nominal atau percentage.');
+                $validator->errors()->add('percentage', 'Hanya salah satu yang boleh diisi: nominal atau percentage.');
+            }
+        });
     }
 }

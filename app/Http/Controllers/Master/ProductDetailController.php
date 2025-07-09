@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers\Master;
 
-use App\Contracts\Interfaces\Master\ProductDetailInterface;
-use App\Contracts\Interfaces\Master\ProductInterface;
-use App\Contracts\Interfaces\Master\ProductStockInterface;
+use Illuminate\Http\Request;
 use App\Enums\UploadDiskEnum;
 use App\Helpers\BaseResponse;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Master\ProductDetailRequest;
-use App\Services\Master\ProductService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Services\Master\ProductService;
 use Illuminate\Support\Facades\Validator;
+use App\Services\Master\ProductDetailService;
+use App\Http\Requests\Master\ProductDetailRequest;
+use App\Contracts\Interfaces\Master\ProductInterface;
+use App\Contracts\Interfaces\Master\ProductStockInterface;
+use App\Contracts\Interfaces\Master\ProductDetailInterface;
+use App\Helpers\PaginationHelper;
+use App\Http\Resources\ProductDetailResource;
+use App\Models\ProductDetail;
 
 class ProductDetailController extends Controller
 {
@@ -20,14 +24,20 @@ class ProductDetailController extends Controller
     private ProductDetailInterface $productDetail;
     private ProductService $productService;
     private ProductStockInterface $productStock;
+    private ProductDetailService $productDetailService;
 
-    public function __construct(ProductInterface $product, ProductDetailInterface $productDetail, ProductService $productService,
-    ProductStockInterface $productStock)
-    {
+    public function __construct(
+        ProductInterface $product,
+        ProductDetailInterface $productDetail,
+        ProductService $productService,
+        ProductStockInterface $productStock,
+        ProductDetailService $productDetailService
+    ) {
         $this->product = $product;
         $this->productDetail = $productDetail;
         $this->productService = $productService;
         $this->productStock = $productStock;
+        $this->productDetailService = $productDetailService;
     }
 
     /**
@@ -40,26 +50,31 @@ class ProductDetailController extends Controller
         $payload = [
             "is_delete" => 0
         ];
+        if (auth()?->user()?->store_id ?? auth()?->user()?->store?->id) {
+            $payload['store_id'] = auth()?->user()?->store_id ?? auth()?->user()?->store->id;
+        }
+
+        if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
+        if (auth()->user()->hasRole('outlet')) $payload["outlet_id"] = auth()->user()->outlet_id;
 
         // check query filter
-        if($request->search) $payload["search"] = $request->search;
-        if($request->is_delete) $payload["is_delete"] = $request->is_delete;
+        if ($request->search) $payload["search"] = $request->search;
+        if ($request->is_delete) $payload["is_delete"] = $request->is_delete;
+        if ($request->sort_by) $payload["sort_by"] = $request->sort_by;
+        if ($request->sort_direction) $payload["sort_direction"] = $request->sort_direction;
 
-        $data = $this->productDetail->customPaginate($per_page, $page, $payload)->toArray();
+        $data = $this->productDetail->customPaginate($per_page, $page, $payload);
 
-        $result = $data["data"];
-        unset($data["data"]);
+        $resource = ProductDetailResource::collection($data);
+        $meta = PaginationHelper::meta($data);
 
-        return BaseResponse::Paginate('Berhasil mengambil list data product !', $result, $data);
+        return BaseResponse::Paginate('Berhasil mengambil list data product !', $resource, $meta);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
@@ -68,13 +83,15 @@ class ProductDetailController extends Controller
     {
         $data = $request->validated();
 
+
         DB::beginTransaction();
         try {
-            $result_product = $this->productDetail->store($data);
+            $mapping = $this->productDetailService->dataProductDetail($data);
+            $result_product = $this->productDetail->store($mapping);
 
             DB::commit();
-            return BaseResponse::Ok('Berhasil membuat product ', $result_product);
-        }catch(\Throwable $th){
+            return BaseResponse::Create('Berhasil membuat product ', new ProductDetailResource($result_product));
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -86,9 +103,10 @@ class ProductDetailController extends Controller
     public function show(string $id)
     {
         $check_product = $this->productDetail->show($id);
-        if(!$check_product) return BaseResponse::Notfound("Tidak dapat menemukan data product !");
 
-        return BaseResponse::Ok("Berhasil mengambil detail product !", $check_product);
+        if (!$check_product) return BaseResponse::Notfound("Tidak dapat menemukan data product !");
+        $resource = new ProductDetailResource($check_product);
+        return BaseResponse::Ok("Berhasil mengambil detail product !", $resource);
     }
 
     /**
@@ -104,16 +122,18 @@ class ProductDetailController extends Controller
      */
     public function update(ProductDetailRequest $request, string $id)
     {
-        
+
         $data = $request->validated();
 
         DB::beginTransaction();
         try {
-            $result_product = $this->productDetail->update($id, $data);
+            $productDetail = $this->productDetail->show($id);
+            $mapping = $this->productDetailService->dataProductDetailUpdate($data, $productDetail);
+            $result_product = $this->productDetail->update($id, $mapping);
 
             DB::commit();
-            return BaseResponse::Ok('Berhasil update product', $result_product);
-        }catch(\Throwable $th){
+            return BaseResponse::Ok('Berhasil update product', new ProductDetailResource($result_product));
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -125,7 +145,15 @@ class ProductDetailController extends Controller
     public function destroy(string $id)
     {
         $check = $this->productDetail->checkActive($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data product detail!");
+        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data product detail!");
+
+        if (
+            $check->discountVouchers()->exists() ||
+            $check->auditDetails()->exists() ||
+            $check->productBlendDetail()->exists()
+        ) {
+            return BaseResponse::Error("Produk tidak dapat dihapus karena masih digunakan dalam relasi lain.", null);
+        }
 
         DB::beginTransaction();
         try {
@@ -133,7 +161,7 @@ class ProductDetailController extends Controller
 
             DB::commit();
             return BaseResponse::Ok('Berhasil menghapus data', null);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -141,30 +169,53 @@ class ProductDetailController extends Controller
 
     public function listProduct(Request $request)
     {
-        try{
+        try {
             $payload = [];
 
-            if($request->product_id) $payload['product_id'] = $request->product_id;  
-            $data = $this->productDetail->customQuery($payload)->get();
+            if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
+            if (auth()->user()->hasRole('outlet')) $payload["outlet_id"] = auth()->user()->outlet_id;
 
-            return BaseResponse::Ok("Berhasil mengambil data product ", $data);
-        }catch(\Throwable $th) {
-          return BaseResponse::Error($th->getMessage(), null);  
+            if ($request->product_id) $payload['product_id'] = $request->product_id;
+
+            if (auth()?->user()?->store_id ?? auth()?->user()?->store?->id) {
+                $payload['store_id'] = auth()?->user()?->store_id ?? auth()?->user()?->store->id;
+            }
+
+            $data = $this->productDetail->customQuery($payload)->get();
+            $resource = ProductDetailResource::collection($data);
+
+            return BaseResponse::Ok("Berhasil mengambil data product ", $resource);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
         }
     }
 
-    public function stockProduct(Request $request) {
-        $payload = [];
+    public function listProductV2(Request $request)
+    {
         try {
-            if($request->warehouse_id) $payload["warehouse_id"] = $request->warehouse_id;
-            if($request->product_detail_id) $payload["product_detail_id"] = $request->product_detail_id;
-            if($request->outlet_id) $payload["outlet_id"] = $request->outlet_id;
-            
-            if($request->page && $request->per_page) $data = $this->productStock->customPaginate($request->per_page, $request->page, $payload); 
-            else $data = $this->productStock->customQuery($payload);
+            $payload = [];
+
+            if ($request->product_id) $payload['product_id'] = $request->product_id;
+            $data = $this->productDetail->customQuery($payload)->get();
 
             return BaseResponse::Ok("Berhasil mengambil data product ", $data);
-        }catch(\Throwable $th) {
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+    public function stockProduct(Request $request)
+    {
+        $payload = [];
+        try {
+            if ($request->warehouse_id) $payload["warehouse_id"] = $request->warehouse_id;
+            if ($request->product_detail_id) $payload["product_detail_id"] = $request->product_detail_id;
+            if ($request->outlet_id) $payload["outlet_id"] = $request->outlet_id;
+
+            if ($request->page && $request->per_page) $data = $this->productStock->customPaginate($request->per_page, $request->page, $payload);
+            else $data = $this->productStock->customQuery($payload)->get();
+            return BaseResponse::Ok("Berhasil mengambil data product ", $data);
+        } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
     }

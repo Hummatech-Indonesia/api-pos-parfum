@@ -27,4 +27,9 @@ class Warehouse extends Model
     {
         return $this->hasMany(User::class)->where('is_delete',0);
     }
+
+    public function productStocks(): HasMany
+    {
+        return $this->hasMany(ProductStock::class);
+    }
 }

@@ -1,16 +1,17 @@
-<?php 
+<?php
 
 namespace App\Helpers;
 
 use Illuminate\Http\JsonResponse;
 
-class BaseResponse 
+class BaseResponse
 {
     public static function Ok(string $message, mixed $data): JsonResponse
     {
         return response()->json([
             "success" => true,
             "message" => $message,
+            "code" => 200,
             "data" => $data
         ])->setStatusCode(200);
     }
@@ -20,6 +21,7 @@ class BaseResponse
         return response()->json([
             "success" => false,
             "message" => $message,
+            "code" => 400,
             "data" => $data
         ])->setStatusCode(400);
     }
@@ -29,6 +31,7 @@ class BaseResponse
         return response()->json([
             "success" => false,
             "message" => $message,
+            "code" => 500,
             "data" => null
         ])->setStatusCode(500);
     }
@@ -38,6 +41,7 @@ class BaseResponse
         return response()->json([
             "success" => false,
             "message" => $message,
+            "code" => 404,
             "data" => null
         ])->setStatusCode(404);
     }
@@ -47,6 +51,7 @@ class BaseResponse
         return response()->json([
             "success" => $status,
             "message" => $message,
+            "code" => $code,
             "data" => $data
         ])->setStatusCode($code);
     }
@@ -57,7 +62,28 @@ class BaseResponse
             "success" => true,
             "message" => $message,
             "data" => $data,
+            "code" => 200,
             "pagination" => $paginate
         ])->setStatusCode(200);
+    }
+
+    public static function Create(string $message, mixed $data): JsonResponse
+    {
+        return response()->json([
+            "success" => true,
+            "message" => $message,
+            "code" => 201,
+            "data" => $data
+        ])->setStatusCode(201);
+    }
+
+    public static function Forbidden(string $message = 'Akses ditolak'): JsonResponse
+    {
+        return response()->json([
+            "success" => false,
+            "message" => $message,
+            "code" => 403,
+            "data" => null
+        ])->setStatusCode(403);
     }
 }

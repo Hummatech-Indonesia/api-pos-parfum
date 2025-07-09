@@ -15,7 +15,6 @@ class ProductDetail extends Model
     public $incrementing = false;
     protected $keyType = "string";
     protected $primaryKey = "id";
-
     protected $guarded = [];
 
     /**
@@ -23,7 +22,7 @@ class ProductDetail extends Model
      */
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class)->where('is_delete',0);
+        return $this->belongsTo(Product::class)->where('is_delete', 0);
     }
 
     /**
@@ -31,23 +30,19 @@ class ProductDetail extends Model
      */
     public function category(): BelongsTo
     {
-        return $this->belongsTo(Category::class)->where('is_delete',0);
+        return $this->belongsTo(Category::class)->where('is_delete', 0);
     }
 
     /**
      * Get data relation belongs to with varian
      */
-    public function varian(): BelongsTo
-    {
-        return $this->belongsTo(ProductVarian::class, 'product_varian_id')->where('is_delete',0);
-    }
 
     /**
      * Get data stock in outlet
      */
     public function productStockOutlet(): HasOne
     {
-        return $this->hasOne(ProductStock::class)->where('outlet_id',auth()->user()->outlet_id);
+        return $this->hasOne(ProductStock::class, 'product_detail_id', 'id')->where('outlet_id', auth()->user()->outlet_id);
     }
 
     /**
@@ -55,6 +50,57 @@ class ProductDetail extends Model
      */
     public function productStockWarehouse(): HasOne
     {
-        return $this->hasOne(ProductStock::class)->where('warehouse_id',auth()->user()->warehouse_id);
+        return $this->hasOne(ProductStock::class, 'product_detail_id', 'id')->where('warehouse_id', auth()->user()->warehouse_id);
+    }
+
+    public function transactionDetails()
+    {
+        return $this->hasMany(TransactionDetail::class, 'product_detail_id');
+    }
+
+    public function discountVouchers()
+    {
+        return $this->hasMany(DiscountVoucher::class, 'product_detail_id');
+    }
+    public function productBundlingDetail()
+    {
+        return $this->hasMany(ProductBundlingDetail::class, 'product_detail_id');
+    }
+    public function productBlend()
+    {
+        return $this->hasMany(ProductBlend::class, 'product_detail_id');
+    }
+    public function productBlendDetail()
+    {
+        return $this->hasMany(ProductBlendDetail::class, 'product_detail_id');
+    }
+    public function auditDetail()
+    {
+        return $this->hasMany(AuditDetail::class, 'product_detail_id');
+    }
+
+    public function unitRelasi(): BelongsTo
+    {
+        return $this->belongsTo(Unit::class, 'unit_id', 'id')->withTrashed();
+    }
+
+    /**
+     * Get the user that owns the ProductDetail
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function unitRelation(): BelongsTo
+    {
+        return $this->belongsTo(Unit::class, 'unit_id', 'id');
+    }
+
+    /**
+     * Get the user that owns the ProductDetail
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function productAll(): BelongsTo
+    {
+        return $this->belongsTo(Product::class, 'product_id');
     }
 }

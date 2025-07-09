@@ -13,6 +13,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Laravel\Sanctum\PersonalAccessToken;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -33,7 +34,8 @@ class User extends Authenticatable implements HasArticles
         'warehouse_id',
         'outlet_id',
         'is_delete',
-        'image'
+        'image',
+        'phone'
     ];
 
     /**
@@ -98,5 +100,10 @@ class User extends Authenticatable implements HasArticles
     public function warehouse(): BelongsTo
     {
         return $this->belongsTo(Warehouse::class)->where('is_delete',0);
+    }
+
+    public function roles()
+    {
+        return $this->morphToMany(Role::class, 'model', 'model_has_roles');
     }
 }

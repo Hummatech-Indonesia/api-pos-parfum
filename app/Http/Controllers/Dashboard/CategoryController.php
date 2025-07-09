@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Dashboard;
 use App\Contracts\Interfaces\CategoryInterface;
 use App\Enums\UploadDiskEnum;
 use App\Helpers\BaseResponse;
+use App\Helpers\PaginationHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Dashboard\CategoryRequest;
 use App\Services\CategoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -29,60 +31,60 @@ class CategoryController extends Controller
     {
         $per_page = $request->per_page ?? 10;
         $page = $request->page ?? 1;
+        $sort = $request->sort ?? 'created_at';
+        $order = $request->order ?? 'ASC';
         $payload = [
-            "is_delete" => 0
+            "is_delete" => 0,
         ];
 
         // check query filter
-        if($request->search) $payload["search"] = $request->search;
-        if($request->is_delete) $payload["is_delete"] = $request->is_delete;
-        if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+        if ($request->search) $payload["search"] = $request->search;
+        if ($request->start_date) $payload["start_date"] = $request->start_date;
+        if ($request->end_date) $payload["end_date"] = $request->end_date;
+        if ($request->is_delete) $payload["is_delete"] = $request->is_delete;
+        if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
+        if (auth()->user()->hasRole('outlet')) $payload["outlet_id"] = auth()->user()->outlet_id;
 
-        $data = $this->category->customPaginate($per_page, $page, $payload)->toArray();
+        // add sorting
+        $sorting = $this->category->sorted($sort, $order);
+        $payload['sorting'] = $sorting;
 
-        $result = $data["data"];
-        unset($data["data"]);
+        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
-        return BaseResponse::Paginate('Berhasil mengambil list data category!', $result, $data);
+        $data = $this->category->customPaginate($per_page, $page, $payload);
+        $meta = PaginationHelper::meta($data);
+
+        $result = $data->items();
+
+        return BaseResponse::Paginate('Berhasil mengambil list data category!', $result, $meta);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CategoryRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            "name" => "required|unique:categories,name",
-        ],[
-            'name.required' => 'Nama kategori harus diisi!',
-            'name.unique' => 'Nama kategori telah digunakan!'
-        ]);
-        
-        if ($validator->fails()) {
-            return BaseResponse::error("Kesalahan dalam input data!", $validator->errors());
-        }
+        $validate = $request->validated();
 
         DB::beginTransaction();
         try {
-            $store_id = null;
-            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id; 
-            $result_category = $this->category->store(["name" => $request->name, "store_id" => $store_id]);
-    
+            $store_id = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+
+            $result_category = $this->category->store($validate);
+
             DB::commit();
             return BaseResponse::Ok('Berhasil membuat category', $result_category);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
+
 
     /**
      * Display the specified resource.
@@ -90,7 +92,7 @@ class CategoryController extends Controller
     public function show(string $id)
     {
         $check_category = $this->category->show($id);
-        if(!$check_category) return BaseResponse::Notfound("Tidak dapat menemukan data category!");
+        if (!$check_category) return BaseResponse::Notfound("Tidak dapat menemukan data category!");
 
         return BaseResponse::Ok("Berhasil mengambil detail category!", $check_category);
     }
@@ -106,30 +108,26 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(CategoryRequest $request, string $id)
     {
-        $validator = Validator::make($request->all(), [
-            "name" => "required|unique:categories,name," . $id,
-        ],[
-            'name.required' => 'Nama kategori harus diisi!',
-            'name.unique' => 'Nama kategori telah digunakan!'
-        ]);
-        
-        if ($validator->fails()) {
-            return BaseResponse::error("Kesalahan dalam input data!", $validator->errors());
-        }
-
         $check = $this->category->checkActive($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data category!");
+        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data category!");
+
+        $validate = $request->validated();
+
+        if (auth()->user()->hasRole('outlet')) {
+            $validate["outlet_id"] = auth()->user()->outlet_id;
+        } else if (auth()->user()->hasRole('warehouse')) {
+            $validate["warehouse_id"] = auth()->user()->warehouse_id;
+        }
 
         DB::beginTransaction();
         try {
+            $this->category->update($id, $validate);
 
-            $result_category = $this->category->update($id, ["name" => $request->name]);
-    
             DB::commit();
-            return BaseResponse::Ok('Berhasil update data category', $result_category);
-        }catch(\Throwable $th){
+            return BaseResponse::Ok('Berhasil update data category', $validate);
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -140,10 +138,10 @@ class CategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        
+
         $check = $this->category->checkActive($id);
-        if(!$check) return BaseResponse::Notfound("Tidak dapat menemukan data category!");
-        if($check->products_count) return BaseResponse::Notfound("Data masih terikat dalam product!");
+        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data category!");
+        if ($check->products_count) return BaseResponse::Notfound("Data masih terikat dalam product!");
 
         DB::beginTransaction();
         try {
@@ -151,7 +149,7 @@ class CategoryController extends Controller
 
             DB::commit();
             return BaseResponse::Ok('Berhasil menghapus data', null);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
         }
@@ -159,17 +157,24 @@ class CategoryController extends Controller
 
     public function listCategory(Request $request)
     {
-        try{
+        $sort = $request->sort ?? 'created_at';
+        $order = $request->order ?? 'ASC';
+
+        try {
             $payload = [
                 "is_delete" => 0
             ];
+            if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
+            if (auth()->user()->hasRole('outlet')) $payload["outlet_id"] = auth()->user()->outlet_id;
+            $sorting = $this->category->sorted($sort, $order);
+            $payload['sorting'] = $sorting;
 
-            if(auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;  
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
             $data = $this->category->customQuery($payload)->get();
 
             return BaseResponse::Ok("Berhasil mengambil data category", $data);
-        }catch(\Throwable $th) {
-          return BaseResponse::Error($th->getMessage(), null);  
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
         }
     }
 }
