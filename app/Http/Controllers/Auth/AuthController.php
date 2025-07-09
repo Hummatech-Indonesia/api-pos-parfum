@@ -45,7 +45,7 @@ class AuthController extends Controller
 
         if (auth()->attempt($credentials)) {
 
-            $userRoles = auth()->user()?->roles?->pluck('name');
+            $userRoles = auth()->user()?->roles?->pluck('name')->toArray();
             $userAllowLogin = [
                 'warehouse',
                 'outlet',
@@ -53,7 +53,7 @@ class AuthController extends Controller
                 'auditor',
                 'owner'
             ];
-            if(!array_intersect($userRoles, $userAllowLogin)) return BaseResponse::error('Akun anda tidak mendapatkan akses buat login!, silahkan hubungi admin!', false);
+            if(!array_intersect($userRoles, $userAllowLogin)) return BaseResponse::Custom(false, 'Akun anda tidak mendapatkan akses buat login!, silahkan hubungi admin!', null, 401);
 
             $token = auth()->user()->createToken('authToken')->plainTextToken;
             $user = $this->user->checkUserActive(auth()->user()->id);
