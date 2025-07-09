@@ -30,10 +30,7 @@ class UnitController extends Controller
         $page = $request->page ?? 1;
         $payload = [];
 
-        // check query filter
-        if (auth()->user()->store_id) {
-            $payload['store_id'] = auth()->user()->store_id;    
-        }
+        $payload['store_id'] = auth()->user()?->store_id ?? null;
         if ($request->search) $payload["search"] = $request->search;
         if ($request->start_date) $payload["start_date"] = $request->start_date;
         if ($request->end_date) $payload["end_date"] = $request->end_date;
@@ -51,6 +48,7 @@ class UnitController extends Controller
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -155,20 +153,17 @@ class UnitController extends Controller
         try {
             $payload = [];
 
-            if (auth()->user()->store_id) {
-                $payload['store_id'] = auth()->user()->store_id;
-            }
+            $payload['store_id'] = auth()->user()?->store_id ?? null;
             if ($request->search) $payload['search'] = $request->search;
-            $data = $this->unit->customQuery($payload)
-                ->withCount('productDetails')
-                ->get();
 
+            $data = $this->unit->customQuery($payload)->get();
 
             return BaseResponse::Ok("Berhasil mengambil data unit", $data);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
+
 
     public function trashed(Request $request)
     {
