@@ -111,4 +111,47 @@ class ProductStockRepository extends BaseRepository implements ProductStockInter
                 'unit' => $p->productDetail->unit ?? '-',
             ]);
     }
+
+    public function findByOutletAndProductDetail($outletId, $productDetailId)
+    {
+        return ProductStock::where('outlet_id', $outletId)
+            ->where('product_detail_id', $productDetailId)
+            ->first();
+    }
+
+    public function increaseStock($outletId, $productDetailId, $amount)
+    {
+        $stock = $this->findByOutletAndProductDetail($outletId, $productDetailId);
+
+        if ($stock) {
+            $stock->stock += $amount;
+            $stock->save();
+            return $stock;
+        }
+
+        return $this->store([
+            'outlet_id' => $outletId,
+            'product_detail_id' => $productDetailId,
+            'stock' => $amount,
+        ]);
+    }
+
+    public function updateOrCreateStock($outletId, $productDetailId, $stock): ProductStock
+    {
+        $stockRecord = ProductStock::where('outlet_id', $outletId)
+            ->where('product_detail_id', $productDetailId)
+            ->first();
+
+        if ($stockRecord) {
+            $stockRecord->stock = $stock;
+            $stockRecord->save();
+            return $stockRecord;
+        }
+
+        return ProductStock::create([
+            'outlet_id' => $outletId,
+            'product_detail_id' => $productDetailId,
+            'stock' => $stock,
+        ]);
+    }
 }

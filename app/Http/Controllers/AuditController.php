@@ -3,25 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\Repositories\AuditRepository;
+use App\Contracts\Repositories\Master\ProductDetailRepository;
+use App\Contracts\Repositories\Master\ProductStockRepository;
 use App\Helpers\BaseResponse;
 use App\Helpers\PaginationHelper;
 use App\Http\Requests\AuditRequest;
 use App\Http\Resources\AuditResource;
-use App\Models\Audit;
-use App\Models\AuditDetail;
+
 use App\Services\AuditService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\ProductDetail;
-use App\Models\ProductStock;
+
+use App\Contracts\Repositories\AuditDetailRepository;
 
 class AuditController extends Controller
 {
-    private $auditRepository, $service;
-    public function __construct(AuditRepository $auditRepository, AuditService $service)
+    private $auditRepository, $service, $productDetail, $auditDetail, $productStock;
+    public function __construct(AuditRepository $auditRepository, AuditService $service, ProductDetailRepository $productDetail, AuditDetailRepository $auditDetail, ProductStockRepository $productStock)
     {
         $this->auditRepository = $auditRepository;
         $this->service = $service;
+        $this->productDetail = $productDetail;
+        $this->auditDetail = $auditDetail;
+        $this->productStock = $productStock;
     }
     /**
      * Display a listing of the resource.
@@ -62,13 +66,16 @@ class AuditController extends Controller
         try {
             $validated = $request->validated();
 
-            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $validated['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+            if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
+                $validated['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+            }
 
             $data = $this->service->storeAudit($validated);
-            $audit = Audit::create($data);
+
+            $audit = $this->auditRepository->store($data);
 
             foreach ($validated['products'] as $index => $product) {
-                $productDetail = ProductDetail::with('product')->find($product['product_detail_id']);
+                $productDetail = $this->productDetail->findWithProduct($product['product_detail_id']);
 
                 if (!$productDetail) {
                     return BaseResponse::Error("Inputan produk ke-" . ($index + 1) . " tidak ditemukan.", null);
@@ -78,10 +85,11 @@ class AuditController extends Controller
                     return BaseResponse::Error("Inputan produk ke-" . ($index + 1) . " tidak sesuai dengan toko.", null);
                 }
             }
+
             $mappedDetails = $this->service->mapAuditDetails($validated['products'], $audit);
 
             foreach ($mappedDetails as $detailData) {
-                AuditDetail::create($detailData);
+                $this->auditDetail->store($detailData);
             }
 
             DB::commit();
@@ -146,31 +154,36 @@ class AuditController extends Controller
                 $outlet = $audit->outlet;
                 $details = $audit->auditDetails;
 
-                foreach ($details as $detail) {
-                    $productStock = ProductStock::where('outlet_id', $outlet->id)
-                        ->where('product_detail_id', $detail->product_detail_id)
-                        ->first();
+                if ($updateData['status'] === 'approved') {
+                    $outlet = $audit->outlet;
+                    $details = $audit->auditDetails;
 
-                    $oldStock = $productStock?->stock ?? 0;
+                    foreach ($details as $detail) {
+                        $productStock = $this->productStock->findByOutletAndProductDetail($outlet->id, $detail->product_detail_id);
+                        $oldStock = $productStock?->stock ?? 0;
 
-                    if ($detail->old_stock == 0) {
-                        $detail->old_stock = $oldStock;
-                    }
+                        if ($detail->old_stock == 0) {
+                            $detail->old_stock = $oldStock;
+                        }
 
-                    $difference = $detail->audit_stock - $oldStock;
+                        $difference = $detail->audit_stock - $oldStock;
 
-                    if ($productStock) {
-                        $productStock->stock += $difference;
-                        $productStock->save();
-                    } else {
-                        ProductStock::create([
-                            'outlet_id' => $outlet->id,
-                            'product_detail_id' => $detail->product_detail_id,
-                            'stock' => $detail->audit_stock,
+                        if ($productStock) {
+                            $this->productStock->increaseStock($outlet->id, $detail->product_detail_id, $difference);
+                        } else {
+                            $this->productStock->store([
+                                'outlet_id' => $outlet->id,
+                                'product_detail_id' => $detail->product_detail_id,
+                                'stock' => $detail->audit_stock,
+                            ]);
+                        }
+
+                        $this->auditDetail->update($detail->id, [
+                            'old_stock' => $detail->old_stock,
+                            'audit_stock' => $detail->audit_stock,
+                            'unit_id' => $detail->unit_id,
                         ]);
                     }
-
-                    $detail->save();
                 }
             }
 
@@ -261,11 +274,14 @@ class AuditController extends Controller
 
     public function restore(string $id)
     {
-        $audit = Audit::withTrashed()->find($id);
-        if (!$audit) return BaseResponse::Notfound("sampah audit tidak ditemukan");
+        $audit = $this->auditRepository->findTrashed($id);
+        if (!$audit) {
+            return BaseResponse::Notfound("Sampah audit tidak ditemukan");
+        }
+
         try {
-            $audit = $this->auditRepository->restore($id);
-            return BaseResponse::Ok("Audit berhasil dikembalikan", $audit);
+            $restoredAudit = $this->auditRepository->restore($id);
+            return BaseResponse::Ok("Audit berhasil dikembalikan", $restoredAudit);
         } catch (\Throwable $th) {
             return BaseResponse::Error("Gagal mengembalikan audit: " . $th->getMessage(), null);
         }
@@ -274,62 +290,32 @@ class AuditController extends Controller
     public function updateStatusWithProducts(AuditRequest $request, $id)
     {
         $audit = $this->auditRepository->show($id);
-
-        if (!$audit) {
-            return BaseResponse::Notfound("Audit tidak ditemukan");
-        }
-
-        if ($audit->status !== 'pending') {
-            return BaseResponse::Error('Audit tidak dapat diubah karena sudah ditanggapi.', null);
-        }
+        if (!$audit) return BaseResponse::Notfound("Audit tidak ditemukan");
+        if ($audit->status !== 'pending') return BaseResponse::Error('Audit tidak dapat diubah karena sudah ditanggapi.', null);
 
         DB::beginTransaction();
         try {
-            // Mapping status dan reason via service
+
             $updateData = $this->service->updateAuditData($request->all(), $audit);
             $audit->update($updateData);
 
-            $outlet = $audit->outlet;
-
-            // Mapping auditDetails via service
             $mappedDetails = $this->service->mapAuditDetails($request->products, $audit);
+            $outletId = $audit->outlet_id;
 
             foreach ($mappedDetails as $detail) {
                 $productDetailId = $detail['product_detail_id'];
                 $auditStock = $detail['audit_stock'];
-                $unitId = $detail['unit_id'];
-                $oldStock = $detail['old_stock'];
 
-                // Update or create audit_detail
-                $auditDetail = $audit->auditDetails()
-                    ->where('product_detail_id', $productDetailId)
-                    ->first();
+                $existingAuditDetail = $this->auditDetail->findByAuditAndProductDetail($audit->id, $productDetailId);
 
-                if ($auditDetail) {
-                    $auditDetail->old_stock = $oldStock;
-                    $auditDetail->audit_stock = $auditStock;
-                    $auditDetail->unit_id = $unitId;
-                    $auditDetail->save();
+                if ($existingAuditDetail) {
+                    $this->auditDetail->update($existingAuditDetail->id, $detail);
                 } else {
-                    $audit->auditDetails()->create($detail);
+                    $this->auditDetail->store($detail);
                 }
 
-                // Jika approved, update ke ProductStock
                 if ($updateData['status'] === 'approved') {
-                    $productStock = ProductStock::where('outlet_id', $outlet->id)
-                        ->where('product_detail_id', $productDetailId)
-                        ->first();
-
-                    if ($productStock) {
-                        $productStock->stock = $auditStock;
-                        $productStock->save();
-                    } else {
-                        ProductStock::create([
-                            'outlet_id' => $outlet->id,
-                            'product_detail_id' => $productDetailId,
-                            'stock' => $auditStock,
-                        ]);
-                    }
+                    $this->productStock->updateOrCreateStock($outletId, $productDetailId, $auditStock);
                 }
             }
 

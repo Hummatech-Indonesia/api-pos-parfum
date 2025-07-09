@@ -41,6 +41,9 @@ class UnitRepository extends BaseRepository implements UnitInterface
                     });
                 }
             }])
+            ->when(isset($data['store_id']), function ($q) use ($data) {
+                $q->where('store_id', $data['store_id']);
+            })
 
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (isset($data["search"])) {
@@ -56,7 +59,6 @@ class UnitRepository extends BaseRepository implements UnitInterface
                         $query->where($index, $value);
                     }
                 }
-
             })
             ->when(!is_null($minCount), fn($q) => $q->having('product_details_count', '>=', $minCount))
             ->when(!is_null($maxCount), fn($q) => $q->having('product_details_count', '<=', $maxCount));
@@ -84,7 +86,9 @@ class UnitRepository extends BaseRepository implements UnitInterface
                     });
                 }
             }])
-
+            ->when(isset($data['store_id']), function ($q) use ($data) {
+                $q->where('store_id', $data['store_id']);
+            })
             ->when($data, function ($query) use ($data) {
                 if (!empty($data["search"])) {
                     $query->where(function ($query2) use ($data) {
