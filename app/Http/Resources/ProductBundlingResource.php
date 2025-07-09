@@ -18,6 +18,7 @@ class ProductBundlingResource extends JsonResource
             'category' => $this->category->name ?? '-',
             'created_by' => $this->getCreatedBy(),
             'bundling_material_count' => $this->details->count(),
+            'image' => $this->product->image ?? null,
             'bundling_material' => $this->details->map(function ($detail) {
                 $user = auth()->user();
                 return [
@@ -26,7 +27,6 @@ class ProductBundlingResource extends JsonResource
                     'sum_stock' => $user->hasRole('outlet')
                     ? optional($detail->productDetail->productStockOutlet) ?? 0 
                     : optional($detail->productDetail->productStockWarehouse) ?? 0,
-                    'image' => $this->product->image ?? null,
                     'unit_id' => $detail->unitRelation->id,
                     'unit_code' => $detail->unitRelation->code ?? null
                 ];
