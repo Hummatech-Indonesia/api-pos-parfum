@@ -19,6 +19,14 @@ use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
+    /**
+     * @OA\Info(
+     *      version="1.0.0",
+     *      title="Laravel 11 API Documentation",
+     *      description="Swagger documentation for Laravel 11"
+     * )
+     */
+
     private UserInterface $user;
     private StoreInterface $stores;
     private UserService $userService;
@@ -39,34 +47,108 @@ class AuthController extends Controller
         $this->warehouse = $warehouse;
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/login",
+     *     summary="Login user",
+     *     tags={"Auth"},
+     *     operationId="loginUser",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="secret123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Login berhasil",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Berhasil melakukan login"),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="John Doe"),
+     *                 @OA\Property(property="email", type="string", example="john@example.com"),
+     *                 @OA\Property(property="token", type="string", example="1|sometoken123"),
+     *                 @OA\Property(property="role", type="array", @OA\Items(type="string", example="warehouse"))
+     *             )
+     *         )
+     *     ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Kesalahan server",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Terjadi kesalahan pada server."),
+     *              @OA\Property(property="code", type="integer", example=400),
+     *              @OA\Property(property="data", type="string", nullable=true, example=null)
+     *          )
+     *      ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Akun tidak diizinkan login atau tidak ditemukan",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Akun anda tidak mendapatkan akses buat login!"),
+     *             @OA\Property(property="data", type="string", nullable=true, example=null)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User tidak ditemukan",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Tidak dapat menemukan user!"),
+     *             @OA\Property(property="data", type="string", nullable=true, example=null)
+     *         )
+     *     ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Kesalahan server",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Terjadi kesalahan pada server."),
+     *              @OA\Property(property="code", type="integer", example=500),
+     *              @OA\Property(property="data", type="string", nullable=true, example=null)
+     *          )
+     *      )
+     * )
+     */
     public function login(LoginRequest $request)
     {
         $credentials = $request->validated();
+        try{
 
-        if (auth()->attempt($credentials)) {
-
-            $userRoles = auth()->user()?->roles?->pluck('name')->toArray();
-            $userAllowLogin = [
-                'warehouse',
-                'outlet',
-                'cashier',
-                'auditor',
-                'owner'
-            ];
-            if(!array_intersect($userRoles, $userAllowLogin)) return BaseResponse::Custom(false, 'Akun anda tidak mendapatkan akses buat login!, silahkan hubungi admin!', null, 401);
-
-            $token = auth()->user()->createToken('authToken')->plainTextToken;
-            $user = $this->user->checkUserActive(auth()->user()->id);
-
-            if(!$user) return BaseResponse::Notfound("Tidak dapat menukan user!");
-
-            $user->role = auth()->user()->roles;
-            $user->token = $token;
-
-            return BaseResponse::Ok("Berhasil melakukan login", $user);
+            if (auth()->attempt($credentials)) {
+    
+                $userRoles = auth()->user()?->roles?->pluck('name')->toArray();
+                $userAllowLogin = [
+                    'warehouse',
+                    'outlet',
+                    'cashier',
+                    'auditor',
+                    'owner'
+                ];
+                if(!array_intersect($userRoles, $userAllowLogin)) return BaseResponse::Custom(false, 'Akun anda tidak mendapatkan akses buat login!, silahkan hubungi admin!', null, 401);
+    
+                $token = auth()->user()->createToken('authToken')->plainTextToken;
+                $user = $this->user->checkUserActive(auth()->user()->id);
+    
+                if(!$user) return BaseResponse::Notfound("Tidak dapat menukan user!");
+    
+                $user->role = auth()->user()->roles;
+                $user->token = $token;
+    
+                return BaseResponse::Ok("Berhasil melakukan login", $user);
+            }
+    
+            return BaseResponse::Custom(false, "Akun tidak dapat ditemukan!, Silahkan masukan kembali", null, 401);
+        }catch(\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
         }
 
-        return BaseResponse::Custom(false, "Akun tidak dapat ditemukan!, Silahkan masukan kembali", null, 401);
     }
 
     public function register(RegisterRequest $request)
