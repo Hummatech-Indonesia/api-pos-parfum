@@ -15,7 +15,7 @@ class ProductResource extends JsonResource
         $isBundling = $this->relationLoaded('productBundling')
             ? $this->productBundling !== null
             : $this->productBundling()->exists();
-        $data = [
+        return [
             'id' => $isBundling
                 ? $this->productBundling?->id
                 : $this->id,
@@ -28,7 +28,7 @@ class ProductResource extends JsonResource
             'sum_purchase' => $this->details?->sum('transaction_details_count'),
             'is_bundling' => $isBundling,
             'unit_id' => $this->details?->first()?->unit_id,
-            'unit_code' => $this->details?->first()?->unit_relasi?->code,
+            'unit_code' => optional($this->details->first()?->unitRelasi)->code,
             'density' => $this->details?->first()?->density,
             'bundling_price' => $this->when(
                 $isBundling,
@@ -86,13 +86,9 @@ class ProductResource extends JsonResource
                     });
                 }
             ),
+
+
         ];
-
-        if(isset($data["product_detail"])) {
-            $data["unit_code"] = $data["product_detail"][0]["unit_code"];
-        }
-
-        return $data;
     }
     private function getCreatedBy(): ?string
     {
