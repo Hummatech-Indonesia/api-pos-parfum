@@ -17,7 +17,7 @@ class ProductBundlingDetailResource extends JsonResource
             'stock' => $this->stock ?? 0,
             'status' => ($this->stock ?? 0) > 0 ? 'active' : 'non-active',
             'category' => $this->category->name ?? '-',
-            'category' => $this->category->name ?? '-',
+            'category_id' => $this->category_id ?? null,
             'description' => $this->product?->description ?? null,
             'bundling_material_count' => $this->whenLoaded('details', fn() => $this->details->count()),
 
