@@ -68,6 +68,7 @@ class UserService
             'owner' => ['owner', 'outlet', 'employee', 'warehouse', 'auditor', 'manager', 'cashier', 'admin'],
             'outlet' => ['outlet', 'employee', 'cashier'],
             'warehouse' => ['warehouse', 'employee', 'cashier'],
+            'cashier' => ['member'],
             default => [],
         };
 
