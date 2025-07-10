@@ -187,7 +187,7 @@ class ProductBundlingController extends Controller
                 $unitName = null;
                 if (!empty($inputDetail['unit_id'])) {
                     Log::info("Masuk ke unit", [$inputDetail]);
-                    $unit = Unit::find($inputDetail['unit_id']);
+                    $unit = Unit::withTrashed()->where('id',$inputDetail['unit_id'])->first();
                     Log::info("unit", [$unit]);
                     if (!$unit) {
                         return BaseResponse::Error("Unit tidak ditemukan", 400);
