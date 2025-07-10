@@ -318,7 +318,8 @@ class ProductController extends Controller
             }
 
             $products = $this->product->getListProduct($payload);
-
+            
+            Log::info("data product", [$products]);
             return BaseResponse::Ok("Berhasil mengambil data product", ProductResource::collection($products));
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
