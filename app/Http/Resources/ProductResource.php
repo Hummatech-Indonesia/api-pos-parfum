@@ -15,7 +15,7 @@ class ProductResource extends JsonResource
         $isBundling = $this->relationLoaded('productBundling')
             ? $this->productBundling !== null
             : $this->productBundling()->exists();
-        Log::info($this->details?->first());
+        Log::info($this->details?->first()->unit_relasi);
         return [
             'id' => $isBundling
                 ? $this->productBundling?->id
