@@ -17,6 +17,7 @@ use App\Models\Unit;
 use App\Services\Master\ProductBundlingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProductBundlingController extends Controller
 {
@@ -185,7 +186,9 @@ class ProductBundlingController extends Controller
             foreach ($validated['details'] as $inputDetail) {
                 $unitName = null;
                 if (!empty($inputDetail['unit_id'])) {
+                    Log::info("Masuk ke unit", [$inputDetail]);
                     $unit = Unit::find($inputDetail['unit_id']);
+                    Log::info("unit", [$unit]);
                     if (!$unit) {
                         return BaseResponse::Error("Unit tidak ditemukan", 400);
                     }
