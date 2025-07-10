@@ -35,6 +35,7 @@ class ProductRequest extends FormRequest
             "category_id" => "required|exists:categories,id",
 
             "product_details" => "sometimes|array",
+            "product_details.*.product_detail_id" => "nullable|uuid|exists:product_details,id",
             "product_details.*.product_id" => "nullable|uuid|exists:products,id",
             "product_details.*.category_id" => "required|exists:categories,id",
             "product_details.*.material" => "nullable|string",
@@ -70,6 +71,10 @@ class ProductRequest extends FormRequest
             'product_details.product_image|mimes:png,jpg,jpeg' => 'Gambar detail yang bisa dipakai adalah jpg, png, dan jpeg!',
             'product_details.product_image|max:2048' => "Gambar detail maksimal adalah 2mb",
             'product_details.*.product_image.required' => 'Gambar produk harus diunggah!',
+            'product_details.*.product_id.uuid' => 'Produk tidak valid',
+            'product_details.*.product_id.exists' => 'Produk tidak ditemukan!',
+            'product_details.*.product_detail_id.uuid' => 'Produk Detail tidak valid',
+            'product_details.*.product_detail_id.exists' => 'Produk Detail tidak ditemukan!',
             'product_details.*.category_id.required' => 'Kategori pada detail produk harus diisi!',
             'product_details.*.product_code' => 'Kode produk harus diisi!',
             'description.string' => 'Deskripsi produk harus berupa teks!',
