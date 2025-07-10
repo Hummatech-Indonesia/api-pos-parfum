@@ -19,6 +19,7 @@ use App\Contracts\Interfaces\Master\ProductVarianInterface;
 use App\Helpers\PaginationHelper;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 
 class ProductController extends Controller
@@ -209,7 +210,7 @@ class ProductController extends Controller
                 /**
                  * Pengecekan apakah data varian yang dikirim sudah ada atau belum
                  */
-                dd($detail);
+                Log::info("payload update detail", [$detail]);
                 if (isset($detail["product_detail_id"])) {
                     $idDetail = $detail["product_detail_id"];
                     $products = collect($products)->filter(function ($item) use ($detail) {
