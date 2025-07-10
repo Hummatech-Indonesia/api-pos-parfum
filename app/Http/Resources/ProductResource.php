@@ -15,8 +15,7 @@ class ProductResource extends JsonResource
         $isBundling = $this->relationLoaded('productBundling')
             ? $this->productBundling !== null
             : $this->productBundling()->exists();
-        Log::info($this->details?->first()?->load('unitRelasi')?->unit_relasi);
-        return [
+        $data = [
             'id' => $isBundling
                 ? $this->productBundling?->id
                 : $this->id,
@@ -87,9 +86,13 @@ class ProductResource extends JsonResource
                     });
                 }
             ),
-
-
         ];
+
+        if(isset($data["product_detail"])) {
+            $data["unit_code"] = $data["product_detail"][0]["unit_code"];
+        }
+
+        return $data;
     }
     private function getCreatedBy(): ?string
     {
