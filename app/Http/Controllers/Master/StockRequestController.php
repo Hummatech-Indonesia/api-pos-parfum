@@ -248,27 +248,42 @@ class StockRequestController extends Controller
                 $stockRequested = collect($data["stock_requested"] ?? []);
 
                 foreach ($details as $detail) {
+                    $productCode = $detail->detailProduct?->product_code;
+                    $productDetailId = $detail->product_detail_id;
 
-                    $checkData = $stockRequested->firstWhere('product_detail_id', $detail->product_detail_id)
-                        ?? $stockRequested->firstWhere('variant_id', $detail->product_detail_id);
+                    if (!$productCode || !$productDetailId) {
+                        DB::rollBack();
+                        return BaseResponse::Error("Data produk tidak valid!", null);
+                    }
+
+                    $checkData = $stockRequested->firstWhere('product_code', $productCode);
 
                     if ($checkData && isset($checkData['sended_stock'])) {
                         $detail->sended_stock = $checkData['sended_stock'];
                         $detail->price = $checkData['price'] ?? 0;
                         $detail->save();
                     }
+
                     $price = $detail->price ?? 0;
                     $newTotal += $detail->sended_stock * $price;
 
                     $warehouseStock = $this->productStock->customQuery([
                         "warehouse_id" => auth()->user()->warehouse_id,
-                        "product_detail_id" => $detail->product_detail_id
+                        "product_code" => $productCode
                     ])->first();
 
+                    if (!$warehouseStock || $warehouseStock->stock < $detail->sended_stock) {
+                        DB::rollBack();
+                        return BaseResponse::Error("Stok gudang tidak mencukupi", 400);
+                    }
+
+                    $warehouseStock->stock -= $detail->sended_stock;
+                    $warehouseStock->save();
 
                     $outletStock = $this->productStock->customQuery([
                         "outlet_id" => $stockRequest->outlet_id,
-                        "product_detail_id" => $detail->product_detail_id
+                        "product_code" => $productCode,
+                        "product_detail_id" => $productDetailId,
                     ])->first();
 
                     if ($outletStock) {
@@ -276,12 +291,15 @@ class StockRequestController extends Controller
                         $outletStock->save();
                     } else {
                         $this->productStock->store([
+                            "warehouse_id" => null,
                             "outlet_id" => $stockRequest->outlet_id,
+                            "product_detail_id" => $productDetailId,
+                            "product_code" => $productCode,
                             "stock" => $detail->sended_stock,
-                            "product_detail_id" => $detail->product_detail_id
                         ]);
                     }
                 }
+
 
                 $stockRequest->update(['total' => $newTotal]);
             }

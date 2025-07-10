@@ -28,7 +28,7 @@ class StockRequestUpdateRequest extends FormRequest
         return [
             'status' => 'required|string',
             'stock_requested' => 'sometimes|array',
-            'stock_requested.*.product_detail_id' => 'required_with:stock_requested|uuid',
+            'stock_requested.*.product_code' => 'required|string|exists:product_details,product_code',
             'stock_requested.*.sended_stock' => 'required_with:stock_requested|integer|min:0',
             'stock_requested.*.price' => 'nullable|numeric|min:0',
         ];

@@ -132,6 +132,7 @@ class ProductController extends Controller
                     'warehouse_id' => auth()->user()->warehouse_id ?? null,
                     'outlet_id' => auth()->user()->outlet_id ?? null,
                     'product_id' => $result_product->id,
+                    'product_code' => $storedDetail->product_code,
                     'product_detail_id' => $storedDetail->id,
                     'stock' => $storedDetail->stock ?? 0,
                 ]);
