@@ -11,7 +11,7 @@ class ProductImportRules
             '*.category_name' => 'nullable|exists:categories,name',
             '*.stock' => 'required|numeric|min:0',
             '*.price' => 'required|numeric|min:0',
-            '*.product_code' => 'required|string|max:50',
+            '*.product_code' => 'required|max:50',
         ];
     }
 
