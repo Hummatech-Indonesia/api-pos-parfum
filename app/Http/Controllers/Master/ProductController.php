@@ -234,7 +234,7 @@ class ProductController extends Controller
                     ])->first();
 
                     if($warehouseStock) {
-                        $warehouseStock->stock += isset($detail['stock']) ? $detail['stock'] : 0;
+                        $warehouseStock->stock = isset($detail['stock']) ? $detail['stock'] : $warehouseStock->stock;
                         $warehouseStock->save();
                     } else if($idDetail) {
                         $this->productStock->store([
@@ -253,7 +253,7 @@ class ProductController extends Controller
                     ])->first();
 
                     if($outletStock) {
-                        $outletStock->stock += isset($detail['stock']) ? $detail['stock'] : 0;
+                        $outletStock->stock = isset($detail['stock']) ? $detail['stock'] : $outletStock->stock;
                         $outletStock->save();
                     } else if($idDetail) {
                         $this->productStock->store([
