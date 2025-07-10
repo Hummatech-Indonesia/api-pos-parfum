@@ -130,8 +130,8 @@ class ProductController extends Controller
                 $storedDetail = $this->productDetail->store($mappingDetail);
 
                 $this->productStock->store([
-                    'warehouse_id' => auth()->user()->warehouse_id ?? null,
-                    'outlet_id' => auth()->user()->outlet_id ?? null,
+                    'warehouse_id' => auth()->user()?->hasRole('warehouse') ? auth()->user()->warehouse_id : null,
+                    'outlet_id' => auth()->user()?->hasRole('outlet') ? auth()->user()->outlet_id : null,
                     'product_id' => $result_product->id,
                     'product_detail_id' => $storedDetail->id,
                     'stock' => $storedDetail->stock ?? 0,
@@ -210,23 +210,58 @@ class ProductController extends Controller
                 /**
                  * Pengecekan apakah data varian yang dikirim sudah ada atau belum
                  */
-                Log::info("payload update detail", [$detail]);
                 if (isset($detail["product_detail_id"])) {
-                    Log::info("Masuk ke case punya product_detail_id");
                     $idDetail = $detail["product_detail_id"];
                     $products = collect($products)->filter(function ($item) use ($detail) {
                         return $item->id != $detail["product_detail_id"];
                     });
-                    Log::info("producsts", [$products]);
                     
                     unset($detail["product_detail_id"]);
                     $productDetailShow = $this->productDetail->show($idDetail);
                     $mappingDetailUpdate = $this->productDetailService->dataProductDetailUpdate($detail, $productDetailShow);
                     $this->productDetail->update($idDetail, $mappingDetailUpdate);
                 } else {
-                    Log::info("Masuk ke case ga punya product_detail_id");
                     $mappingDetail = $this->productDetailService->dataProductDetail($detail);
-                    $this->productDetail->store($mappingDetail);
+                    $resultStore = $this->productDetail->store($mappingDetail);
+                    $idDetail = $resultStore->id;
+                }
+                
+                // insert stock into product stock warehouse
+                if(auth()->user()?->hasRole('warehouse')) {
+                    $warehouseStock = $this->productStock->customQuery([
+                        "warehouse_id" => auth()->user()?->warehouse_id,
+                        "product_detail_id" => $idDetail
+                    ])->first();
+
+                    if($warehouseStock) {
+                        $warehouseStock->stock += isset($detail['stock']) ? $detail['stock'] : 0;
+                        $warehouseStock->save();
+                    } else if($idDetail) {
+                        $this->productStock->store([
+                            "warehouse_id" => auth()->user()?->warehouse_id,
+                            "stock" => isset($detail['stock']) ? $detail['stock'] : 0,
+                            "product_detail_id" => $idDetail
+                        ]);
+                    }
+                }
+
+                // insert stock into product stock outlet
+                if(auth()->user()?->hasRole('outlet')) {
+                    $outletStock = $this->productStock->customQuery([
+                        "outlet_id" => auth()->user()?->outlet_id,
+                        "product_detail_id" => $idDetail
+                    ])->first();
+
+                    if($outletStock) {
+                        $outletStock->stock += isset($detail['stock']) ? $detail['stock'] : 0;
+                        $outletStock->save();
+                    } else if($idDetail) {
+                        $this->productStock->store([
+                            "outlet_id" => auth()->user()?->outlet_id,
+                            "stock" => isset($detail['stock']) ? $detail['stock'] : 0,
+                            "product_detail_id" => $idDetail
+                        ]);
+                    }
                 }
             }
 
