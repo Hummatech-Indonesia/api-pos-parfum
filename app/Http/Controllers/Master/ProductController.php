@@ -212,16 +212,19 @@ class ProductController extends Controller
                  */
                 Log::info("payload update detail", [$detail]);
                 if (isset($detail["product_detail_id"])) {
+                    Log::info("Masuk ke case punya product_detail_id");
                     $idDetail = $detail["product_detail_id"];
                     $products = collect($products)->filter(function ($item) use ($detail) {
                         return $item->id != $detail["product_detail_id"];
                     });
-
+                    Log::info("producsts", [$products]);
+                    
                     unset($detail["product_detail_id"]);
                     $productDetailShow = $this->productDetail->show($idDetail);
                     $mappingDetailUpdate = $this->productDetailService->dataProductDetailUpdate($detail, $productDetailShow);
                     $this->productDetail->update($idDetail, $mappingDetailUpdate);
                 } else {
+                    Log::info("Masuk ke case ga punya product_detail_id");
                     $mappingDetail = $this->productDetailService->dataProductDetail($detail);
                     $this->productDetail->store($mappingDetail);
                 }
