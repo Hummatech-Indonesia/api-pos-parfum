@@ -6,6 +6,7 @@ use App\Contracts\Repositories\Master\ProductStockRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\ProductDetailResource;
 use App\Models\ProductStock;
+use Illuminate\Support\Facades\Log;
 
 class ProductResource extends JsonResource
 {
@@ -14,6 +15,7 @@ class ProductResource extends JsonResource
         $isBundling = $this->relationLoaded('productBundling')
             ? $this->productBundling !== null
             : $this->productBundling()->exists();
+        Log::info($this->details?->first());
         return [
             'id' => $isBundling
                 ? $this->productBundling?->id
