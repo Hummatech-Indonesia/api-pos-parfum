@@ -25,6 +25,7 @@ class ProductBundlingDetailResource extends JsonResource
                     $user = auth()->user();
                     return [
                         'product_name' => $detail->productDetail?->product?->name ?? null,
+                        'product_id' => $detail->productDetail?->product?->id ?? null,
                         'product_detail_id' => $detail->product_detail_id,
                         'variant_name' => $detail->productDetail?->variant_name ?? '-',
                         'quantity' => $detail->quantity ?? null,
