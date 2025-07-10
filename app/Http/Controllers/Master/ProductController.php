@@ -209,7 +209,7 @@ class ProductController extends Controller
                 /**
                  * Pengecekan apakah data varian yang dikirim sudah ada atau belum
                  */
-
+                dd($detail);
                 if (isset($detail["product_detail_id"])) {
                     $idDetail = $detail["product_detail_id"];
                     $products = collect($products)->filter(function ($item) use ($detail) {
