@@ -201,7 +201,7 @@ class TransactionController extends Controller
 
             // Pajak dari transaksi
             $pajak = $transaction->amount_tax;
-            Log::info("Data transaction detail", [$productDetail]);
+            Log::info("Data transaction detail", [$product]);
             return BaseResponse::Ok("Berhasil mengambil detail transaksi", [
                 'transaction_code' => $transaction->transaction_code,
                 'created_at' => $transaction->created_at->format('d F Y, H:i'),
