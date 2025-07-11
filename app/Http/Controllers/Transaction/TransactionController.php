@@ -184,6 +184,8 @@ class TransactionController extends Controller
                 'transaction_id' => $id
             ])->with(['product.product', 'product.unit'])->get();
 
+            $productDetail = $details;
+
             $vouchers = $this->voucherUsed->customQuery([
                 'store_id' => $transaction->store_id,
             ])->where('description', 'like', "%{$transaction->created_at->format('d-m-Y')}%")->get();
@@ -212,7 +214,7 @@ class TransactionController extends Controller
                 'total_barang' => $totalHargaBarang,
                 'outlet' => $transaction->outlet,
                 'warehouse' => $transaction->warehouse,
-                'details' => TransactionDetailResource::collection($details),
+                'details' => TransactionDetailResource::collection($productDetail),
             ]);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
