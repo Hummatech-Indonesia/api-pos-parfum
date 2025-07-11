@@ -215,7 +215,7 @@ class TransactionController extends Controller
                 'total_barang' => $totalHargaBarang,
                 'outlet' => $transaction->outlet,
                 'warehouse' => $transaction->warehouse,
-                'details' => TransactionDetailResource::collection($product->productDetail),
+                'details' => TransactionDetailResource::collection($product),
             ]);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
