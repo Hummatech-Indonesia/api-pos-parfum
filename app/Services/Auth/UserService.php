@@ -24,7 +24,7 @@ class UserService
         $result = [
             "name" => $data->name,
             "email" => $data->email,
-            "phone" => $data->phone,
+            "phone" => $data?->phone,
             "password" => bcrypt($data->password)
         ];
 
