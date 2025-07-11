@@ -10,10 +10,10 @@ class TransactionDetailResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        Log::info("Data Product", [$this->product?->product]);
+        Log::info("Data Product", [$this->product]);
         return [
-            'product_name' => optional($this->product)?->product?->name ?? null,
-            'variant_name' => optional($this->product)?->variant_name ?? null,
+            'product_name' => optional($this->product)?->name ?? null,
+            'variant_name' => $this->variant_name ?? null,
             'price' => (float) $this->price,
             'quantity' => $this->quantity . ' ' . $this->unit,
             'discount' => optional($this->product)?->price_discount ?? 0,

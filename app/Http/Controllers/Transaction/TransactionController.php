@@ -183,9 +183,9 @@ class TransactionController extends Controller
 
             $details = $this->transactionDetail->customQuery([
                 'transaction_id' => $id
-            ])->with(['productDetail', 'productDetail.unitRelasi'])->get();
+            ])->with(['productDetail.product', 'productDetail.unitRelasi'])->get();
 
-            $productDetail = $details;
+            $product = $details;
 
             $vouchers = $this->voucherUsed->customQuery([
                 'store_id' => $transaction->store_id,
@@ -215,7 +215,7 @@ class TransactionController extends Controller
                 'total_barang' => $totalHargaBarang,
                 'outlet' => $transaction->outlet,
                 'warehouse' => $transaction->warehouse,
-                'details' => TransactionDetailResource::collection($productDetail),
+                'details' => TransactionDetailResource::collection($product->productDetail),
             ]);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
