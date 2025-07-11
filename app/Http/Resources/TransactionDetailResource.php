@@ -4,11 +4,13 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Log;
 
 class TransactionDetailResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        Log::info("Data Product", $this->product?->product);
         return [
             'product_name' => optional($this->product)->product->name ?? null,
             'variant_name' => optional($this->product)->variant_name ?? null,
