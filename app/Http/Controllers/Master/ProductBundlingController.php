@@ -240,6 +240,7 @@ class ProductBundlingController extends Controller
                 $this->bundlingDetailRepo->delete($detail->id);
             }
 
+            $this->productRepo->delete($bundling->product_id);
             $this->repository->delete($bundling->id);
 
             DB::commit();
