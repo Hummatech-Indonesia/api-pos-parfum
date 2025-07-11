@@ -11,6 +11,7 @@ class UserService
 
     public function mappingDataUser(array $data): array
     {
+        if(!isset($data["phone"])) $data["phone"] = null;
         $data = (object)$data;
 
         $image = null;
@@ -24,7 +25,7 @@ class UserService
         $result = [
             "name" => $data->name,
             "email" => $data->email,
-            "phone" => $data?->phone,
+            "phone" => $data->phone,
             "password" => bcrypt($data->password)
         ];
 
