@@ -99,8 +99,14 @@ class UserController extends Controller
         DB::beginTransaction();
         try {
             $userData = $this->userService->prepareUserCreationData($data, $request->role);
+            
+            if(auth()->user()?->hasRole('cashier')) {
+                $userData["warehouse_id"] = auth()->user()?->warehouse_id;
+                $userData["outlet_id"] = auth()->user()?->outlet_id;
+            }
             $result_user = $this->user->store($userData);
             $result_user->syncRoles($request->role);
+            
             DB::commit();
             return BaseResponse::Ok('Berhasil membuat user', $result_user);
         } catch (\Throwable $th) {

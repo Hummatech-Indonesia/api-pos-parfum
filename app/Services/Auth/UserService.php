@@ -83,8 +83,8 @@ class UserService
         return [
             ...$this->mappingDataUser($data),
             'store_id' => $user->store->id ?? $user->store_id,
-            'outlet_id' => $user->outlet->id ?? null,
-            'warehouse_id' => $user->warehouse->id ?? null,
+            'outlet_id' => $user->hasRole('outlet') ? $user->outlet_id : null,
+            'warehouse_id' => $user->hasRole('warehouse') ? $user->warehouse_id : null,
             'is_delete' => 0,
         ];
     }
