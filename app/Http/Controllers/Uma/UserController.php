@@ -47,14 +47,18 @@ class UserController extends Controller
         $role_user_warehouse = ["warehouse", "cashier", "employee"];
 
         // Filter otomatis berdasarkan role login
-        if (in_array('outlet', $userRoles)) {
+        if (in_array('outlet', $userRoles) && !$request->role) {
             $request->merge(['role' => $role_user_outlet]);
-        } elseif (in_array('warehouse', $userRoles)) {
+        } elseif (in_array('warehouse', $userRoles) && !$request->role) {
             $request->merge(['role' => $role_user_warehouse]);
         } elseif (!$request->has('role')) {
             // Jika tidak ada role tertentu dikirim dan bukan outlet/warehouse
             $request->merge([
                 "role" => ['owner','manager', 'auditor', 'warehouse', 'outlet', 'cashier', 'employee'],
+            ]);
+        } elseif($request->role) {
+            $request->merge([
+                "role" => explode(",", $request->role)
             ]);
         }
 
