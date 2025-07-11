@@ -183,7 +183,7 @@ class TransactionController extends Controller
 
             $details = $this->transactionDetail->customQuery([
                 'transaction_id' => $id
-            ])->with(['productDetail', 'product.unit'])->get();
+            ])->with(['productDetail', 'productDetail.unit'])->get();
 
             $productDetail = $details;
 
