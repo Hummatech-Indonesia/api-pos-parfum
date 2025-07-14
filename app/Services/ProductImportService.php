@@ -52,6 +52,7 @@ class ProductImportService
             'product_id' => $productId,
             'product_detail_id' => $detailId,
             'stock' => $row['stock'] ?? 0,
+            'product_code' => $row['product_code']
         ];
     }
 }
