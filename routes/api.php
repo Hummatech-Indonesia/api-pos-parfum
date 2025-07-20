@@ -37,7 +37,8 @@ use App\Http\Controllers\Transaction\TransactionController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
+Route::get('users/export', [UserController::class, 'export'])->name('userexport');
+Route::get('product/export', [ProductController::class, 'export'])->name('productexport');
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -86,8 +87,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // API FOR ROLE OWNER
     Route::middleware('role:warehouse|outlet|employee|cashier')->group(function () {
-        // API FOR DATA USER
         Route::get('users/no-paginate', [UserController::class, 'listUser'])->name('list-users-no-paginate');
+        
+        // API FOR DATA USER
         Route::get('users/v2/no-paginate', [UserController::class, 'listUserV2'])->name('list-users-no-paginate.v2');
         Route::resource("users", UserController::class)->only(['store', 'destroy', 'update']);
         // API FOR DATA OUTLET

@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers\Uma;
 
-use App\Contracts\Interfaces\Auth\UserInterface;
+use App\Exports\UserExport;
+use Illuminate\Http\Request;
 use App\Helpers\BaseResponse;
 use App\Helpers\PaginationHelper;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Master\UserSyncRequest;
 use App\Http\Requests\UserRequest;
-use App\Http\Resources\UserDetailResource;
-use App\Http\Resources\UserResource;
 use App\Services\Auth\UserService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Resources\UserDetailResource;
+use App\Http\Requests\Master\UserSyncRequest;
+use App\Contracts\Interfaces\Auth\UserInterface;
 
 class UserController extends Controller
 {
@@ -232,6 +234,32 @@ class UserController extends Controller
             return BaseResponse::Ok("Berhasil sikronisasi member!", null);
         } catch (\Throwable $th) {
             DB::rollBack();
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+    public function export(Request $request)
+    {
+        try {
+            $user = $this->user->customQuery($request->all())->get();
+
+            $data = [
+              ['ID', 'Name', 'Email', 'Role']
+            ];
+
+            foreach ($user as $item) {
+                $data[] = [
+                    'ID' => $item->id,
+                    'Name' => $item->name,
+                    'Email' => $item->email,
+                    'Role' => $item->roles[0]->name ?? 'N/A',
+                ];
+            }
+
+            $export = new UserExport($data);
+
+            return Excel::download($export, 'users.xlsx');
+        } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
     }

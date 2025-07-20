@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers\Master;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Enums\UploadDiskEnum;
 use App\Helpers\BaseResponse;
+use App\Exports\ProductExport;
+use App\Helpers\PaginationHelper;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Resources\ProductResource;
 use App\Services\Master\ProductService;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\Master\ProductRequest;
 use App\Services\Master\ProductDetailService;
@@ -16,10 +22,6 @@ use App\Contracts\Interfaces\Master\ProductInterface;
 use App\Contracts\Interfaces\Master\ProductStockInterface;
 use App\Contracts\Interfaces\Master\ProductDetailInterface;
 use App\Contracts\Interfaces\Master\ProductVarianInterface;
-use App\Helpers\PaginationHelper;
-use App\Http\Resources\ProductResource;
-use App\Models\Product;
-use Illuminate\Support\Facades\Response;
 
 class ProductController extends Controller
 {
@@ -79,8 +81,6 @@ class ProductController extends Controller
             $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
         }
 
-        $payload["sort_by"] = in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null;
-        $payload["sort_order"] = in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'asc';
 
         $paginated = $this->product->customPaginate($perPage, $page, $payload);
 
@@ -267,8 +267,6 @@ class ProductController extends Controller
             $payload = [
                 'is_delete' => $request->get('is_delete', 0),
                 'search' => $request->get('search'),
-                'sort_by' => in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null,
-                'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
             ];
 
             if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
@@ -293,8 +291,6 @@ class ProductController extends Controller
             $payload = [
                 'is_delete' => $request->get('is_delete', 0),
                 'search' => $request->get('search'),
-                'sort_by' => in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null,
-                'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
             ];
 
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
@@ -319,8 +315,6 @@ class ProductController extends Controller
             $payload = [
                 'is_delete' => $request->get('is_delete', 0),
                 'search' => $request->get('search'),
-                'sort_by' => in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null,
-                'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
             ];
 
             $user = auth()->user();
@@ -364,8 +358,6 @@ class ProductController extends Controller
             $payload = [
                 'is_delete' => $request->get('is_delete', 0),
                 'search' => $request->get('search'),
-                'sort_by' => in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null,
-                'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
             ];
 
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
@@ -381,6 +373,45 @@ class ProductController extends Controller
             $meta = PaginationHelper::meta($products);
 
             return BaseResponse::Paginate("Berhasil sync list product", $products["data"], $meta);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+    public function export(Request $request)
+    {
+        try {
+            $payload = [
+                'is_delete' => $request->get('is_delete', 0),
+            ];
+            $products = $this->product->customQuery($request->all())->get();
+
+            $data = [
+              ['ID', 'Name', 'Detail Sum Stock', 'Category', 'Created By', 'Description', 'Sum Purchase', 'Density', 'Unit Code', 'Price', 'Variant Name', 'Product Code', 'Transaction Detail Count', 'Stock']
+            ];
+
+            foreach ($products as $item) {
+                $data[] = [
+                    'ID' => $item->id,
+                    'Name' => $item->name,
+                    'details_sum_stock' => $item->details_sum_stock ?? 'N/A',
+                    'category' => $item->category->name ?? 'N/A',
+                    'created_by' => $item->created_by ?? 'N/A',
+                    'description' => $item->description ?? 'N/A',
+                    'sum_purchase' => $item->sum_purchase ?? 'N/A',
+                    'density' => $item->density ?? 'N/A',
+                    'unit_code' => $item->product_detail[0]->unit_code ?? 'N/A',
+                    'price' => $item->product_detail[0]->price ?? 'N/A',
+                    'variant_name' => $item->product_detail[0]->variant_name ?? 'N/A',
+                    'product_code' => $item->product_detail[0]->product_code ?? 'N/A',
+                    'transaction_details_count' => $item->product_detail[0]->transaction_details_count ?? 'N/A',
+                    'stock' => $item->product_detail[0]->stock ?? '0',
+                ];
+            }
+
+            $export = new ProductExport($data);
+
+            return Excel::download($export, 'products.xlsx');
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
