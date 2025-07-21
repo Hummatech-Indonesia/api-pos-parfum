@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Enums\UploadDiskEnum;
 use App\Helpers\BaseResponse;
 use App\Exports\ProductExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Helpers\PaginationHelper;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -378,15 +379,12 @@ class ProductController extends Controller
         }
     }
 
-    public function export(Request $request)
+    public function export()
     {
         try {
-            $payload = [
-                'is_delete' => $request->get('is_delete', 0),
-            ];
-            $products = $this->product->customQuery($request->all())->get();
+            $products = $this->product->customQuery(['is_delete' => 0])->get();
 
-            $data = [
+             $data = [
               ['ID', 'Name', 'Detail Sum Stock', 'Category', 'Created By', 'Description', 'Sum Purchase', 'Density', 'Unit Code', 'Price', 'Variant Name', 'Product Code', 'Transaction Detail Count', 'Stock']
             ];
 
@@ -415,5 +413,16 @@ class ProductController extends Controller
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
+    }
+
+    public function exportPdf() {
+        try {
+            $products = $this->product->customQuery(['is_delete' => 0])->get();
+
+            $pdf = Pdf::loadView('pdf.product', compact('products'));
+            return $pdf->download('products.pdf');
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }      
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Uma;
 use App\Exports\UserExport;
 use Illuminate\Http\Request;
 use App\Helpers\BaseResponse;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Helpers\PaginationHelper;
 use App\Http\Requests\UserRequest;
 use App\Services\Auth\UserService;
@@ -238,16 +239,16 @@ class UserController extends Controller
         }
     }
 
-    public function export(Request $request)
+    public function export()
     {
         try {
-            $user = $this->user->customQuery($request->all())->get();
+            $users = $this->user->customQuery(['is_delete' => 0])->get();
 
             $data = [
               ['ID', 'Name', 'Email', 'Role']
             ];
 
-            foreach ($user as $item) {
+            foreach ($users as $item) {
                 $data[] = [
                     'ID' => $item->id,
                     'Name' => $item->name,
@@ -263,4 +264,16 @@ class UserController extends Controller
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
+
+    public function exportPdf() {
+        try {
+            $users = $this->user->customQuery(['is_delete' => 0])->get();
+
+            $pdf = Pdf::loadView('pdf.users', compact('users'));
+            return $pdf->download('users.pdf');
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
 }
+ 
