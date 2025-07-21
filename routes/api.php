@@ -186,10 +186,14 @@ Route::middleware('auth:sanctum')->group(function () {
     // API FOR DATA TRANSACTION
     Route::get("transactions/no-paginate", [TransactionController::class, 'getData']);
     Route::post("transactions/sync", [TransactionController::class, 'syncStoreData']);
+    // Route::get("transactions/export", [TransactionController::class, 'exportExcel']);
+    // Route::get("transactions/export-pdf", [TransactionController::class, 'exportPdf']);
     Route::resource("transactions", TransactionController::class)->except(['destroy']);
     // API FOR DATA SHIFT
     Route::post("shifts/sync", [ShiftUserController::class, 'syncStoreData']);
     Route::get("shifts/no-paginate", [ShiftUserController::class, 'getData']);
+    Route::get("shifts/export", [ShiftUserController::class, 'export'])->name('shifts.export');
+    Route::get("shifts/export-pdf", [ShiftUserController::class, 'exportPdf']);
     Route::resource("shifts", ShiftUserController::class)->except(['destroy']);
     // API FOR UNIT
     Route::get("unit/no-paginate", [UnitController::class, 'list']);
