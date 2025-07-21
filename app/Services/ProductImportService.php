@@ -15,6 +15,7 @@ class ProductImportService
         $data = [
             'name' => $firstRow['name'],
             'store_id' => $user->store_id,
+            'category_id' => $firstRow['category_id']
         ];
 
         if ($user->hasRole('warehouse')) {
@@ -28,11 +29,6 @@ class ProductImportService
 
     public function mapProductDetail(array $row, string $productId): array
     {
-        $unit = Unit::where('code', $row['unit'] ?? null)->first();
-
-        if (!$unit) {
-            throw new \Exception("Unit dengan kode '{$row['unit']}' tidak ditemukan.");
-        }
         return [
             'product_id' => $productId,
             'material' => $row['material'] ?? null,
@@ -41,7 +37,7 @@ class ProductImportService
             'weight' => $row['weight'] ?? 0,
             'density' => $row['density'] ?? 0,
             'price' => $row['price'] ?? 0,
-            'unit_id' => $unit?->id,
+            'unit_id' => $row['unit'],
             'price_discount' => $row['price_discount'] ?? null,
             'variant_name' => $row['variant_name'] ?? null,
             'product_code' => $row['product_code'] ?? null,
@@ -56,6 +52,7 @@ class ProductImportService
             'product_id' => $productId,
             'product_detail_id' => $detailId,
             'stock' => $row['stock'] ?? 0,
+            'product_code' => $row['product_code']
         ];
     }
 }

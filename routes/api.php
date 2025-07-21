@@ -200,5 +200,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get("unit/alltrashed", [UnitController::class, 'trashed']);
     Route::resource("unit", UnitController::class)->except(['create', 'edit']);
 
-    Route::middleware(['role:warehouse|outlet|admin'])->get('/dashboard', [DashboardController::class, 'index']);
+    Route::middleware(['role:warehouse|outlet|admin|cashier|employee'])->get('/dashboard', [DashboardController::class, 'index']);
 });

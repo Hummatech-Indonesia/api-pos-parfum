@@ -86,4 +86,20 @@ class ProductBundlingService
         return 'BNDL-' . $initials;
     }
 
+    public function mapProductImage(array $data): array
+    {
+        $image = null;
+
+        try {
+            if(isset($data["image"])) {
+                $image = $this->upload("products", $data["image"]);
+            }
+        } catch (\Throwable $th) {
+
+        }
+        return [
+            'image' => $image ?? 'default/Default.jpeg',
+        ];
+    }
+
 }

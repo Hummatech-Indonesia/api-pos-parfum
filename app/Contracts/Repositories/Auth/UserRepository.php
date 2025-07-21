@@ -227,11 +227,9 @@ class UserRepository extends BaseRepository implements UserInterface
             }, function ($query) {
                 $query->where('is_delete', 0); // default ke user aktif
             })
-            ->when($data, function ($query) use ($data) {
-                if (!empty($data["search"])) {
-                    $query->where(function ($query2) use ($data) {
-                        $query2->where('name', 'like', '%' . $data["search"] . '%');
-                    });
+            ->when($data, function ($query) use ($data, $search) {
+                if ($search) {
+                    $query->where('name', 'like', '%' . $search . '%');
                 }
 
                 if (!empty($data["start_date"])) {

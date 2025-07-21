@@ -17,6 +17,7 @@ use App\Models\Unit;
 use App\Services\Master\ProductBundlingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProductBundlingController extends Controller
 {
@@ -98,7 +99,7 @@ class ProductBundlingController extends Controller
             $bundling = $this->repository->store($bundlingData);
 
             // Mapping & simpan ke product_bundling_details
-            $details = collect($validated['details'][0]['product_bundling_material'])
+            $details = collect($validated['details'])
                 ->map(function ($item) {
                     $unit = Unit::find($item['unit_id']);
                     if (!$unit) {
@@ -173,10 +174,21 @@ class ProductBundlingController extends Controller
             ];
             $this->repository->update($bundling->id, $bundlingData);
 
+            if($request->hasFile('image')) {
+                $product = $this->productRepo->show($bundling->product_id);
+                if($product) {
+                    $productData = $this->service->mapProductImage($validated);
+                    $product->image = $productData["image"];
+                    $product->save();
+                }
+            }
+
             foreach ($validated['details'] as $inputDetail) {
                 $unitName = null;
                 if (!empty($inputDetail['unit_id'])) {
-                    $unit = Unit::find($inputDetail['unit_id']);
+                    Log::info("Masuk ke unit", [$inputDetail]);
+                    $unit = Unit::withTrashed()->where('id',$inputDetail['unit_id'])->first();
+                    Log::info("unit", [$unit]);
                     if (!$unit) {
                         return BaseResponse::Error("Unit tidak ditemukan", 400);
                     }
@@ -228,6 +240,7 @@ class ProductBundlingController extends Controller
                 $this->bundlingDetailRepo->delete($detail->id);
             }
 
+            $this->productRepo->delete($bundling->product_id);
             $this->repository->delete($bundling->id);
 
             DB::commit();

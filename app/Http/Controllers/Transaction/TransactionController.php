@@ -18,6 +18,7 @@ use App\Http\Resources\TransactionDetailResource;
 use App\Services\Transaction\TransactionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TransactionController extends Controller
 {
@@ -182,7 +183,9 @@ class TransactionController extends Controller
 
             $details = $this->transactionDetail->customQuery([
                 'transaction_id' => $id
-            ])->with(['product.product', 'product.unit'])->get();
+            ])->with(['productDetail.product', 'productDetail.unitRelasi'])->get();
+
+            $product = $details;
 
             $vouchers = $this->voucherUsed->customQuery([
                 'store_id' => $transaction->store_id,
@@ -198,7 +201,6 @@ class TransactionController extends Controller
 
             // Pajak dari transaksi
             $pajak = $transaction->amount_tax;
-
             return BaseResponse::Ok("Berhasil mengambil detail transaksi", [
                 'transaction_code' => $transaction->transaction_code,
                 'created_at' => $transaction->created_at->format('d F Y, H:i'),
@@ -212,7 +214,7 @@ class TransactionController extends Controller
                 'total_barang' => $totalHargaBarang,
                 'outlet' => $transaction->outlet,
                 'warehouse' => $transaction->warehouse,
-                'details' => TransactionDetailResource::collection($details),
+                'details' => TransactionDetailResource::collection($product),
             ]);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);

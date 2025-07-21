@@ -31,7 +31,8 @@ class UserRequest extends FormRequest
             "email" => 'required|email|unique:users,email,' . $id,
             'password' => 'required|min:8',
             'role' => 'required|array',
-            'image' => 'nullable|image|max:2024'
+            'image' => 'nullable|image|max:2024',
+            'phone' => 'nullable'
         ];
     }
 
