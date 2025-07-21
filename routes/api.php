@@ -49,14 +49,7 @@ Route::get('unauthorized', function () {
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::post('register', [AuthController::class, 'register'])->name('register');
 
-// API FOR AUTHENTIKASI
-// Export PDF
-Route::get('users/exportPdf', [UserController::class, 'exportPdf'])->name('userexportpdf');
-Route::get('product/exportPdf', [ProductController::class, 'exportPdf'])->name('productexportpdf');
-// Export Excel
-Route::get('users/export', [UserController::class, 'export'])->name('userexport');
-Route::get('product/export', [ProductController::class, 'export'])->name('productexport');
-        
+// API FOR AUTHENTIKASI       
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('me', [AuthController::class, 'getMe'])->name('get-me');
@@ -93,7 +86,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // API FOR ROLE OWNER
     Route::middleware('role:warehouse|outlet|employee|cashier')->group(function () {
-        
+        // Export PDF
+        Route::get('users/exportPdf', [UserController::class, 'exportPdf'])->name('userexportpdf');
+        Route::get('product/exportPdf', [ProductController::class, 'exportPdf'])->name('productexportpdf');
+        // Export Excel
+        Route::get('users/export', [UserController::class, 'export'])->name('userexport');
+        Route::get('product/export', [ProductController::class, 'export'])->name('productexport');
         // API FOR DATA USER
         Route::get('users/no-paginate', [UserController::class, 'listUser'])->name('list-users-no-paginate');
         Route::get('users/v2/no-paginate', [UserController::class, 'listUserV2'])->name('list-users-no-paginate.v2');
