@@ -37,7 +37,12 @@ use App\Http\Controllers\Transaction\TransactionController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
+// Export PDF
+        Route::get('users/exportPdf', [UserController::class, 'exportPdf'])->name('userexportpdf');
+        Route::get('product/exportPdf', [ProductController::class, 'exportPdf'])->name('productexportpdf');
+        // Export Excel
+        Route::get('users/export', [UserController::class, 'export'])->name('userexport');
+        Route::get('product/export', [ProductController::class, 'export'])->name('productexport');
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -86,12 +91,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // API FOR ROLE OWNER
     Route::middleware('role:warehouse|outlet|employee|cashier')->group(function () {
-        // Export PDF
-        Route::get('users/exportPdf', [UserController::class, 'exportPdf'])->name('userexportpdf');
-        Route::get('product/exportPdf', [ProductController::class, 'exportPdf'])->name('productexportpdf');
-        // Export Excel
-        Route::get('users/export', [UserController::class, 'export'])->name('userexport');
-        Route::get('product/export', [ProductController::class, 'export'])->name('productexport');
+        
         // API FOR DATA USER
         Route::get('users/no-paginate', [UserController::class, 'listUser'])->name('list-users-no-paginate');
         Route::get('users/v2/no-paginate', [UserController::class, 'listUserV2'])->name('list-users-no-paginate.v2');

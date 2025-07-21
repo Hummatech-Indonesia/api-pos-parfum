@@ -383,30 +383,7 @@ class ProductController extends Controller
     {
         try {
             $products = $this->product->customQuery(['is_delete' => 0])->get();
-
-             $data = [
-              ['ID', 'Name', 'Detail Sum Stock', 'Category', 'Created By', 'Description', 'Sum Purchase', 'Density', 'Unit Code', 'Price', 'Variant Name', 'Product Code', 'Transaction Detail Count', 'Stock']
-            ];
-
-            foreach ($products as $item) {
-                $data[] = [
-                    'ID' => $item->id,
-                    'Name' => $item->name,
-                    'details_sum_stock' => $item->details_sum_stock ?? 'N/A',
-                    'category' => $item->category->name ?? 'N/A',
-                    'created_by' => $item->created_by ?? 'N/A',
-                    'description' => $item->description ?? 'N/A',
-                    'sum_purchase' => $item->sum_purchase ?? 'N/A',
-                    'density' => $item->density ?? 'N/A',
-                    'unit_code' => $item->product_detail[0]->unit_code ?? 'N/A',
-                    'price' => $item->product_detail[0]->price ?? 'N/A',
-                    'variant_name' => $item->product_detail[0]->variant_name ?? 'N/A',
-                    'product_code' => $item->product_detail[0]->product_code ?? 'N/A',
-                    'transaction_details_count' => $item->product_detail[0]->transaction_details_count ?? 'N/A',
-                    'stock' => $item->product_detail[0]->stock ?? '0',
-                ];
-            }
-
+            $data = $this->product->mappingExcel($products);
             $export = new ProductExport($data);
 
             return Excel::download($export, 'products.xlsx');

@@ -243,20 +243,7 @@ class UserController extends Controller
     {
         try {
             $users = $this->user->customQuery(['is_delete' => 0])->get();
-
-            $data = [
-              ['ID', 'Name', 'Email', 'Role']
-            ];
-
-            foreach ($users as $item) {
-                $data[] = [
-                    'ID' => $item->id,
-                    'Name' => $item->name,
-                    'Email' => $item->email,
-                    'Role' => $item->roles[0]->name ?? 'N/A',
-                ];
-            }
-
+            $data = $this->user->mappingExcel($users);
             $export = new UserExport($data);
 
             return Excel::download($export, 'users.xlsx');
