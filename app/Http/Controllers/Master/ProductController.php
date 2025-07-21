@@ -23,6 +23,11 @@ use App\Contracts\Interfaces\Master\ProductInterface;
 use App\Contracts\Interfaces\Master\ProductStockInterface;
 use App\Contracts\Interfaces\Master\ProductDetailInterface;
 use App\Contracts\Interfaces\Master\ProductVarianInterface;
+use App\Helpers\PaginationHelper;
+use App\Http\Resources\ProductResource;
+use App\Models\Product;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Response;
 
 class ProductController extends Controller
 {
@@ -130,10 +135,10 @@ class ProductController extends Controller
                 $storedDetail = $this->productDetail->store($mappingDetail);
 
                 $this->productStock->store([
-                    'warehouse_id' => auth()->user()->warehouse_id ?? null,
-                    'outlet_id' => auth()->user()->outlet_id ?? null,
+                    'warehouse_id' => auth()->user()?->hasRole('warehouse') ? auth()->user()->warehouse_id : null,
+                    'outlet_id' => auth()->user()?->hasRole('outlet') ? auth()->user()->outlet_id : null,
                     'product_id' => $result_product->id,
-                    'product_code' => $storedDetail->product_code,
+                    'product_code' => $mappingDetail["product_code"],
                     'product_detail_id' => $storedDetail->id,
                     'stock' => $storedDetail->stock ?? 0,
                 ]);
@@ -211,20 +216,58 @@ class ProductController extends Controller
                 /**
                  * Pengecekan apakah data varian yang dikirim sudah ada atau belum
                  */
-
                 if (isset($detail["product_detail_id"])) {
                     $idDetail = $detail["product_detail_id"];
                     $products = collect($products)->filter(function ($item) use ($detail) {
                         return $item->id != $detail["product_detail_id"];
                     });
-
+                    
                     unset($detail["product_detail_id"]);
                     $productDetailShow = $this->productDetail->show($idDetail);
                     $mappingDetailUpdate = $this->productDetailService->dataProductDetailUpdate($detail, $productDetailShow);
                     $this->productDetail->update($idDetail, $mappingDetailUpdate);
                 } else {
                     $mappingDetail = $this->productDetailService->dataProductDetail($detail);
-                    $this->productDetail->store($mappingDetail);
+                    $resultStore = $this->productDetail->store($mappingDetail);
+                    $idDetail = $resultStore->id;
+                }
+                
+                // insert stock into product stock warehouse
+                if(auth()->user()?->hasRole('warehouse')) {
+                    $warehouseStock = $this->productStock->customQuery([
+                        "warehouse_id" => auth()->user()?->warehouse_id,
+                        "product_detail_id" => $idDetail
+                    ])->first();
+
+                    if($warehouseStock) {
+                        $warehouseStock->stock = isset($detail['stock']) ? $detail['stock'] : $warehouseStock->stock;
+                        $warehouseStock->save();
+                    } else if($idDetail) {
+                        $this->productStock->store([
+                            "warehouse_id" => auth()->user()?->warehouse_id,
+                            "stock" => isset($detail['stock']) ? $detail['stock'] : 0,
+                            "product_detail_id" => $idDetail
+                        ]);
+                    }
+                }
+
+                // insert stock into product stock outlet
+                if(auth()->user()?->hasRole('outlet')) {
+                    $outletStock = $this->productStock->customQuery([
+                        "outlet_id" => auth()->user()?->outlet_id,
+                        "product_detail_id" => $idDetail
+                    ])->first();
+
+                    if($outletStock) {
+                        $outletStock->stock = isset($detail['stock']) ? $detail['stock'] : $outletStock->stock;
+                        $outletStock->save();
+                    } else if($idDetail) {
+                        $this->productStock->store([
+                            "outlet_id" => auth()->user()?->outlet_id,
+                            "stock" => isset($detail['stock']) ? $detail['stock'] : 0,
+                            "product_detail_id" => $idDetail
+                        ]);
+                    }
                 }
             }
 
@@ -279,7 +322,7 @@ class ProductController extends Controller
             }
 
             $products = $this->product->getListProduct($payload);
-
+            
             return BaseResponse::Ok("Berhasil mengambil data product", ProductResource::collection($products));
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);

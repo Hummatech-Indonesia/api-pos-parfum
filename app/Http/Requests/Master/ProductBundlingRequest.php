@@ -26,11 +26,11 @@ class ProductBundlingRequest extends FormRequest
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
 
             'details' => 'required|array|min:1',
-            'details.*.product_bundling_material' => 'required|array|min:1',
-            'details.*.product_bundling_material.*.product_detail_id' => 'required|uuid|exists:product_details,id',
-            'details.*.product_bundling_material.*.quantity' => 'required|numeric|min:1',
-            'details.*.product_bundling_material.*.unit_id' => 'nullable|uuid',
-            'details.*.product_bundling_material.*.unit' => 'nullable|string|max:255'
+            // 'details.*.product_bundling_material' => 'required|array|min:1',
+            'details.*.product_detail_id' => 'required|uuid|exists:product_details,id',
+            'details.*.quantity' => 'required|numeric|min:1',
+            'details.*.unit_id' => 'nullable|uuid',
+            'details.*.unit' => 'nullable|string|max:255'
         ];
     }
 
@@ -54,16 +54,19 @@ class ProductBundlingRequest extends FormRequest
             'category_id.exists' => 'Kategori tidak ditemukan.',
 
             'image.string' => 'URL gambar harus berupa teks.',
+            'image.image' => 'File valid hanya berupa image!',
+            'image.max' => 'Max file 2mb!',
+            'image.mimes' => 'Gambar hanya boleh berupa jpg, png, jpeg',
 
             'details.required' => 'Detail bundling harus diisi.',
-            'details.*.product_bundling_material.required' => 'Daftar bahan wajib diisi.',
-            'details.*.product_bundling_material.*.product_detail_id.required' => 'ID produk detail wajib diisi.',
-            'details.*.product_bundling_material.*.product_detail_id.exists' => 'Produk detail tidak ditemukan.',
+            // 'details.*.product_bundling_material.required' => 'Daftar bahan wajib diisi.',
+            'details.*.product_detail_id.required' => 'ID produk detail wajib diisi.',
+            'details.*.product_detail_id.exists' => 'Produk detail tidak ditemukan.',
             
             // Baru:
-            'details.*.product_bundling_material.*.quantity.required' => 'Jumlah quantity wajib diisi.',
-            'details.*.product_bundling_material.*.quantity.numeric' => 'Quantity harus berupa angka.',
-            'details.*.product_bundling_material.*.quantity.min' => 'Quantity minimal harus 1.',
+            'details.*.quantity.required' => 'Jumlah quantity wajib diisi.',
+            'details.*.quantity.numeric' => 'Quantity harus berupa angka.',
+            'details.*.quantity.min' => 'Quantity minimal harus 1.',
         ];
     }
 

@@ -3,23 +3,32 @@
 namespace App\Http\Controllers\Transaction;
 
 use App\Contracts\Interfaces\Transaction\ShiftUserInterface;
+use App\Contracts\Repositories\Transaction\ShiftUserRepository;
+use App\Exports\ShiftUserExport;
 use App\Helpers\BaseResponse;
 use App\Helpers\PaginationHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Transaction\ShiftUserRequest;
 use App\Http\Requests\Transaction\ShiftUserSyncRequest;
 use App\Http\Resources\ShiftResource;
+use App\Models\ShiftUser;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+
+use function PHPUnit\Framework\isEmpty;
 
 class ShiftUserController extends Controller
 {
     private ShiftUserInterface $shiftUser;
+    private ShiftUserRepository $shiftUserRepository;
 
-    public function __construct(ShiftUserInterface $shiftUser)
+    public function __construct(ShiftUserInterface $shiftUser, ShiftUserRepository $shiftUserRepository)
     {
         $this->shiftUser = $shiftUser;
+        $this->shiftUserRepository = $shiftUserRepository;
     }
 
     /**
@@ -178,6 +187,46 @@ class ShiftUserController extends Controller
             return BaseResponse::Ok('Berhasil sinkronisasi data shift', null);
         } catch (\Throwable $th) {
             DB::rollBack();
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+    public function export(Request $request)
+    {
+        $filters = [];
+
+        if ($request->from_date) {
+            $filters['from_date'] = Carbon::createFromFormat('d-m-Y', $request->from_date)
+                ->format('Y-m-d');
+        }
+
+        if ($request->until_date) {
+            $filters['until_date'] = Carbon::createFromFormat('d-m-Y', $request->until_date)
+                ->format('Y-m-d');
+        }
+
+        try {
+            return Excel::download(new ShiftUserExport($filters), 'shift_user.xlsx');
+        } catch (\Throwable $th) {
+            return BaseResponse::ServerError($th->getMessage(), null);
+        }
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $filters = [];
+
+        if ($request->search) $filters["search"] = $request->search;
+        if ($request->start_date) $filters["start_date"] = $request->start_date;
+        if ($request->end_date) $filters["end_date"] = $request->end_date;
+
+        try {
+            $shiftUsers = $this->shiftUserRepository->getDataForExport($filters);
+             $pdf = Pdf::loadView('exports.shift_user', compact('shiftUsers'))
+                  ->setPaper('4A', 'landscape');
+
+            return $pdf->download('shift_user.pdf');
+        } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
     }

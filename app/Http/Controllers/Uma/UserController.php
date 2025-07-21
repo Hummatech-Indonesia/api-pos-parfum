@@ -50,14 +50,18 @@ class UserController extends Controller
         $role_user_warehouse = ["warehouse", "cashier", "employee"];
 
         // Filter otomatis berdasarkan role login
-        if (in_array('outlet', $userRoles)) {
+        if (in_array('outlet', $userRoles) && !$request->role) {
             $request->merge(['role' => $role_user_outlet]);
-        } elseif (in_array('warehouse', $userRoles)) {
+        } elseif (in_array('warehouse', $userRoles) && !$request->role) {
             $request->merge(['role' => $role_user_warehouse]);
         } elseif (!$request->has('role')) {
             // Jika tidak ada role tertentu dikirim dan bukan outlet/warehouse
             $request->merge([
                 "role" => ['owner','manager', 'auditor', 'warehouse', 'outlet', 'cashier', 'employee'],
+            ]);
+        } elseif($request->role) {
+            $request->merge([
+                "role" => explode(",", $request->role)
             ]);
         }
 
@@ -102,8 +106,14 @@ class UserController extends Controller
         DB::beginTransaction();
         try {
             $userData = $this->userService->prepareUserCreationData($data, $request->role);
+            
+            if(auth()->user()?->hasRole('cashier')) {
+                $userData["warehouse_id"] = auth()->user()?->warehouse_id;
+                $userData["outlet_id"] = auth()->user()?->outlet_id;
+            }
             $result_user = $this->user->store($userData);
             $result_user->syncRoles($request->role);
+            
             DB::commit();
             return BaseResponse::Ok('Berhasil membuat user', $result_user);
         } catch (\Throwable $th) {

@@ -17,6 +17,7 @@ class ProductBundlingDetailResource extends JsonResource
             'stock' => $this->stock ?? 0,
             'status' => ($this->stock ?? 0) > 0 ? 'active' : 'non-active',
             'category' => $this->category->name ?? '-',
+            'category_id' => $this->category_id ?? null,
             'description' => $this->product?->description ?? null,
             'bundling_material_count' => $this->whenLoaded('details', fn() => $this->details->count()),
 
@@ -25,6 +26,7 @@ class ProductBundlingDetailResource extends JsonResource
                     $user = auth()->user();
                     return [
                         'product_name' => $detail->productDetail?->product?->name ?? null,
+                        'product_id' => $detail->productDetail?->product?->id ?? null,
                         'product_detail_id' => $detail->product_detail_id,
                         'variant_name' => $detail->productDetail?->variant_name ?? '-',
                         'quantity' => $detail->quantity ?? null,

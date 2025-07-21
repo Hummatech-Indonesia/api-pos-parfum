@@ -292,6 +292,7 @@ class ProductRepository extends BaseRepository implements ProductInterface
             ->when(!empty($data['sort_by']), function ($q) use ($data) {
                 $q->orderBy($data['sort_by'], $data['sort_order'] ?? 'asc');
             })
+            ->where('is_delete',0)
             ->get();
     }  
 

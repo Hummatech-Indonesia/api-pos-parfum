@@ -11,6 +11,7 @@ class UserService
 
     public function mappingDataUser(array $data): array
     {
+        if(!isset($data["phone"])) $data["phone"] = null;
         $data = (object)$data;
 
         $image = null;
@@ -24,6 +25,7 @@ class UserService
         $result = [
             "name" => $data->name,
             "email" => $data->email,
+            "phone" => $data->phone,
             "password" => bcrypt($data->password)
         ];
 
@@ -68,6 +70,7 @@ class UserService
             'owner' => ['owner', 'outlet', 'employee', 'warehouse', 'auditor', 'manager', 'cashier', 'admin'],
             'outlet' => ['outlet', 'employee', 'cashier'],
             'warehouse' => ['warehouse', 'employee', 'cashier'],
+            'cashier' => ['member'],
             default => [],
         };
 
@@ -81,8 +84,8 @@ class UserService
         return [
             ...$this->mappingDataUser($data),
             'store_id' => $user->store->id ?? $user->store_id,
-            'outlet_id' => $user->outlet->id ?? null,
-            'warehouse_id' => $user->warehouse->id ?? null,
+            'outlet_id' => $user->hasRole('outlet') ? $user->outlet_id : null,
+            'warehouse_id' => $user->hasRole('warehouse') ? $user->warehouse_id : null,
             'is_delete' => 0,
         ];
     }

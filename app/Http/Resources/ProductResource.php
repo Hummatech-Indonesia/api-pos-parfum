@@ -6,6 +6,7 @@ use App\Contracts\Repositories\Master\ProductStockRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\ProductDetailResource;
 use App\Models\ProductStock;
+use Illuminate\Support\Facades\Log;
 
 class ProductResource extends JsonResource
 {
@@ -27,6 +28,7 @@ class ProductResource extends JsonResource
             'sum_purchase' => $this->details?->sum('transaction_details_count'),
             'is_bundling' => $isBundling,
             'unit_id' => $this->details?->first()?->unit_id,
+            'unit_code' => optional($this->details->first()?->unitRelasi)->code,
             'density' => $this->details?->first()?->density,
             'bundling_price' => $this->when(
                 $isBundling,
