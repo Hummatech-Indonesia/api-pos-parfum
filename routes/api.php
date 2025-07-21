@@ -49,7 +49,7 @@ Route::get('unauthorized', function () {
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::post('register', [AuthController::class, 'register'])->name('register');
 
-// API FOR AUTHENTIKASI
+// API FOR AUTHENTIKASI       
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('me', [AuthController::class, 'getMe'])->name('get-me');
@@ -86,6 +86,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // API FOR ROLE OWNER
     Route::middleware('role:warehouse|outlet|employee|cashier')->group(function () {
+        // Export PDF
+        Route::get('users/exportPdf', [UserController::class, 'exportPdf'])->name('userexportpdf');
+        Route::get('product/exportPdf', [ProductController::class, 'exportPdf'])->name('productexportpdf');
+        // Export Excel
+        Route::get('users/export', [UserController::class, 'export'])->name('userexport');
+        Route::get('product/export', [ProductController::class, 'export'])->name('productexport');
         // API FOR DATA USER
         Route::get('users/no-paginate', [UserController::class, 'listUser'])->name('list-users-no-paginate');
         Route::get('users/v2/no-paginate', [UserController::class, 'listUserV2'])->name('list-users-no-paginate.v2');
@@ -180,10 +186,14 @@ Route::middleware('auth:sanctum')->group(function () {
     // API FOR DATA TRANSACTION
     Route::get("transactions/no-paginate", [TransactionController::class, 'getData']);
     Route::post("transactions/sync", [TransactionController::class, 'syncStoreData']);
+    Route::get("transactions/export", [TransactionController::class, 'exportExcel']);
+    Route::get("transactions/export-pdf", [TransactionController::class, 'exportPdf']);
     Route::resource("transactions", TransactionController::class)->except(['destroy']);
     // API FOR DATA SHIFT
     Route::post("shifts/sync", [ShiftUserController::class, 'syncStoreData']);
     Route::get("shifts/no-paginate", [ShiftUserController::class, 'getData']);
+    Route::get("shifts/export", [ShiftUserController::class, 'export'])->name('shifts.export');
+    Route::get("shifts/export-pdf", [ShiftUserController::class, 'exportPdf']);
     Route::resource("shifts", ShiftUserController::class)->except(['destroy']);
     // API FOR UNIT
     Route::get("unit/no-paginate", [UnitController::class, 'list']);

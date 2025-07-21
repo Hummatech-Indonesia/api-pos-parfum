@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers\Uma;
 
-use App\Contracts\Interfaces\Auth\UserInterface;
-use App\Helpers\BaseResponse;
-use App\Helpers\PaginationHelper;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Master\UserSyncRequest;
-use App\Http\Requests\UserRequest;
-use App\Http\Resources\UserDetailResource;
-use App\Http\Resources\UserResource;
-use App\Services\Auth\UserService;
+use App\Exports\UserExport;
 use Illuminate\Http\Request;
+use App\Helpers\BaseResponse;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Helpers\PaginationHelper;
+use App\Http\Requests\UserRequest;
+use App\Services\Auth\UserService;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Resources\UserDetailResource;
+use App\Http\Requests\Master\UserSyncRequest;
+use App\Contracts\Interfaces\Auth\UserInterface;
 
 class UserController extends Controller
 {
@@ -245,4 +248,29 @@ class UserController extends Controller
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
+
+    public function export()
+    {
+        try {
+            $users = $this->user->customQuery(['is_delete' => 0])->get();
+            $data = $this->user->mappingExcel($users);
+            $export = new UserExport($data);
+
+            return Excel::download($export, 'users.xlsx');
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+    public function exportPdf() {
+        try {
+            $users = $this->user->customQuery(['is_delete' => 0])->get();
+
+            $pdf = Pdf::loadView('pdf.users', compact('users'));
+            return $pdf->download('users.pdf');
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
 }
+ 

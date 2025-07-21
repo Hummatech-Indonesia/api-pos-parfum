@@ -283,4 +283,23 @@ class UserRepository extends BaseRepository implements UserInterface
     {
         return User::where('store_id', $storeId)->where('outlet_id', $outletId)->count();
     }
+
+    public function mappingExcel($data): mixed 
+    {
+        $mapping = [];
+        $mapping = [
+            ['ID', 'Name', 'Email', 'Role']
+        ];
+
+        foreach ($data as $item) {
+            $mapping[] = [
+                'ID' => $item->id,
+                'Name' => $item->name,
+                'Email' => $item->email,
+                'Role' => $item->roles[0]->name ?? 'N/A',
+            ];
+        }
+
+        return $mapping;
+    }
 }

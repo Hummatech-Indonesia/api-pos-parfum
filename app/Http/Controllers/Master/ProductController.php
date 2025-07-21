@@ -2,12 +2,19 @@
 
 namespace App\Http\Controllers\Master;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Enums\UploadDiskEnum;
 use App\Helpers\BaseResponse;
+use App\Exports\ProductExport;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Helpers\PaginationHelper;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Resources\ProductResource;
 use App\Services\Master\ProductService;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\Master\ProductRequest;
 use App\Services\Master\ProductDetailService;
@@ -80,8 +87,6 @@ class ProductController extends Controller
             $payload['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
         }
 
-        $payload["sort_by"] = in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null;
-        $payload["sort_order"] = in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'asc';
 
         $paginated = $this->product->customPaginate($perPage, $page, $payload);
 
@@ -306,8 +311,6 @@ class ProductController extends Controller
             $payload = [
                 'is_delete' => $request->get('is_delete', 0),
                 'search' => $request->get('search'),
-                'sort_by' => in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null,
-                'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
             ];
 
             if (auth()->user()->hasRole('warehouse')) $payload["warehouse_id"] = auth()->user()->warehouse_id;
@@ -332,8 +335,6 @@ class ProductController extends Controller
             $payload = [
                 'is_delete' => $request->get('is_delete', 0),
                 'search' => $request->get('search'),
-                'sort_by' => in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null,
-                'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
             ];
 
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
@@ -358,8 +359,6 @@ class ProductController extends Controller
             $payload = [
                 'is_delete' => $request->get('is_delete', 0),
                 'search' => $request->get('search'),
-                'sort_by' => in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null,
-                'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
             ];
 
             $user = auth()->user();
@@ -403,8 +402,6 @@ class ProductController extends Controller
             $payload = [
                 'is_delete' => $request->get('is_delete', 0),
                 'search' => $request->get('search'),
-                'sort_by' => in_array($request->sort_by, ['name', 'created_at']) ? $request->sort_by : null,
-                'sort_order' => in_array($request->sort_order, ['asc', 'desc']) ? $request->sort_order : 'desc',
             ];
 
             if (auth()?->user()?->store?->id || auth()?->user()?->store_id) {
@@ -423,5 +420,29 @@ class ProductController extends Controller
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
+    }
+
+    public function export()
+    {
+        try {
+            $products = $this->product->customQuery(['is_delete' => 0])->get();
+            $data = $this->product->mappingExcel($products);
+            $export = new ProductExport($data);
+
+            return Excel::download($export, 'products.xlsx');
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+    public function exportPdf() {
+        try {
+            $products = $this->product->customQuery(['is_delete' => 0])->get();
+
+            $pdf = Pdf::loadView('pdf.product', compact('products'));
+            return $pdf->download('products.pdf');
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }      
     }
 }

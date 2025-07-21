@@ -8,6 +8,8 @@ use App\Contracts\Interfaces\Master\ProductStockInterface;
 use App\Contracts\Interfaces\Transaction\TransactionDetailInterface;
 use App\Contracts\Interfaces\Transaction\TransactionInterface;
 use App\Contracts\Interfaces\Transaction\VoucherUsedInterface;
+use App\Contracts\Repositories\Transaction\TransactionRepository;
+use App\Exports\TransactionExport;
 use App\Helpers\BaseResponse;
 use App\Helpers\PaginationHelper;
 use App\Http\Controllers\Controller;
@@ -15,10 +17,15 @@ use App\Http\Requests\Transaction\TransactionRequest;
 use App\Http\Requests\Transaction\TransactionSyncRequest;
 use App\Http\Resources\TransactionResource;
 use App\Http\Resources\TransactionDetailResource;
+use App\Models\Transaction;
 use App\Services\Transaction\TransactionService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TransactionController extends Controller
 {
@@ -29,6 +36,7 @@ class TransactionController extends Controller
     private ProductDetailInterface $productDetail;
     private ProductStockInterface $productStock;
     private TransactionService $transactionService;
+    private TransactionRepository $transactionRepository;
 
     public function __construct(
         TransactionInterface $transaction,
@@ -37,7 +45,8 @@ class TransactionController extends Controller
         DiscountVoucherInterface $discountVoucher,
         ProductDetailInterface $productDetail,
         ProductStockInterface $productStock,
-        TransactionService $transactionService
+        TransactionService $transactionService,
+        TransactionRepository $transactionRepository,
     ) {
         $this->transaction = $transaction;
         $this->transactionDetail = $transactionDetail;
@@ -46,6 +55,7 @@ class TransactionController extends Controller
         $this->productDetail = $productDetail;
         $this->productStock = $productStock;
         $this->transactionService = $transactionService;
+        $this->transactionRepository = $transactionRepository;
     }
 
 
@@ -332,6 +342,46 @@ class TransactionController extends Controller
             return BaseResponse::Ok("Berhasil melakukan sinkronisasi transaksi", null);
         } catch (\Throwable $th) {
             DB::rollBack();
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $filters = [];
+
+        if ($request->start_date) {
+            $filters['start_date'] = $request->start_date;
+        }
+
+        if ($request->end_date) {
+            $filters['end_date'] = $request->end_date;
+        }
+        
+        try {
+
+            return Excel::download(new TransactionExport($filters), 'transactions.xlsx');
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $filters = [];
+
+        if ($request->search) $filters["search"] = $request->search;
+        if ($request->start_date) $filters["start_date"] = $request->start_date;
+        if ($request->end_date) $filters["end_date"] = $request->end_date;
+        
+        try {
+            $transactions = $this->transactionRepository->getDataForExport($filters);
+
+            $pdf = Pdf::loadView('exports.transaction', compact('transactions'))
+                ->setPaper('A4', 'landscape');
+
+            return $pdf->download('transactions.pdf');
+        } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
     }

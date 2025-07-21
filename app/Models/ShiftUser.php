@@ -26,4 +26,9 @@ class ShiftUser extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function outlet(): BelongsTo
+    {
+        return $this->belongsTo(Outlet::class);
+    }
 }
