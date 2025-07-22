@@ -57,7 +57,7 @@ class TransactionExport implements FromQuery, WithHeadings, WithMapping, ShouldA
     public function map($transaction): array
     {
         return [
-            Auth::user()?->name ?? null,
+            $transaction->cashier_id ?? 'kasir',
             $transaction->user_name,
             $transaction->transaction_details?->count() ?? 0,
             $transaction->amount_price,

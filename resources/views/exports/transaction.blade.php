@@ -24,10 +24,9 @@
             </tr>
         </thead>
         <tbody>
-            {{-- {{ dd($transactions) }} --}}
             @foreach ($transactions as $trx)
                 <tr>
-                    <td>{{ Auth::user()?->name ?? null }}</td>
+                    <td>{{ $trx->cashier_id ?? 'kasir' }}</td>
                     <td>{{ $trx->user_name}}</td>
                     <td>{{ $trx->transaction_details_count }}</td>
                     <td>{{ number_format($trx->amount_price) }}</td>
