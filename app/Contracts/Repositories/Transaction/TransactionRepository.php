@@ -157,11 +157,11 @@ class TransactionRepository extends BaseRepository implements TransactionInterfa
     public function getDataForExport(array $filters)
     {
         $query = $this->model->query()
-            ->with(['store', 'user', 'transaction_details.product'])
+            ->with(['store', 'outlet', 'user', 'transaction_details'])
             ->withCount('transaction_details');
 
-        if ($storeId = Auth::user()?->store_id ?? Auth::user()?->store?->id) {
-            $query->where('store_id', $storeId);
+        if ($outletId = Auth::user()?->outlet_id ?? Auth::user()?->outlet?->id) {
+            $query->where('outlet_id', $outletId);
         }
 
         if (!empty($filters["search"])) {

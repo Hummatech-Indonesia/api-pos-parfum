@@ -8,12 +8,14 @@ use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class TransactionExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize, WithStyles
+class TransactionExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize, WithStyles, WithColumnFormatting
 {
     protected array $filters;
 
@@ -25,9 +27,9 @@ class TransactionExport implements FromQuery, WithHeadings, WithMapping, ShouldA
     public function query()
     {
         $query = Transaction::query()
-            ->with(['store', 'user', 'transaction_details.product'])
-            ->when(Auth::user()?->store_id ?? Auth::user()?->store?->id, function ($q, $storeId) {
-                $q->where('store_id', $storeId);
+            ->with(['store', 'user', 'transaction_details'])
+            ->when(Auth::user()?->outlet_id ?? Auth::user()?->outlet?->id, function ($q, $outletId) {
+                $q->where('outlet_id', $outletId);
             });
 
         if (!empty($this->filters['start_date'])) {
@@ -70,6 +72,14 @@ class TransactionExport implements FromQuery, WithHeadings, WithMapping, ShouldA
                 'font' => ['bold' => true],
                 'alignment' => ['horizontal' => 'center'],
             ],
+        ];
+    }
+
+    public function columnFormats(): array
+    {
+        return [
+            'D' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+            'E' => NumberFormat::FORMAT_DATE_DDMMYYYY,
         ];
     }
 }
