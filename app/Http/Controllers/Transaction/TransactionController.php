@@ -351,16 +351,18 @@ class TransactionController extends Controller
         $filters = [];
 
         if ($request->start_date) {
-            $filters['start_date'] = $request->start_date;
+            $filters['start_date'] = Carbon::createFromFormat('d-m-Y', $request->start_date)
+                ->format('Y-m-d');
         }
 
         if ($request->end_date) {
-            $filters['end_date'] = $request->end_date;
+            $filters['end_date'] = Carbon::createFromFormat('d-m-Y', $request->end_date)
+                ->format('Y-m-d');
         }
         
         try {
 
-            return Excel::download(new TransactionExport($filters), 'transactions.xlsx');
+            return Excel::download(new TransactionExport($this->transactionRepository, $filters), 'transactions.xlsx');
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
         }
