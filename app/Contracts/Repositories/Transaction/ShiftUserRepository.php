@@ -83,7 +83,6 @@ class ShiftUserRepository extends BaseRepository implements ShiftUserInterface
                     $query->whereDate('date', '<=', $filters['end_date']);
                 }
             });
-            // dd($query->get());
             return $query->get();
     }
 
