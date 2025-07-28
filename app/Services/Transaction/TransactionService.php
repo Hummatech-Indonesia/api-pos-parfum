@@ -23,6 +23,7 @@ class TransactionService
                 'outlet_id' => auth()->user()?->outlet_id ?? auth()->user()?->outlet?->id,
                 'warehouse_id' => auth()->user()?->warehouse_id ?? auth()->user()?->warehouse?->id,
                 'transaction_status' => "Success",
+                'cashier_id' => isset($data["cashier_id"]) ? $data["cashier_id"] : null,
                 'user_id' => isset($data["user_id"]) ? $data["user_id"] : null,
                 'user_name' => isset($data["user_name"]) ? $data["user_name"] : null,
                 'amount_price' => isset($data["amount_price"]) ? $data["amount_price"] : null,
@@ -31,7 +32,8 @@ class TransactionService
                 'total_price' => $total_price,
                 'payment_method' => isset($data["payment_method"]) ? $data["payment_method"] : null,
                 'note' => isset($data["note"]) ? $data["note"] : null,
-                'payment_time' => now()
+                'status' => isset($data["status"]) ? $data["status"] : "Complete",
+                'payment_time' => isset($data["payment_time"]) ? $data["payment_time"] : now()
             ];
         }catch(\Throwable $th){
             Log::error($th->getMessage());

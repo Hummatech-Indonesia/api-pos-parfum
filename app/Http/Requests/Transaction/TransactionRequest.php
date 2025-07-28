@@ -33,6 +33,7 @@ class TransactionRequest extends FormRequest
             'transaction_detail.*.unit' => 'required',
             'discounts' => 'sometimes|array',
             'discounts.*' => 'sometimes|exists:discount_vouchers,id',
+            'cashier_id' => 'sometimes|exists:users,id',
             'user_id' => 'sometimes|exists:users,id',
             'cashier_id' => 'sometimes|exists:users,id',
             'user_name' => 'sometimes',
@@ -40,6 +41,8 @@ class TransactionRequest extends FormRequest
             'tax' => 'required|min:0',
             'amount_tax' => 'required|min:0',
             'payment_method' => 'required',
+            'transaction.*.payment_time' => 'nullable',
+            'transaction.*.status' => 'nullable',
             'note' => 'nullable' 
         ];
     }
@@ -81,5 +84,6 @@ class TransactionRequest extends FormRequest
     public function prepareForValidation()
     {
         if(!$this->discounts) $this->merge(["discounts" => []]);
+        if(!$this->cashier_id) $this->merge(["cashier_id" => auth()->user()?->id]);
     }
 }

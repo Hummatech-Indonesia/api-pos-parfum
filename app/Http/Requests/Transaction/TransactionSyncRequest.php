@@ -41,6 +41,8 @@ class TransactionSyncRequest extends FormRequest
             'transaction.*.tax' => 'required|min:0',
             'transaction.*.amount_tax' => 'required|min:0',
             'transaction.*.payment_method' => 'required',
+            'transaction.*.payment_time' => 'nullable',
+            'transaction.*.status' => 'nullable',
             'transaction.*.note' => 'nullable' 
         ];
     }
