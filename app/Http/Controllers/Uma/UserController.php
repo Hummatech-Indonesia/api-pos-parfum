@@ -234,6 +234,11 @@ class UserController extends Controller
                     $user["email"] = str_replace(" ", "", explode(" ", $user["name"])[0]) . date("ymdhms") . "@gmail.com";
                     $user["password"] = bcrypt("password");
                     $user["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+                    
+                    if(auth()->user()?->warehouse_id) $user["warehouse_id"] = auth()?->user()?->warehouse_id;
+                    else if(auth()->user()?->outlet_id) $user["outlet_id"] = auth()?->user()?->outlet_id;
+                    $user["store_id"] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+                    
                     $result_user = $this->user->store($user);
 
                     $result_user->syncRoles(["member"]);
