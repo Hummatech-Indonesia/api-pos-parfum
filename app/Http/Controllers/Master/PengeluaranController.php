@@ -29,12 +29,12 @@ class PengeluaranController extends Controller
     {
         $per_page = $request->per_page ?? 8;
         $page = $request->page ?? 1;
-        $payload = [
-            "is_delete" => 0
-        ];
+        $payload = [];
 
         // check query filter
         if ($request->search) $payload["search"] = $request->search;
+        if ($request->warehouse_id) $payload["warehouse_id"] = $request->warehouse_id;
+        if ($request->outlet_id) $payload["outlet_id"] = $request->outlet_id;
 
         try {
             $paginate = $this->pengeluaran->customPaginate($per_page, $page, $payload);
@@ -82,8 +82,6 @@ class PengeluaranController extends Controller
      */
     public function show(string $id)
     {
-        $check = $this->pengeluaran->checkActive($id);
-        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data pengeluaran!");
 
         $check_pengeluaran = $this->pengeluaran->show($id);
         if (!$check_pengeluaran) return BaseResponse::Notfound("Tidak dapat menemukan data pengeluaran!");
@@ -106,7 +104,7 @@ class PengeluaranController extends Controller
     {
         $data = $request->validated();
 
-        $check = $this->pengeluaran->checkActive($id);
+        $check = $this->pengeluaran->show($id);
         if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data pengeluaran!");
 
         DB::beginTransaction();
@@ -127,7 +125,7 @@ class PengeluaranController extends Controller
      */
     public function destroy(string $id)
     {
-        $check = $this->pengeluaran->checkActive($id);
+        $check = $this->pengeluaran->show($id);
         if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data pengeluaran!");
 
         DB::beginTransaction();
@@ -146,7 +144,8 @@ class PengeluaranController extends Controller
     {
         try {
             $payload = [];
-            if ($request->has('is_delete')) $payload["is_delete"] = $request->is_delete;
+            if ($request->warehouse_id) $payload["warehouse_id"] = $request->warehouse_id;
+            if ($request->outlet_id) $payload["outlet_id"] = $request->outlet_id;
 
             $data = $this->pengeluaran->customQuery($payload)->get();
 

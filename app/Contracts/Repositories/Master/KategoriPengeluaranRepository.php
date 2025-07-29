@@ -24,11 +24,6 @@ class KategoriPengeluaranRepository extends BaseRepository implements KategoriPe
         return $this->model->create($data);
     }
 
-    public function checkActive(mixed $id): mixed
-    {
-        return $this->model->with('outlet', 'warehouse')->where('is_delete', 0)->find($id);
-    }
-
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
@@ -68,9 +63,9 @@ class KategoriPengeluaranRepository extends BaseRepository implements KategoriPe
 
     public function update(mixed $id, array $data): mixed
     {
-        $model = $this->model->select('id', 'is_delete')->findOrFail($id);
+        $model = $this->model->select('id')->findOrFail($id);
 
-        if ($model->is_delete) {
+        if (!$model) {
             return null;
         }
 
@@ -81,13 +76,13 @@ class KategoriPengeluaranRepository extends BaseRepository implements KategoriPe
 
     public function delete(mixed $id): mixed
     {
-        $model = $this->model->select('id', 'is_delete')->findOrFail($id);
+        $model = $this->model->select('id')->findOrFail($id);
 
-        if ($model->is_delete) {
+        if (!$model) {
             return null;
         }
 
-        $model->update(['is_delete' => 1]);
+        $model->delete();
 
         return $model->fresh();
     }

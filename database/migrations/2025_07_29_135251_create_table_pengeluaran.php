@@ -15,25 +15,30 @@ return new class extends Migration
             Schema::create('pengeluaran', function (Blueprint $table) {
                 $table->uuid('id')->primary();
                 $table->string("nama_pengeluaran");
-                $table->foreignUuid("kategori_pengeluaran_id")
-                    ->constrained("kategori_pengeluaran")
-                    ->onDelete("cascade");
                 $table->bigInteger('nominal_pengeluaran');
                 $table->text('deskripsi');
                 $table->string('image')->nullable();
                 $table->date('tanggal_pengeluaran');
+                $table->foreignUuid("kategori_pengeluaran_id")
+                    ->references('id')
+                    ->on("kategori_pengeluaran")
+                    ->onDelete("cascade");
                 $table->foreignUuid('outlet_id')
-                    ->constrained('outlets')
+                    ->nullable()
+                    ->references('id')
+                    ->on('outlets')
                     ->onDelete("cascade");
                 $table->foreignUuid('warehouse_id')
-                    ->constrained('warehouses')
+                    ->nullable()
+                    ->references('id')
+                    ->on('warehouses')
                     ->onDelete("cascade");
                 $table->foreignId('category_id');
                 $table->foreign("category_id")
                     ->references('id')
                     ->on('categories')
                     ->onDelete("cascade");
-                $table->tinyInteger('is_delete')->default(0);
+                $table->softDeletes();
             });
         }
     }
@@ -43,6 +48,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pengeluarans');
+        Schema::dropIfExists('pengeluaran');
     }
 };

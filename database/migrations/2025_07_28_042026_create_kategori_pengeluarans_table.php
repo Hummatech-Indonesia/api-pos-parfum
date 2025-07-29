@@ -16,12 +16,16 @@ return new class extends Migration
                 $table->uuid('id')->primary();
                 $table->string("nama");
                 $table->foreignUuid('outlet_id')
-                    ->constrained('outlets')
+                    ->nullable()
+                    ->references('id')
+                    ->on('outlets')
                     ->onDelete("cascade");
                 $table->foreignUuid('warehouse_id')
-                    ->constrained('warehouses')
+                    ->nullable()
+                    ->references('id')
+                    ->on('warehouses')
                     ->onDelete("cascade");
-                $table->tinyInteger('is_delete')->default(0);
+                $table->softDeletes();
             });
         }
     }

@@ -26,19 +26,18 @@ class PengeluaranResource extends JsonResource
                 'id' => $this->kategori_pengeluaran->id,
                 'nama' => $this->kategori_pengeluaran->nama,
                 'outlet_id' => $this->kategori_pengeluaran->outlet_id,
-                'warehouse_id' => $this->kategori_pengeluaran->warehouse_id,
-                'is_delete' => $this->kategori_pengeluaran->is_delete
+                'warehouse_id' => $this->kategori_pengeluaran->warehouse_id
             ],
             'outlet' => new OutletResource($this->whenLoaded('outlet')),
             'warehouse' => [
                 'id' => $this->warehouse_id,
-                'store_id' => $this->warehouse->store_id,
-                'name' => $this->warehouse->name,
-                'adress' => $this->warehouse->adress,
-                'telp' => $this->warehouse->telp,
-                'person_responsible' => $this->warehouse->person_responsible,
-                'image' => $this->warehouse->image,
-                'is_delete' => $this->warehouse->is_delete,
+                'store_id' => $this->warehouse->store_id ?? null,
+                'name' => $this->warehouse->name ?? null,
+                'adress' => $this->warehouse->adress ?? null,
+                'telp' => $this->warehouse->telp ?? null,
+                'person_responsible' => $this->warehouse->person_responsible ?? null,
+                'image' => $this->warehouse->image ?? null,
+                'is_delete' => $this->warehouse->is_delete ?? null,
             ],
             'category' => [
                 'id' => $this->category->id,

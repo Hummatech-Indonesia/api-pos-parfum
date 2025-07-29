@@ -21,13 +21,13 @@ class KategoriPengeluaranResource extends JsonResource
             'outlet' => new OutletResource($this->whenLoaded('outlet')),
             'warehouse' => [
                 'id' => $this->warehouse_id,
-                'store_id' => $this->warehouse->store_id,
-                'name' => $this->warehouse->name,
-                'adress' => $this->warehouse->adress,
-                'telp' => $this->warehouse->telp,
-                'person_responsible' => $this->warehouse->person_responsible,
-                'image' => $this->warehouse->image,
-                'is_delete' => $this->warehouse->is_delete,
+                'store_id' => $this->warehouse->store_id ?? null,
+                'name' => $this->warehouse->name ?? null,
+                'adress' => $this->warehouse->adress ?? null,
+                'telp' => $this->warehouse->telp ?? null,
+                'person_responsible' => $this->warehouse->person_responsible ?? null,
+                'image' => $this->warehouse->image ?? null,
+                'is_delete' => $this->warehouse->is_delete ?? null,
             ],
         ];
     }

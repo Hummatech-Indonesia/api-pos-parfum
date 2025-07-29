@@ -31,12 +31,12 @@ class KategoriPengeluaranController extends Controller
     {
         $per_page = $request->per_page ?? 8;
         $page = $request->page ?? 1;
-        $payload = [
-            "is_delete" => 0
-        ];
+        $payload = [];
 
         // check query filter
         if ($request->search) $payload["search"] = $request->search;
+        if ($request->warehouse_id) $payload["warehouse_id"] = $request->warehouse_id;
+        if ($request->outlet_id) $payload["outlet_id"] = $request->outlet_id;
 
         try {
             $paginate = $this->kategoriPengeluaran->customPaginate($per_page, $page, $payload);
@@ -84,9 +84,6 @@ class KategoriPengeluaranController extends Controller
      */
     public function show(string $id)
     {
-        $check = $this->kategoriPengeluaran->checkActive($id);
-        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data pengeluaran!");
-
         $check_kategori_pengeluaran = $this->kategoriPengeluaran->show($id);
         if (!$check_kategori_pengeluaran) return BaseResponse::Notfound("Tidak dapat menemukan data kategori pengeluaran!");
 
@@ -108,8 +105,8 @@ class KategoriPengeluaranController extends Controller
     {
         $data = $request->validated();
 
-        $check = $this->kategoriPengeluaran->checkActive($id);
-        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data outlet!");
+        $check = $this->kategoriPengeluaran->show($id);
+        if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data kategori pengeluaran!");
 
         DB::beginTransaction();
         try {
@@ -129,7 +126,7 @@ class KategoriPengeluaranController extends Controller
      */
     public function destroy(string $id)
     {
-        $check = $this->kategoriPengeluaran->checkActive($id);
+        $check = $this->kategoriPengeluaran->show($id);
         if (!$check) return BaseResponse::Notfound("Tidak dapat menemukan data kategori pengeluaran!");
 
         DB::beginTransaction();
@@ -148,7 +145,8 @@ class KategoriPengeluaranController extends Controller
     {
         try {
             $payload = [];
-            if ($request->has('is_delete')) $payload["is_delete"] = $request->is_delete;
+            if ($request->warehouse_id) $payload["warehouse_id"] = $request->warehouse_id;
+            if ($request->outlet_id) $payload["outlet_id"] = $request->outlet_id;
 
             $data = $this->kategoriPengeluaran->customQuery($payload)->get();
 

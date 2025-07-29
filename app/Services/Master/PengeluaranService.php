@@ -36,10 +36,14 @@ class PengeluaranService
                 "nominal_pengeluaran" => $data["nominal_pengeluaran"],
                 "kategori_pengeluaran_id" => $data["kategori_pengeluaran_id"],
                 "image" => $image,
-                "outlet_id" => $data["outlet_id"],
-                "warehouse_id" => $data["warehouse_id"],
                 "category_id" => $data["category_id"]
             ];
+            if(auth()->user()->warehouse_id) {
+                $result['warehouse_id'] = auth()->user()->warehouse_id;
+            } else if (auth()->user()->outlet_id) {
+                $result['outlet_id'] = auth()->user()->outlet_id;
+            }
+
             return $result;
         } catch (\Throwable $th) {
             Log::error($th->getMessage());
@@ -60,7 +64,7 @@ class PengeluaranService
             } catch (\Throwable $th) {
             }
 
-            return [
+            $result = [
                 "nama_pengeluaran" => $data["nama_pengeluaran"],
                 "nominal_pengeluaran" => $data["nominal_pengeluaran"],
                 "deskripsi" => $data["deskripsi"],
@@ -68,10 +72,16 @@ class PengeluaranService
                 "nominal_pengeluaran" => $data["nominal_pengeluaran"],
                 "kategori_pengeluaran_id" => $data["kategori_pengeluaran_id"],
                 "image" => $image,
-                "outlet_id" => $data["outlet_id"],
-                "warehouse_id" => $data["warehouse_id"],
                 "category_id" => $data["category_id"]
             ];
+            if(auth()->user()->warehouse_id) {
+                $result['warehouse_id'] = auth()->user()->warehouse_id;
+            } else if (auth()->user()->outlet_id) {
+                $result['outlet_id'] = auth()->user()->outlet_id;
+            }
+
+            return $result;
+
         } catch (\Throwable $th) {
             Log::error($th->getMessage());
             throw new Error($th->getMessage(), 400);

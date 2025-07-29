@@ -63,16 +63,11 @@ class PengeluaranRepository extends BaseRepository implements PengeluaranInterfa
             ->find($id);
     }
 
-    public function checkActive(mixed $id): mixed
-    {
-        return $this->model->with('category', 'outlet', 'warehouse', 'kategori_pengeluaran')->where('is_delete', 0)->find($id);
-    }
-
     public function update(mixed $id, array $data): mixed
     {
-        $model = $this->model->select('id', 'is_delete')->findOrFail($id);
+        $model = $this->model->select('id')->findOrFail($id);
 
-        if ($model->is_delete) {
+        if (!$model) {
             return null;
         }
 
@@ -83,13 +78,13 @@ class PengeluaranRepository extends BaseRepository implements PengeluaranInterfa
 
     public function delete(mixed $id): mixed
     {
-        $model = $this->model->select('id', 'is_delete')->findOrFail($id);
+        $model = $this->model->select('id')->findOrFail($id);
 
-        if ($model->is_delete) {
+        if (!$model) {
             return null;
         }
 
-        $model->update(['is_delete' => 1]);
+        $model->delete();
 
         return $model->fresh();
     }

@@ -5,13 +5,14 @@ namespace App\Models;
 use App\Models\Outlet;
 use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class KategoriPengeluaran extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
     protected $table = 'kategori_pengeluaran';
     public $timestamps = false;
     public $incrementing = false;

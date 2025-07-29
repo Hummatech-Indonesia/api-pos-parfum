@@ -27,8 +27,6 @@ class PengeluaranRequest extends FormRequest
             'deskripsi' => 'required',
             'image' => 'nullable|image|max:2024',
             'kategori_pengeluaran_id' => 'required|exists:kategori_pengeluaran,id',
-            'outlet_id' => 'required|exists:outlets,id',
-            'warehouse_id' => 'required|exists:warehouses,id',
             'category_id' => 'required|exists:categories,id'
         ];
     }
@@ -36,11 +34,15 @@ class PengeluaranRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'nama.required' => 'Nama kategori pengeluaran tidak boleh kosong!',
-            'outlet_id.required' => 'Outlet tidak boleh kosong!',
-            'warehouse_id.required' => 'Gudang tidak boleh kosong!',
-            'outlet_id.exists' => 'Outlet yang dipilih tidak valid!',
-            'warehouse_id.exists' => 'Warehouse yang dipilih tidak valid!',
+            'nama_pengeluaran.required' => 'Nama pengeluaran tidak boleh kosong!',
+            'nominal_pengeluaran.required' => 'Nominal pengeluaran tidak boleh kosong!',
+            'deskripsi.required' => 'Deskripsi pengeluaran tidak boleh kosong!',
+            'image.image' => 'File yang diunggah harus berupa gambar!',
+            'image.max' => 'Ukuran gambar tidak boleh lebih dari 2MB!',
+            'kategori_pengeluaran_id.required' => 'Kategori pengeluaran tidak boleh kosong!',
+            'kategori_pengeluaran_id.exists' => 'Kategori pengeluaran yang dipilih tidak valid!',
+            'category_id.required' => 'Kategori tidak boleh kosong!',
+            'category_id.exists' => 'Kategori yang dipilih tidak valid!'
         ];
     }
 }
