@@ -11,10 +11,12 @@ use App\Services\Master\OutletService;
 use App\Http\Requests\Master\OutletRequest;
 use App\Contracts\Repositories\Auth\UserRepository;
 use App\Contracts\Repositories\Master\OutletRepository;
+use App\Contracts\Repositories\Master\ProductStockRepository;
 use App\Helpers\PaginationHelper;
 use App\Http\Resources\OutletDetailResource;
 use App\Http\Resources\OutletDetailWithTransactionResource;
 use App\Http\Resources\OutletResource;
+use PhpOffice\PhpSpreadsheet\Shared\Escher\DggContainer\BstoreContainer;
 
 class OutletController extends Controller
 {
@@ -22,13 +24,15 @@ class OutletController extends Controller
     private UserRepository $user;
     private OutletService $outletService;
     private UserService $userService;
+    private ProductStockRepository $productStockRepository;
 
-    public function __construct(OutletRepository $outlet, UserRepository $user, OutletService $outletService, UserService $userService)
+    public function __construct(OutletRepository $outlet, UserRepository $user, OutletService $outletService, UserService $userService, ProductStockRepository $productStockRepository)
     {
         $this->outlet = $outlet;
         $this->user = $user;
         $this->outletService = $outletService;
         $this->userService = $userService;
+        $this->productStockRepository = $productStockRepository;
     }
 
     /**
@@ -215,6 +219,19 @@ class OutletController extends Controller
             return BaseResponse::Ok("Berhasil mengambil data outlet", OutletResource::collection($data));
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+    public function latestStocking(Request $request)
+    {
+        try {
+            $outlet_id = auth()->user()->outlet_id ?? null;
+
+            $stocks = $this->productStockRepository->getLastStocks(null, $outlet_id);
+
+            return BaseResponse::Ok('Berhasil mengambil daftar stocking terakhir', $stocks);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error('Gagal mengambil daftar stocking terakhir', $th->getMessage());
         }
     }
 }
