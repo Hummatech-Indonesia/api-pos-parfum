@@ -20,5 +20,5 @@ interface ProductStockInterface extends GetInterface, StoreInterface, CustomQuer
     public function findByOutletAndProductDetail($outletId, $productDetailId);
     public function increaseStock($outletId, $productDetailId, $amount);
     public function updateOrCreateStock($outletId, $productDetailId, $stock): ProductStock;
-
+    public function getLastStocks(?string $warehouse_id, ?string $outlet_id): mixed;
 }

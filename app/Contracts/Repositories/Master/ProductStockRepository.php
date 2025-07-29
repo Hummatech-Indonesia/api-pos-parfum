@@ -154,4 +154,23 @@ class ProductStockRepository extends BaseRepository implements ProductStockInter
             'stock' => $stock,
         ]);
     }
+
+    public function getLastStocks(?string $warehouse_id, ?string $outlet_id): mixed
+    {
+        if ($warehouse_id) {
+            return $this->model
+                ->where('warehouse_id', $warehouse_id)
+                ->orderByDesc('updated_at')
+                ->get();
+        }
+
+        if ($outlet_id) {
+            return $this->model
+                ->where('outlet_id', $outlet_id)
+                ->orderByDesc('updated_at')
+                ->get();
+        }
+
+        return collect();
+    }
 }
