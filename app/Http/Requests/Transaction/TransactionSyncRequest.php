@@ -28,7 +28,8 @@ class TransactionSyncRequest extends FormRequest
         return [
             'transaction' => 'required|array',
             'transaction.*.transaction_detail' => 'required|array',
-            'transaction.*.transaction_detail.*.product_detail_id' => 'required|exists:product_details,id',
+            // 'transaction.*.transaction_detail.*.product_detail_id' => 'required|exists:product_details,id',
+            'transaction.*.transaction_detail.*.product_detail_id' => 'required',
             'transaction.*.transaction_detail.*.price' => 'required|min:1',
             'transaction.*.transaction_detail.*.quantity' => 'required|min:1',
             'transaction.*.transaction_detail.*.unit' => 'required',
