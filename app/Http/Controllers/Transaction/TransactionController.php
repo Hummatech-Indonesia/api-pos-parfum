@@ -8,6 +8,7 @@ use App\Contracts\Interfaces\Master\ProductStockInterface;
 use App\Contracts\Interfaces\Transaction\TransactionDetailInterface;
 use App\Contracts\Interfaces\Transaction\TransactionInterface;
 use App\Contracts\Interfaces\Transaction\VoucherUsedInterface;
+use App\Contracts\Repositories\Master\ProductBundlingRepository;
 use App\Contracts\Repositories\Transaction\TransactionRepository;
 use App\Exports\TransactionExport;
 use App\Helpers\BaseResponse;
@@ -37,6 +38,7 @@ class TransactionController extends Controller
     private ProductStockInterface $productStock;
     private TransactionService $transactionService;
     private TransactionRepository $transactionRepository;
+    private ProductBundlingRepository $productBundling;
 
     public function __construct(
         TransactionInterface $transaction,
@@ -47,6 +49,7 @@ class TransactionController extends Controller
         ProductStockInterface $productStock,
         TransactionService $transactionService,
         TransactionRepository $transactionRepository,
+        ProductBundlingRepository $productBundling
     ) {
         $this->transaction = $transaction;
         $this->transactionDetail = $transactionDetail;
@@ -56,6 +59,7 @@ class TransactionController extends Controller
         $this->productStock = $productStock;
         $this->transactionService = $transactionService;
         $this->transactionRepository = $transactionRepository;
+        $this->productBundling = $productBundling;
     }
 
 
@@ -309,6 +313,37 @@ class TransactionController extends Controller
                     ]);
                 }
 
+                // handling product bundling 
+                $bundlingProduct = collect($trans["transaction_detail"])->filter(fn($item) => isset($item["type"]));
+                foreach($bundlingProduct as $bundling) {
+                    $product_bundling = $this->productBundling->customQuery(["id" => $bundling["product_detail_id"]])->first();
+
+                    foreach($product_bundling->details as $item) {
+                        $productStock = $this->productStock->customQuery(["product_detail_id" => $item->product_detail_id, 'outlet_id' => auth()->user()?->outlet_id])->first();
+    
+                        if (!$productStock) return BaseResponse::Error("Product tidak memiliki stock yang terdaftar di dalam outlet, silahkan check kembali dalam gudang!", null);
+    
+                        if ($productStock->stock < ($item->quantity * $bundling["quantity"])) return BaseResponse::Error("Product tidak memiliki stock memadai!", null);
+    
+                        $productDetail = $this->productDetail->show($item->product_detail_id);
+    
+                        if (!$productDetail) return BaseResponse::Error("Product tidak terdaftar, silahkan check ke admin!", null);
+                        $used_quantity = ($item->quantity * $bundling["quantity"]);
+                        // if (strtolower($item["unit"]) == "gram") $used_quantity = $item["quantity"] * $productDetail->density;
+    
+                        $productStock->stock -= $used_quantity;
+                        $productStock->save();
+                    }
+
+                    $this->transactionDetail->store([
+                        "transaction_id" => $transaction->id,
+                        "product_detail_id" => $product_bundling?->product?->details?->first()?->id,
+                        "quantity" => $bundling['quantity'],
+                        "price" => $bundling['price'],
+                        "unit" => $bundling['unit'],
+                    ]);
+                }
+
                 // handling product
                 foreach ($trans["transaction_detail"] as $item) {
 
@@ -321,7 +356,6 @@ class TransactionController extends Controller
                     $productDetail = $this->productDetail->show($item['product_detail_id']);
 
                     if (!$productDetail) return BaseResponse::Error("Product tidak terdaftar, silahkan check ke admin!", null);
-
                     $used_quantity = $item["quantity"];
                     if (strtolower($item["unit"]) == "gram") $used_quantity = $item["quantity"] * $productDetail->density;
 
