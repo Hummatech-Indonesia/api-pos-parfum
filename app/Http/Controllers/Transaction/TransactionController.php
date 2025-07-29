@@ -315,8 +315,8 @@ class TransactionController extends Controller
 
                 // handling product bundling 
                 $bundlingProduct = collect($trans["transaction_detail"])->filter(fn($item) => isset($item["type"]));
-                $bundlingProducts = collect($trans["transaction_detail"]);
-                dd($bundlingProducts, $bundlingProduct, $trans["transaction_detail"]);
+                $noBundlingProducts = collect($trans["transaction_detail"])->filter(fn($item) => !isset($item["type"]));
+                
                 foreach($bundlingProduct as $bundling) {
                     $product_bundling = $this->productBundling->customQuery(["id" => $bundling["product_detail_id"]])->first();
 
@@ -347,7 +347,7 @@ class TransactionController extends Controller
                 }
 
                 // handling product
-                foreach ($trans["transaction_detail"] as $item) {
+                foreach ($noBundlingProducts as $item) {
 
                     $productStock = $this->productStock->customQuery(["product_detail_id" => $item['product_detail_id'], 'outlet_id' => auth()->user()?->outlet_id])->first();
 
