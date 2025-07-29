@@ -319,6 +319,7 @@ class TransactionController extends Controller
                     $product_bundling = $this->productBundling->customQuery(["id" => $bundling["product_detail_id"]])->first();
 
                     foreach($product_bundling->details as $item) {
+                        dd($item, $product_bundling);
                         $productStock = $this->productStock->customQuery(["product_detail_id" => $item->product_detail_id, 'outlet_id' => auth()->user()?->outlet_id])->first();
     
                         if (!$productStock) return BaseResponse::Error("Product tidak memiliki stock yang terdaftar di dalam outlet, silahkan check kembali dalam gudang!", null);
