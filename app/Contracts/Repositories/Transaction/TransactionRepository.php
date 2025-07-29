@@ -6,7 +6,9 @@ use App\Contracts\Interfaces\Transaction\TransactionInterface;
 use App\Contracts\Repositories\BaseRepository;
 use App\Models\Transaction;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TransactionRepository extends BaseRepository implements TransactionInterface
 {
@@ -179,5 +181,81 @@ class TransactionRepository extends BaseRepository implements TransactionInterfa
         }
 
         return $query->get();
+    }
+
+    public function getSummary(?string $warehouse_id, ?string $outlet_id): mixed
+    {
+        $query = $this->model->query();
+
+        if ($warehouse_id) {
+            $query->where('warehouse_id', $warehouse_id);
+        }
+
+        if ($outlet_id) {
+            $query->where('outlet_id', $outlet_id);
+        }
+
+        $transactions = $query
+            ->orderBy('payment_time', 'desc')
+            ->get();
+
+        $summary = [
+            'total_transaksi' => $transactions->count(),
+            'total_nominal' => $transactions->sum('amount_price'),
+            'terakhir_transaksi' => optional(Carbon::parse($transactions->max('payment_time')))->format('Y-m-d H:i:s'),
+            'data' => $transactions,
+        ];
+
+        return $summary;
+    }
+
+    public function getTotalIncome(?string $outlet_id = null, ?string $warehouse_id = null): int
+    {
+        $query = $this->model->where('transaction_status', 'Success');
+
+        if ($outlet_id) {
+            $query->where('outlet_id', $outlet_id);
+        }
+
+        if ($warehouse_id) {
+            $query->where('warehouse_id', $warehouse_id);
+        }
+
+        return (int) $query->sum('amount_price');
+    }
+
+    public function getMonthlyIncome(): mixed
+    {
+        return $this->model
+            ->selectRaw('
+            DATE_FORMAT(payment_time, "%Y-%m") as bulan,
+            SUM(amount_price) as total_pendapatan
+        ')
+            ->where('transaction_status', 'Success')
+            ->groupBy(DB::raw('DATE_FORMAT(payment_time, "%Y-%m")'))
+            ->orderBy('bulan', 'desc')
+            ->get();
+    }
+
+    public function getTransactionByDate(): mixed
+    {
+        $transactions = Transaction::query()
+            ->where('transaction_status', 'Success')
+            ->orderBy('payment_time', 'desc')
+            ->get()
+            ->groupBy(fn($item) => \Carbon\Carbon::parse($item->payment_time)->format('Y-m-d'));
+
+        $result = [];
+
+        foreach ($transactions as $date => $items) {
+            $result[] = [
+                'date' => $date,
+                'total_transaksi' => $items->count(),
+                'total_nominal' => $items->sum('amount_price'),
+                'data' => $items->values()
+            ];
+        }
+
+        return $result;
     }
 }

@@ -321,4 +321,39 @@ class WarehouseController extends Controller
             return BaseResponse::Error('Gagal menampilkan data restock', $th->getMessage());
         }
     }
+
+    public function getTotalExpenditure()
+    {
+        try {
+            $total = $this->warehouseStock->getTotalExpenditure();
+
+            return BaseResponse::Ok('Berhasil mengambil total pengeluaran', $total);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error('Gagal mengambil total pengeluaran', $th->getMessage());
+        }
+    }
+
+    public function latestStocking(Request $request)
+    {
+        try {
+            $warehouse_id = auth()->user()->warehouse_id ?? null;
+
+            $stocks = $this->productStock->getLastStocks($warehouse_id, null);
+
+            return BaseResponse::Ok('Berhasil mengambil daftar stocking terakhir', $stocks);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error('Gagal mengambil daftar stocking terakhir', $th->getMessage());
+        }
+    }
+
+    public function expenditureByDate()
+    {
+        try {
+            $data = $this->warehouseStock->getSpendingByDate();
+
+            return BaseResponse::Ok('Berhasil mengambil data pengeluaran harian', $data);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error('Gagal mengambil data pengeluaran harian', $th->getMessage());
+        }
+    }
 }

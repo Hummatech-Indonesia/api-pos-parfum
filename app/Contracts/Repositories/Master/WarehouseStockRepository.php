@@ -117,4 +117,37 @@ class WarehouseStockRepository extends BaseRepository implements WarehouseStockI
             ->orderBy('created_at')
             ->get();
     }
+
+    public function getTotalExpenditure(): mixed
+    {
+        return $this->model
+            ->selectRaw('
+            DATE_FORMAT(created_at, "%Y-%m") as bulan,
+            COALESCE(SUM(total_price), 0) as total_pengeluaran
+        ')
+            ->groupByRaw('DATE_FORMAT(created_at, "%Y-%m")')
+            ->orderBy('bulan', 'desc')
+            ->get();
+    }
+
+    public function getSpendingByDate(): mixed
+    {
+        $data = $this->model
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->groupBy(fn($item) => \Carbon\Carbon::parse($item->created_at)->format('Y-m-d'));
+
+        $result = [];
+
+        foreach ($data as $date => $items) {
+            $result[] = [
+                'tanggal' => $date,
+                'total_data' => $items->count(),
+                'total_pengeluaran' => $items->sum('total_price'),
+                'data' => $items->values()
+            ];
+        }
+
+        return $result;
+    }
 }

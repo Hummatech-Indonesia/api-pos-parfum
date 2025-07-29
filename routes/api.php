@@ -24,10 +24,11 @@ use App\Http\Controllers\Master\ProductVarianController;
 use App\Http\Controllers\Transaction\ShiftUserController;
 use App\Http\Controllers\Master\DiscountVoucherController;
 use App\Http\Controllers\Master\ProductBundlingController;
+use App\Http\Controllers\Master\ProductBundlingDetailController;
+use App\Http\Controllers\Master\ProductExportImportController;
+use App\Http\Controllers\ProfitLossController;
 use App\Http\Controllers\Transaction\TransactionController;
 use App\Http\Controllers\Master\KategoriPengeluaranController;
-use App\Http\Controllers\Master\ProductExportImportController;
-use App\Http\Controllers\Master\ProductBundlingDetailController;
 
 /*
 |--------------------------------------------------------------------------
@@ -81,6 +82,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('role:owner|warehouse')->group(function () {
         // API FOR DATA WAREHOUSE
+        Route::get('/warehouse/latest-stocking', [WarehouseController::class, 'latestStocking']);
+        Route::get('/warehouse/total-expenditure', [WarehouseController::class, 'getTotalExpenditure']);
+        Route::get('/expenditure-by-date', [WarehouseController::class, 'expenditureByDate']);
         Route::get('warehouses/no-paginate', [WarehouseController::class, 'listWarehouse'])->name('list-warehouses-no-paginate');
         Route::resource("warehouses", WarehouseController::class)->only(['store', 'destroy', 'update']);
     });
@@ -98,6 +102,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('users/v2/no-paginate', [UserController::class, 'listUserV2'])->name('list-users-no-paginate.v2');
         Route::resource("users", UserController::class)->only(['store', 'destroy', 'update']);
         // API FOR DATA OUTLET
+        Route::get('/outlet/latest-stocking', [OutletController::class, 'latestStocking']);
         Route::get('outlets/no-paginate', [OutletController::class, 'listOutlet'])->name('list-outlets-no-paginate');
         Route::resource("outlets", OutletController::class)->only(['store', 'destroy', 'update']);
         // API FOR DATA PRODUCT
@@ -193,6 +198,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // API FOR DATA TRANSACTION
     Route::get("transactions/no-paginate", [TransactionController::class, 'getData']);
     Route::post("transactions/sync", [TransactionController::class, 'syncStoreData']);
+    Route::get("/transactions/summary", [TransactionController::class, 'summary']);
+    Route::get('/transactions/income/total', [TransactionController::class, 'totalIncome']);
+    Route::get("/transactions/monthly-income", [TransactionController::class, 'getMonthlyIncome']);
+    Route::get('/transaction-by-date', [TransactionController::class, 'transactionByDate']);
     Route::get("transactions/export", [TransactionController::class, 'exportExcel']);
     Route::get("transactions/export-pdf", [TransactionController::class, 'exportPdf']);
     Route::resource("transactions", TransactionController::class)->except(['destroy']);
@@ -206,6 +215,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get("unit/no-paginate", [UnitController::class, 'list']);
     Route::get("unit/alltrashed", [UnitController::class, 'trashed']);
     Route::resource("unit", UnitController::class)->except(['create', 'edit']);
+
+    // Route::get("income/statement/outlet", [ProfitLossController::class, 'index']);
+    // Route::get("income/statement/warehouse", [ProfitLossController::class, 'warehouseReport']);
 
     Route::middleware(['role:warehouse|outlet|admin|cashier|employee'])->get('/dashboard', [DashboardController::class, 'index']);
 });
