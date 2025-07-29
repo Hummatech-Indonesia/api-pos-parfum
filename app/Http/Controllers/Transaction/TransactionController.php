@@ -315,7 +315,8 @@ class TransactionController extends Controller
 
                 // handling product bundling 
                 $bundlingProduct = collect($trans["transaction_detail"])->filter(fn($item) => isset($item["type"]));
-                dd($bundlingProduct, $trans["transaction_detail"]);
+                $bundlingProducts = collect($trans["transaction_detail"]);
+                dd($bundlingProducts, $bundlingProduct, $trans["transaction_detail"]);
                 foreach($bundlingProduct as $bundling) {
                     $product_bundling = $this->productBundling->customQuery(["id" => $bundling["product_detail_id"]])->first();
 
