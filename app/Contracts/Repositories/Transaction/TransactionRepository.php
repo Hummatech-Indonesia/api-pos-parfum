@@ -6,6 +6,7 @@ use App\Contracts\Interfaces\Transaction\TransactionInterface;
 use App\Contracts\Repositories\BaseRepository;
 use App\Models\Transaction;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Auth;
 
 class TransactionRepository extends BaseRepository implements TransactionInterface
 {
@@ -151,5 +152,32 @@ class TransactionRepository extends BaseRepository implements TransactionInterfa
                 'transaction_code' => $order->transaction_code,
                 'total_price' => $order->total_price,
             ]);
+    }
+
+    public function getDataForExport(array $filters)
+    {
+        $query = $this->model->query()
+            ->with(['store', 'outlet', 'user', 'transaction_details'])
+            ->withCount('transaction_details');
+
+        if ($outletId = Auth::user()?->outlet_id ?? Auth::user()?->outlet?->id) {
+            $query->where('outlet_id', $outletId);
+        }
+
+        if (!empty($filters["search"])) {
+            $query->where(function ($q) use ($filters) {
+                $q->where('payment_time', 'like', '%' . $filters["search"] . '%');
+            });
+        }
+
+        if (!empty($filters['start_date'])) {
+            $query->whereDate('payment_time', '>=', $filters['start_date']);
+        }
+
+        if (!empty($filters['end_date'])) {
+            $query->whereDate('payment_time', '<=', $filters['end_date']);
+        }
+
+        return $query->get();
     }
 }

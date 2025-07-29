@@ -195,18 +195,18 @@ class ShiftUserController extends Controller
     {
         $filters = [];
 
-        if ($request->from_date) {
-            $filters['from_date'] = Carbon::createFromFormat('d-m-Y', $request->from_date)
+        if ($request->start_date) {
+            $filters['start_date'] = Carbon::createFromFormat('d-m-Y', $request->start_date)
                 ->format('Y-m-d');
         }
 
-        if ($request->until_date) {
-            $filters['until_date'] = Carbon::createFromFormat('d-m-Y', $request->until_date)
+        if ($request->end_date) {
+            $filters['end_date'] = Carbon::createFromFormat('d-m-Y', $request->end_date)
                 ->format('Y-m-d');
         }
-
+        
         try {
-            return Excel::download(new ShiftUserExport($filters), 'shift_user.xlsx');
+            return Excel::download(new ShiftUserExport($this->shiftUserRepository, $filters), 'shift_user.xlsx');
         } catch (\Throwable $th) {
             return BaseResponse::ServerError($th->getMessage(), null);
         }

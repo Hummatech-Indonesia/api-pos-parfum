@@ -21,3 +21,4 @@ yarn-error.log
 composer.lock
 /storage/logs/laravel.log
 /.github/**
+/bootstrap/cache/*.php
