@@ -359,7 +359,7 @@ class TransactionController extends Controller
             $filters['end_date'] = Carbon::createFromFormat('d-m-Y', $request->end_date)
                 ->format('Y-m-d');
         }
-        
+
         try {
 
             return Excel::download(new TransactionExport($this->transactionRepository, $filters), 'transactions.xlsx');
@@ -375,7 +375,7 @@ class TransactionController extends Controller
         if ($request->search) $filters["search"] = $request->search;
         if ($request->start_date) $filters["start_date"] = $request->start_date;
         if ($request->end_date) $filters["end_date"] = $request->end_date;
-        
+
         try {
             $transactions = $this->transactionRepository->getDataForExport($filters);
 
@@ -385,6 +385,62 @@ class TransactionController extends Controller
             return $pdf->download('transactions.pdf');
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
+
+    public function summary()
+    {
+        try {
+            $warehouse_id = auth()->user()->warehouse_id ?? null;
+            $outlet_id = auth()->user()->outlet_id ?? null;
+
+            if (!$warehouse_id && !$outlet_id) {
+                return BaseResponse::Custom(false, 'User tidak memiliki warehouse atau outlet yang valid', null, 402);
+            }
+
+            $summary = $this->transactionRepository->getSummary($warehouse_id, $outlet_id);
+
+            return BaseResponse::Ok('Berhasil mengambil ringkasan transaksi', $summary);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error('Gagal mengambil ringkasan transaksi', $th->getMessage());
+        }
+    }
+
+    public function totalIncome()
+    {
+        try {
+            $outlet_id = auth()->user()->outlet_id ?? null;
+            $warehouse_id = auth()->user()->warehouse_id ?? null;
+
+            $total = $this->transactionRepository->getTotalIncome($outlet_id, $warehouse_id);
+
+            return BaseResponse::Ok('Berhasil menghitung total pendapatan', [
+                'total_pendapatan' => $total
+            ]);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error('Gagal menghitung total pendapatan', $th->getMessage());
+        }
+    }
+
+    public function getMonthlyIncome(Request $request)
+    {
+        try {
+            $monthly = $this->transactionRepository->getMonthlyIncome();
+
+            return BaseResponse::Ok("Berhasil mengambil pendapatan bulanan", $monthly);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error("Gagal mengambil pendapatan bulanan", $th->getMessage());
+        }
+    }
+
+    public function transactionByDate()
+    {
+        try {
+            $data = $this->transactionRepository->getTransactionByDate();
+
+            return BaseResponse::Ok('Berhasil mengambil data transaksi per tanggal', $data);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error('Gagal mengambil data transaksi', $th->getMessage());
         }
     }
 }
