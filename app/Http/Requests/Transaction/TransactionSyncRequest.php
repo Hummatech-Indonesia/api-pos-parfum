@@ -33,6 +33,7 @@ class TransactionSyncRequest extends FormRequest
             'transaction.*.transaction_detail.*.price' => 'required|min:1',
             'transaction.*.transaction_detail.*.quantity' => 'required|min:1',
             'transaction.*.transaction_detail.*.unit' => 'required',
+            'transaction.*.transaction_detail.*.type' => 'nullable',
             'transaction.*.discounts' => 'sometimes|array',
             'transaction.*.discounts.*' => 'sometimes|exists:discount_vouchers,id',
             'transaction.*.user_id' => 'sometimes|exists:users,id',
