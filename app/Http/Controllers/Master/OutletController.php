@@ -20,7 +20,7 @@ class OutletController extends Controller
 {
     private OutletRepository $outlet;
     private UserRepository $user;
-    private $outletService;
+    private OutletService $outletService;
     private UserService $userService;
 
     public function __construct(OutletRepository $outlet, UserRepository $user, OutletService $outletService, UserService $userService)

@@ -2,30 +2,32 @@
 
 use Illuminate\Http\Request;
 use App\Helpers\BaseResponse;
-use App\Http\Controllers\AuditController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuditController;
 use App\Http\Controllers\BelajarController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\Uma\UserController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExpenditureController;
 use App\Http\Controllers\Master\RoleController;
 use App\Http\Controllers\Master\UnitController;
+use App\Http\Controllers\ProductBlendController;
 use App\Http\Controllers\Master\OutletController;
 use App\Http\Controllers\Master\ProductController;
 use App\Http\Controllers\Master\WarehouseController;
 use App\Http\Controllers\Dashboard\CategoryController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ExpenditureController;
+use App\Http\Controllers\Master\PengeluaranController;
 use App\Http\Controllers\Master\StockRequestController;
 use App\Http\Controllers\Master\ProductDetailController;
 use App\Http\Controllers\Master\ProductVarianController;
 use App\Http\Controllers\Transaction\ShiftUserController;
 use App\Http\Controllers\Master\DiscountVoucherController;
 use App\Http\Controllers\Master\ProductBundlingController;
-use App\Http\Controllers\Master\ProductBundlingDetailController;
-use App\Http\Controllers\Master\ProductExportImportController;
-use App\Http\Controllers\ProductBlendController;
 use App\Http\Controllers\Transaction\TransactionController;
+use App\Http\Controllers\Master\KategoriPengeluaranController;
+use App\Http\Controllers\Master\ProductExportImportController;
+use App\Http\Controllers\Master\ProductBundlingDetailController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,7 +39,6 @@ use App\Http\Controllers\Transaction\TransactionController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -116,6 +117,12 @@ Route::middleware('auth:sanctum')->group(function () {
         // API FOR DATA DISCOUNT VOUCHER
         Route::get('discount-vouchers/no-paginate', [DiscountVoucherController::class, 'listDiscountVoucher'])->name('list-discount-vouchers-no-paginate');
         Route::resource("discount-vouchers", DiscountVoucherController::class)->only(['store', 'destroy', 'update']);
+        // API FOR DATA KATEGORI PENGELUARAN
+        Route::resource("kategori-pengeluaran", KategoriPengeluaranController::class)->except(['edit', 'create']);
+        Route::get('kategori-pengeluaran-nopaginate', [KategoriPengeluaranController::class, 'listKategoriPengeluaran'])->name('kategori-pengeluaran-nopaginate');
+        // API FOR DATA PENGELUARAN
+        Route::resource("pengeluaran", PengeluaranController::class)->except(['edit', 'create']);
+        Route::get('pengeluaran-nopaginate', [PengeluaranController::class, 'listPengeluaran'])->name('pengeluaran-nopaginate');
     });
 
     Route::middleware(['auth:sanctum', 'role:admin|warehouse|outlet'])->group(function () {
