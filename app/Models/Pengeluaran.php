@@ -16,7 +16,7 @@ class Pengeluaran extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
     protected $table = 'pengeluaran';
-    public $timestamps = false;
+    public $timestamps = true;
     public $incrementing = false;
     protected $keyType = "string";
     protected $primaryKey = "id";

@@ -18,14 +18,13 @@ return new class extends Migration
                 $table->foreignUuid('outlet_id')
                     ->nullable()
                     ->references('id')
-                    ->on('outlets')
-                    ->onDelete("cascade");
+                    ->on('outlets');
                 $table->foreignUuid('warehouse_id')
                     ->nullable()
                     ->references('id')
-                    ->on('warehouses')
-                    ->onDelete("cascade");
+                    ->on('warehouses');
                 $table->softDeletes();
+                $table->timestamps();
             });
         }
     }
