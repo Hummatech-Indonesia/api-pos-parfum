@@ -322,10 +322,10 @@ class WarehouseController extends Controller
         }
     }
 
-    public function getTotalExpenditure()
+    public function getMonthlyExpenditure()
     {
         try {
-            $total = $this->warehouseStock->getTotalExpenditure();
+            $total = $this->warehouseStock->getMonthlyExpenditure();
 
             return BaseResponse::Ok('Berhasil mengambil total pengeluaran', $total);
         } catch (\Throwable $th) {
@@ -354,6 +354,17 @@ class WarehouseController extends Controller
             return BaseResponse::Ok('Berhasil mengambil data pengeluaran harian', $data);
         } catch (\Throwable $th) {
             return BaseResponse::Error('Gagal mengambil data pengeluaran harian', $th->getMessage());
+        }
+    }
+
+    public function totalExpenditure()
+    {
+        try {
+            $total = $this->warehouseStock->getTotalExpenditure();
+
+            return BaseResponse::Ok('Berhasil mengambil total pengeluaran', ['total_pengeluaran' => $total]);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error('Gagal mengambil total pengeluaran', $th->getMessage());
         }
     }
 }

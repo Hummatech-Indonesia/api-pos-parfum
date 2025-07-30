@@ -16,6 +16,7 @@ interface WarehouseStockInterface extends GetInterface, StoreInterface, CustomQu
 {
     public function checkActive(mixed $id): mixed;
     public function getAll(?string $date = null): Collection;
-    public function getTotalExpenditure(): mixed;
+    public function getMonthlyExpenditure(): mixed;
     public function getSpendingByDate(): mixed;
+    public function getTotalExpenditure(): int;
 }

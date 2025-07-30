@@ -118,7 +118,7 @@ class WarehouseStockRepository extends BaseRepository implements WarehouseStockI
             ->get();
     }
 
-    public function getTotalExpenditure(): mixed
+    public function getMonthlyExpenditure(): mixed
     {
         return $this->model
             ->selectRaw('
@@ -132,22 +132,15 @@ class WarehouseStockRepository extends BaseRepository implements WarehouseStockI
 
     public function getSpendingByDate(): mixed
     {
-        $data = $this->model
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->groupBy(fn($item) => \Carbon\Carbon::parse($item->created_at)->format('Y-m-d'));
+        return $this->model
+            ->selectRaw('DATE(created_at) as tanggal, COUNT(*) as total_data, SUM(total_price) as total_pengeluaran')
+            ->groupBy('tanggal')
+            ->orderBy('tanggal', 'desc')
+            ->get();
+    }
 
-        $result = [];
-
-        foreach ($data as $date => $items) {
-            $result[] = [
-                'tanggal' => $date,
-                'total_data' => $items->count(),
-                'total_pengeluaran' => $items->sum('total_price'),
-                'data' => $items->values()
-            ];
-        }
-
-        return $result;
+    public function getTotalExpenditure(): int
+    {
+        return $this->model ->sum('total_price');
     }
 }
