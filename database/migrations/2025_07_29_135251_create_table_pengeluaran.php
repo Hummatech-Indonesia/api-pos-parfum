@@ -21,23 +21,19 @@ return new class extends Migration
                 $table->date('tanggal_pengeluaran');
                 $table->foreignUuid("kategori_pengeluaran_id")
                     ->references('id')
-                    ->on("kategori_pengeluaran")
-                    ->onDelete("cascade");
+                    ->on("kategori_pengeluaran");
                 $table->foreignUuid('outlet_id')
                     ->nullable()
                     ->references('id')
-                    ->on('outlets')
-                    ->onDelete("cascade");
+                    ->on('outlets');
                 $table->foreignUuid('warehouse_id')
                     ->nullable()
                     ->references('id')
-                    ->on('warehouses')
-                    ->onDelete("cascade");
+                    ->on('warehouses');
                 $table->foreignId('category_id');
                 $table->foreign("category_id")
                     ->references('id')
-                    ->on('categories')
-                    ->onDelete("cascade");
+                    ->on('categories');
                 $table->softDeletes();
             });
         }
