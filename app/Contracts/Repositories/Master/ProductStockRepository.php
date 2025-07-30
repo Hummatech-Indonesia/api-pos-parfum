@@ -5,6 +5,7 @@ namespace App\Contracts\Repositories\Master;
 use App\Contracts\Interfaces\Master\ProductStockInterface;
 use App\Contracts\Repositories\BaseRepository;
 use App\Models\ProductStock;
+use App\Models\Setting;
 
 class ProductStockRepository extends BaseRepository implements ProductStockInterface
 {
@@ -172,5 +173,18 @@ class ProductStockRepository extends BaseRepository implements ProductStockInter
         }
 
         return collect();
+    }
+
+    public function getLowStockProduct(string $store_id) : mixed
+    {
+        $setting = Setting::where('code', 'SET_MIN_PRODUCT')
+            ->where('store_id', $store_id)
+            ->first();
+
+        $minStock = $setting?->value_text ?? 10;
+
+        return ProductStock::query()
+            ->where('stock', '<=', $minStock)
+            ->get();
     }
 }

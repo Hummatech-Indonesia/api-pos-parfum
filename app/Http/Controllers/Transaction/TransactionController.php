@@ -388,17 +388,20 @@ class TransactionController extends Controller
         }
     }
 
-    public function summary()
+    public function summary(Request $request)
     {
         try {
             $warehouse_id = auth()->user()->warehouse_id ?? null;
             $outlet_id = auth()->user()->outlet_id ?? null;
 
+            $month = $request->input('month');
+            $year = $request->input('year');
+
             if (!$warehouse_id && !$outlet_id) {
                 return BaseResponse::Custom(false, 'User tidak memiliki warehouse atau outlet yang valid', null, 402);
             }
 
-            $summary = $this->transactionRepository->getSummary($warehouse_id, $outlet_id);
+            $summary = $this->transactionRepository->getSummary($warehouse_id, $outlet_id, $month, $year);
 
             return BaseResponse::Ok('Berhasil mengambil ringkasan transaksi', $summary);
         } catch (\Throwable $th) {
@@ -406,13 +409,16 @@ class TransactionController extends Controller
         }
     }
 
-    public function totalIncome()
+    public function totalIncome(Request $request)
     {
         try {
             $outlet_id = auth()->user()->outlet_id ?? null;
             $warehouse_id = auth()->user()->warehouse_id ?? null;
 
-            $total = $this->transactionRepository->getTotalIncome($outlet_id, $warehouse_id);
+            $month = $request->input('month');
+            $year = $request->input('year');
+
+            $total = $this->transactionRepository->getTotalIncome($outlet_id, $warehouse_id, $month, $year);
 
             return BaseResponse::Ok('Berhasil menghitung total pendapatan', [
                 'total_pendapatan' => $total
