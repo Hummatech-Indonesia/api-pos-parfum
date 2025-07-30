@@ -409,13 +409,16 @@ class TransactionController extends Controller
         }
     }
 
-    public function totalIncome()
+    public function totalIncome(Request $request)
     {
         try {
             $outlet_id = auth()->user()->outlet_id ?? null;
             $warehouse_id = auth()->user()->warehouse_id ?? null;
 
-            $total = $this->transactionRepository->getTotalIncome($outlet_id, $warehouse_id);
+            $month = $request->input('month');
+            $year = $request->input('year');
+
+            $total = $this->transactionRepository->getTotalIncome($outlet_id, $warehouse_id, $month, $year);
 
             return BaseResponse::Ok('Berhasil menghitung total pendapatan', [
                 'total_pendapatan' => $total

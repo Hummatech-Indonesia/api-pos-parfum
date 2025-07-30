@@ -218,7 +218,7 @@ class TransactionRepository extends BaseRepository implements TransactionInterfa
         return $summary;
     }
 
-    public function getTotalIncome(?string $outlet_id = null, ?string $warehouse_id = null): int
+    public function getTotalIncome(?string $outlet_id = null, ?string $warehouse_id = null, ?int $month = null, ?int $year = null): mixed
     {
         $query = $this->model->where('transaction_status', TransactionStatus::COMPLETE);
 
@@ -228,6 +228,14 @@ class TransactionRepository extends BaseRepository implements TransactionInterfa
 
         if ($warehouse_id) {
             $query->where('warehouse_id', $warehouse_id);
+        }
+
+        if ($month) {
+            $query->whereMonth('payment_time', $month);
+        }
+
+        if ($year) {
+            $query->whereYear('payment_time', $year);
         }
 
         return (int) $query->sum('amount_price');
