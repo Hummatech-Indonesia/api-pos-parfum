@@ -147,8 +147,41 @@ class TransactionController extends Controller
                 ]);
             }
 
+            // handling product bundling 
+            $bundlingProduct = collect($data["transaction_detail"])->filter(fn($item) => isset($item["type"]));
+            $noBundlingProducts = collect($data["transaction_detail"])->filter(fn($item) => !isset($item["type"]));
+            
+            foreach($bundlingProduct as $bundling) {
+                $product_bundling = $this->productBundling->customQuery(["id" => $bundling["product_detail_id"]])->first();
+
+                foreach($product_bundling->details as $item) {
+                    $productStock = $this->productStock->customQuery(["product_detail_id" => $item->product_detail_id, 'outlet_id' => auth()->user()?->outlet_id])->first();
+
+                    if (!$productStock) return BaseResponse::Error("Product tidak memiliki stock yang terdaftar di dalam outlet, silahkan check kembali dalam gudang!", null);
+
+                    if ($productStock->stock < ($item->quantity * $bundling["quantity"])) return BaseResponse::Error("Product tidak memiliki stock memadai!", null);
+
+                    $productDetail = $this->productDetail->show($item->product_detail_id);
+
+                    if (!$productDetail) return BaseResponse::Error("Product tidak terdaftar, silahkan check ke admin!", null);
+                    $used_quantity = ($item->quantity * $bundling["quantity"]);
+                    // if (strtolower($item["unit"]) == "gram") $used_quantity = $item["quantity"] * $productDetail->density;
+
+                    $productStock->stock -= $used_quantity;
+                    $productStock->save();
+                }
+
+                $this->transactionDetail->store([
+                    "transaction_id" => $transaction->id,
+                    "product_detail_id" => $product_bundling?->product?->details?->first()?->id,
+                    "quantity" => $bundling['quantity'],
+                    "price" => $bundling['price'],
+                    "unit" => $bundling['unit'],
+                ]);
+            }
+
             // handling product
-            foreach ($data["transaction_detail"] as $item) {
+            foreach ($noBundlingProducts as $item) {
 
                 $productStock = $this->productStock->customQuery(["product_detail_id" => $item['product_detail_id'], 'outlet_id' => auth()->user()?->outlet_id])->first();
 
