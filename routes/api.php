@@ -83,7 +83,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:owner|warehouse')->group(function () {
         // API FOR DATA WAREHOUSE
         Route::get('/warehouse/latest-stocking', [WarehouseController::class, 'latestStocking']);
-        Route::get('/warehouse/total-expenditure', [WarehouseController::class, 'getTotalExpenditure']);
+        Route::get('/warehouse/monthly-expenditure', [WarehouseController::class, 'getMonthlyExpenditure']);
+        Route::get('/warehouse/total-expenditure', [WarehouseController::class, 'totalExpenditure']);
         Route::get('/expenditure-by-date', [WarehouseController::class, 'expenditureByDate']);
         Route::get('warehouses/no-paginate', [WarehouseController::class, 'listWarehouse'])->name('list-warehouses-no-paginate');
         Route::resource("warehouses", WarehouseController::class)->only(['store', 'destroy', 'update']);
@@ -106,6 +107,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('outlets/no-paginate', [OutletController::class, 'listOutlet'])->name('list-outlets-no-paginate');
         Route::resource("outlets", OutletController::class)->only(['store', 'destroy', 'update']);
         // API FOR DATA PRODUCT
+        Route::get('/products/low-stock', [ProductController::class, 'lowStock']);
         Route::get('products/without-bundling', [ProductController::class, 'listProductWithoutBundling']);
         Route::get('products/no-paginate', [ProductController::class, 'listProduct'])->name('list-products-no-paginate');
         Route::get('products/v2/no-paginate', [ProductController::class, 'listProductV2'])->name('v2.list-products-no-paginate');
