@@ -35,6 +35,7 @@ return new class extends Migration
                     ->references('id')
                     ->on('categories');
                 $table->softDeletes();
+                $table->timestamps();
             });
         }
     }

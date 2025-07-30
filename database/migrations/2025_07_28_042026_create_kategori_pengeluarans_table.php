@@ -24,6 +24,7 @@ return new class extends Migration
                     ->references('id')
                     ->on('warehouses');
                 $table->softDeletes();
+                $table->timestamps();
             });
         }
     }
