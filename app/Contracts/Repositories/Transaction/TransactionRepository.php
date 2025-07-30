@@ -4,6 +4,7 @@ namespace App\Contracts\Repositories\Transaction;
 
 use App\Contracts\Interfaces\Transaction\TransactionInterface;
 use App\Contracts\Repositories\BaseRepository;
+use App\Enums\TransactionStatus;
 use App\Models\Transaction;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
@@ -183,7 +184,7 @@ class TransactionRepository extends BaseRepository implements TransactionInterfa
         return $query->get();
     }
 
-    public function getSummary(?string $warehouse_id, ?string $outlet_id): mixed
+    public function getSummary(?string $warehouse_id, ?string $outlet_id, ?int $month = null, ?int $year = null): mixed
     {
         $query = $this->model->query();
 
@@ -193,6 +194,14 @@ class TransactionRepository extends BaseRepository implements TransactionInterfa
 
         if ($outlet_id) {
             $query->where('outlet_id', $outlet_id);
+        }
+        
+        if ($month) {
+            $query->whereMonth('payment_time', $month);
+        }
+
+        if ($year) {
+             $query->whereYear('payment_time', $year);
         }
 
         $transactions = $query
@@ -211,7 +220,7 @@ class TransactionRepository extends BaseRepository implements TransactionInterfa
 
     public function getTotalIncome(?string $outlet_id = null, ?string $warehouse_id = null): int
     {
-        $query = $this->model->where('transaction_status', 'Success');
+        $query = $this->model->where('transaction_status', TransactionStatus::COMPLETE);
 
         if ($outlet_id) {
             $query->where('outlet_id', $outlet_id);
@@ -231,7 +240,7 @@ class TransactionRepository extends BaseRepository implements TransactionInterfa
             DATE_FORMAT(payment_time, "%Y-%m") as bulan,
             SUM(amount_price) as total_pendapatan
         ')
-            ->where('transaction_status', 'Success')
+            ->where('transaction_status', TransactionStatus::COMPLETE)
             ->groupBy(DB::raw('DATE_FORMAT(payment_time, "%Y-%m")'))
             ->orderBy('bulan', 'desc')
             ->get();
@@ -239,23 +248,11 @@ class TransactionRepository extends BaseRepository implements TransactionInterfa
 
     public function getTransactionByDate(): mixed
     {
-        $transactions = Transaction::query()
-            ->where('transaction_status', 'Success')
-            ->orderBy('payment_time', 'desc')
-            ->get()
-            ->groupBy(fn($item) => \Carbon\Carbon::parse($item->payment_time)->format('Y-m-d'));
-
-        $result = [];
-
-        foreach ($transactions as $date => $items) {
-            $result[] = [
-                'date' => $date,
-                'total_transaksi' => $items->count(),
-                'total_nominal' => $items->sum('amount_price'),
-                'data' => $items->values()
-            ];
-        }
-
-        return $result;
+        return $this->model
+            ->selectRaw('DATE(payment_time) as date, COUNT(*) as total_transaksi, SUM(amount_price) as total_nominal')
+            ->where('transaction_status', TransactionStatus::COMPLETE)
+            ->groupBy('date')
+            ->orderByDesc('date')
+            ->get();
     }
 }
