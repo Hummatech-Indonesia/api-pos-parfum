@@ -117,4 +117,30 @@ class WarehouseStockRepository extends BaseRepository implements WarehouseStockI
             ->orderBy('created_at')
             ->get();
     }
+
+    public function getMonthlyExpenditure(): mixed
+    {
+        return $this->model
+            ->selectRaw('
+            DATE_FORMAT(created_at, "%Y-%m") as bulan,
+            COALESCE(SUM(total_price), 0) as total_pengeluaran
+        ')
+            ->groupByRaw('DATE_FORMAT(created_at, "%Y-%m")')
+            ->orderBy('bulan', 'desc')
+            ->get();
+    }
+
+    public function getSpendingByDate(): mixed
+    {
+        return $this->model
+            ->selectRaw('DATE(created_at) as tanggal, COUNT(*) as total_data, SUM(total_price) as total_pengeluaran')
+            ->groupBy('tanggal')
+            ->orderBy('tanggal', 'desc')
+            ->get();
+    }
+
+    public function getTotalExpenditure(): int
+    {
+        return $this->model ->sum('total_price');
+    }
 }

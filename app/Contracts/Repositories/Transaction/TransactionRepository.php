@@ -4,9 +4,12 @@ namespace App\Contracts\Repositories\Transaction;
 
 use App\Contracts\Interfaces\Transaction\TransactionInterface;
 use App\Contracts\Repositories\BaseRepository;
+use App\Enums\TransactionStatus;
 use App\Models\Transaction;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TransactionRepository extends BaseRepository implements TransactionInterface
 {
@@ -179,5 +182,85 @@ class TransactionRepository extends BaseRepository implements TransactionInterfa
         }
 
         return $query->get();
+    }
+
+    public function getSummary(?string $warehouse_id, ?string $outlet_id, ?int $month = null, ?int $year = null): mixed
+    {
+        $query = $this->model->query();
+
+        if ($warehouse_id) {
+            $query->where('warehouse_id', $warehouse_id);
+        }
+
+        if ($outlet_id) {
+            $query->where('outlet_id', $outlet_id);
+        }
+        
+        if ($month) {
+            $query->whereMonth('payment_time', $month);
+        }
+
+        if ($year) {
+             $query->whereYear('payment_time', $year);
+        }
+
+        $transactions = $query
+            ->orderBy('payment_time', 'desc')
+            ->get();
+
+        $summary = [
+            'total_transaksi' => $transactions->count(),
+            'total_nominal' => $transactions->sum('amount_price'),
+            'terakhir_transaksi' => optional(Carbon::parse($transactions->max('payment_time')))->format('Y-m-d H:i:s'),
+            'data' => $transactions,
+        ];
+
+        return $summary;
+    }
+
+    public function getTotalIncome(?string $outlet_id = null, ?string $warehouse_id = null, ?int $month = null, ?int $year = null): mixed
+    {
+        $query = $this->model->where('transaction_status', TransactionStatus::COMPLETE);
+
+        if ($outlet_id) {
+            $query->where('outlet_id', $outlet_id);
+        }
+
+        if ($warehouse_id) {
+            $query->where('warehouse_id', $warehouse_id);
+        }
+
+        if ($month) {
+            $query->whereMonth('payment_time', $month);
+        }
+
+        if ($year) {
+            $query->whereYear('payment_time', $year);
+        }
+
+        return (int) $query->sum('amount_price');
+    }
+
+    public function getMonthlyIncome(): mixed
+    {
+        return $this->model
+            ->selectRaw('
+            DATE_FORMAT(payment_time, "%Y-%m") as bulan,
+            SUM(amount_price) as total_pendapatan
+        ')
+            ->where('transaction_status', TransactionStatus::COMPLETE)
+            ->groupBy(DB::raw('DATE_FORMAT(payment_time, "%Y-%m")'))
+            ->orderBy('bulan', 'desc')
+            ->get();
+    }
+
+    public function getTransactionByDate(): mixed
+    {
+        return $this->model
+            ->selectRaw('DATE(payment_time) as date, COUNT(*) as total_transaksi, SUM(amount_price) as total_nominal')
+            ->where('transaction_status', TransactionStatus::COMPLETE)
+            ->groupBy('date')
+            ->orderByDesc('date')
+            ->get();
     }
 }

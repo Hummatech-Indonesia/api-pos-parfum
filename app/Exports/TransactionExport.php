@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Contracts\Repositories\Transaction\TransactionRepository;
 use App\Models\Transaction;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -15,32 +16,20 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class TransactionExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize, WithStyles, WithColumnFormatting
+class TransactionExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithStyles, WithColumnFormatting
 {
-    protected array $filters;
+    private TransactionRepository $transactionRepository;
+    private array $filters;
 
-    public function __construct(array $filters = [])
+    public function __construct(TransactionRepository $transactionRepository, $filters = [])
     {
         $this->filters = $filters;
+        $this->transactionRepository = $transactionRepository;
     }
 
-    public function query()
+    public function collection()
     {
-        $query = Transaction::query()
-            ->with(['store', 'user', 'transaction_details'])
-            ->when(Auth::user()?->outlet_id ?? Auth::user()?->outlet?->id, function ($q, $outletId) {
-                $q->where('outlet_id', $outletId);
-            });
-
-        if (!empty($this->filters['start_date'])) {
-            $query->whereDate('payment_time', '>=', Carbon::createFromFormat('d-m-Y', $this->filters['start_date'])->format('Y-m-d'));
-        }
-
-        if (!empty($this->filters['end_date'])) {
-            $query->whereDate('payment_time', '<=', Carbon::createFromFormat('d-m-Y', $this->filters['end_date'])->format('Y-m-d'));
-        }
-
-        return $query;
+        return $this->transactionRepository->getDataForExport($this->filters);
     }
 
     public function headings(): array

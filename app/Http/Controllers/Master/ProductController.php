@@ -441,4 +441,21 @@ class ProductController extends Controller
             return BaseResponse::Error($th->getMessage(), null);
         }      
     }
+
+    public function lowStock()
+    {
+        try {
+            $store_id = auth()->user()->store_id;
+
+            if(!$store_id) {
+                return BaseResponse::Custom(false, 'Store tidak ditemukan pada user', null, 402);
+            }
+
+            $data = $this->productStock->getLowStockProduct($store_id);
+
+            return BaseResponse::Ok('Produk dengan stok dibawah standart', $data);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error('Gagal mengambil data stok produk', $th->getMessage());
+        }
+    }
 }

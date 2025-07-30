@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Contracts\Repositories\Transaction\ShiftUserRepository;
 use App\Models\ShiftUser;
 use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -12,21 +13,20 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class ShiftUserExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize, WithColumnFormatting
+class ShiftUserExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithColumnFormatting
 {
     protected array $filters;
+    private ShiftUserRepository $shiftUserRepository;
 
-    public function __construct(array $filters = [])
+    public function __construct(ShiftUserRepository $shiftUserRepository, $filters = [])
     {
+        $this->shiftUserRepository = $shiftUserRepository;
         $this->filters = $filters;
     }
 
-    public function query()
+    public function collection()
     {
-        return ShiftUser::query()
-            ->with(['user', 'outlet'])
-            ->when($this->filters['from_date'] ?? null, fn($q, $v) => $q->where('date', '>=', $v))
-            ->when($this->filters['until_date'] ?? null, fn($q, $v) => $q->where('date', '<=', $v));
+        return $this->shiftUserRepository->getDataForExport($this->filters);
     }
 
     public function headings(): array
@@ -37,7 +37,6 @@ class ShiftUserExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
 
     public function map($shift): array
     {
-        // dd($shift);
         return [
             $shift->user?->name ?? null,
             $shift->date ? Carbon::parse($shift->date)->format('H:i:s') : null,
