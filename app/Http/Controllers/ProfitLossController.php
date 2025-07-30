@@ -27,7 +27,7 @@ class ProfitLossController extends Controller
         return BaseResponse::Ok("Berhasil mengambil laporan", $data);
     }
 
-    public function profitLossOutlet()
+    public function profitLossOutlet(Request $request)
     {
         $user = auth()->user();
 
@@ -41,7 +41,10 @@ class ProfitLossController extends Controller
                 return BaseResponse::Error('User tidak memiliki outlet', null, 400);
             }
 
-            $data = $this->profitLossRepository->getOutletProfitLoss($outlet_id);
+            $month = $request->input('month');
+            $year = $request->input('year');
+
+            $data = $this->profitLossRepository->getOutletProfitLoss($outlet_id, $month, $year);
 
             return BaseResponse::Ok('Berhasil mengambil data laba rugi', $data);
         } catch (\Throwable $th) {
@@ -63,7 +66,10 @@ class ProfitLossController extends Controller
                 return BaseResponse::Error('User tidak terkait dengan warehouse', 400);
             }
 
-            $data = $this->profitLossRepository->getWarehouseProfitLoss($warehouseId);
+            $month = $request->input('month');
+            $year = $request->input('year');
+
+            $data = $this->profitLossRepository->getWarehouseProfitLoss($warehouseId, $month, $year);
 
             return BaseResponse::Ok('Berhasil mengambil laporan warehouse', $data);
         } catch (\Throwable $th) {

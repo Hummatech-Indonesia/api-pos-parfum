@@ -13,19 +13,34 @@ use Illuminate\Support\Facades\DB;
 
 final class ProfitLossRepository extends BaseRepository implements ProfitLossInterface
 {
-    public function getOutletProfitLoss(string $outlet_id): array
+    public function getOutletProfitLoss(string $outlet_id, ?int $month = null, ?int $year = null): array
     {
-        $income = Transaction::where('outlet_id', $outlet_id)
-            ->where('transaction_status', TransactionStatus::COMPLETE)
-            ->sum('amount_price');
+        $incomeQuery = Transaction::where('outlet_id', $outlet_id)
+            ->where('transaction_status', TransactionStatus::COMPLETE);
 
-        $requestSpending = StockRequest::query()
+        $requestSpendingQuery = StockRequest::query()
             ->where('outlet_id', $outlet_id)
-            ->where('status', StockRequestStatus::APPROVED)
-            ->sum('total_price');
+            ->where('status', StockRequestStatus::APPROVED);
 
-        $categorySpendings = Pengeluaran::query()
-            ->where('outlet_id', $outlet_id)
+        $categorySpendingsQuery = Pengeluaran::query()
+            ->where('outlet_id', $outlet_id);
+
+        if ($month) {
+            $incomeQuery->whereMonth('payment_time', $month);
+            $requestSpendingQuery->whereMonth('created_at', $month);
+            $categorySpendingsQuery->whereMonth('tanggal_pengeluaran', $month);
+        }
+
+        if ($year) {
+            $incomeQuery->whereYear('payment_time', $year);
+            $requestSpendingQuery->whereYear('created_at', $year);
+            $categorySpendingsQuery->whereYear('tanggal_pengeluaran', $year);
+        }
+
+        $income = $incomeQuery->sum('amount_price');
+        $requestSpending = $requestSpendingQuery->sum('total_price');
+
+        $categorySpendings = $categorySpendingsQuery
             ->groupBy('kategori_pengeluaran_id')
             ->selectRaw('kategori_pengeluaran_id, SUM(nominal_pengeluaran) as total_pengeluaran')
             ->get();
@@ -45,31 +60,46 @@ final class ProfitLossRepository extends BaseRepository implements ProfitLossInt
         ];
     }
 
-    public function getWarehouseProfitLoss(string $warehouse_id): array
+    public function getWarehouseProfitLoss(string $warehouse_id, ?int $month = null, ?int $year = null): array
     {
-        $transactionIncome = Transaction::where('warehouse_id', $warehouse_id)
-            ->where('transaction_status', TransactionStatus::COMPLETE)
-            ->sum('amount_price');
+        $transactionIncomeQuery = Transaction::where('warehouse_id', $warehouse_id)
+            ->where('transaction_status', TransactionStatus::COMPLETE);
 
-        $requestIncome = StockRequest::where('warehouse_id', $warehouse_id)
-            ->where('status', StockRequestStatus::APPROVED)
-            ->sum('total_price');
+        $requestIncomeQuery = StockRequest::where('warehouse_id', $warehouse_id)
+            ->where('status', StockRequestStatus::APPROVED);
 
+        $warehouseSpendingsQuery = WarehouseStock::query();
+
+        $categorySpendingsQuery = Pengeluaran::where('warehouse_id', $warehouse_id);
+
+        if ($month) {
+            $transactionIncomeQuery->whereMonth('payment_time', $month);
+            $requestIncomeQuery->whereMonth('created_at', $month);
+            $warehouseSpendingsQuery->whereMonth('created_at', $month);
+            $categorySpendingsQuery->whereMonth('tanggal_pengeluaran', $month);
+        }
+
+        if ($year) {
+            $transactionIncomeQuery->whereYear('payment_time', $year);
+            $requestIncomeQuery->whereYear('created_at', $year);
+            $warehouseSpendingsQuery->whereYear('created_at', $year);
+            $categorySpendingsQuery->whereYear('tanggal_pengeluaran', $year);
+        }
+
+        $transactionIncome = $transactionIncomeQuery->sum('amount_price');
+        $requestIncome = $requestIncomeQuery->sum('total_price');
         $totalIncome = $transactionIncome + $requestIncome;
 
-        $warehouseSpendings = WarehouseStock::query()
+        $warehouseSpendings = $warehouseSpendingsQuery
             ->groupBy('product_detail_id')
             ->selectRaw('product_detail_id, SUM(total_price) as total_pengeluaran')
             ->get();
-
         $totalWarehouseSpendings = $warehouseSpendings->sum('total_pengeluaran');
 
-        $categorySpendings = Pengeluaran::query()
-            ->where('warehouse_id', $warehouse_id)
+        $categorySpendings = $categorySpendingsQuery
             ->groupBy('kategori_pengeluaran_id')
             ->selectRaw('kategori_pengeluaran_id, SUM(nominal_pengeluaran) as total_pengeluaran')
             ->get();
-
         $totalCategorySpendings = $categorySpendings->sum('total_pengeluaran');
 
         $totalSpending = $totalWarehouseSpendings + $totalCategorySpendings;
@@ -77,11 +107,11 @@ final class ProfitLossRepository extends BaseRepository implements ProfitLossInt
         return [
             'pendapatan' => [
                 'transaksi' => (float) $transactionIncome,
-                'request' => (float) $requestIncome,
+                'stock_request' => (float) $requestIncome,
                 'total' => (float) $totalIncome,
             ],
             'pengeluaran' => [
-                'warehouse' => $warehouseSpendings,
+                'warehouse_stock' => $warehouseSpendings,
                 'pengeluaran_lain' => $categorySpendings,
                 'total' => (float) $totalSpending,
             ],
