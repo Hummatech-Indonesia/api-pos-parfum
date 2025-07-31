@@ -219,4 +219,21 @@ class ProductDetailController extends Controller
             return BaseResponse::Error($th->getMessage(), null);
         }
     }
+
+    public function getProductByCode(string $code)
+    {
+        $payload = [
+            "product_code" => $code
+        ];
+        
+        try {
+            if (auth()->user()->warehouse_id) $payload["warehouse_id"] = auth()->user()->warehouse_id;
+            elseif (auth()->user()->outlet_id) $payload["outlet_id"] = auth()->user()->outlet_id;
+
+            $data = $this->productDetail->customQuery($payload)->first();
+            return BaseResponse::Ok("Berhasil mengambil data product ", $data);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error($th->getMessage(), null);
+        }
+    }
 }

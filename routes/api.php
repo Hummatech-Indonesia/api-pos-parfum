@@ -150,6 +150,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get("audit/no-paginate", [AuditController::class, 'list']);
         Route::get("audit/alltrashed", [AuditController::class, 'trashed']);
         Route::put('/audit/{id}/detail', [AuditController::class, 'updateStatusWithProducts']);
+        Route::get('product-details/get-by-code/{code}', [ProductDetailController::class, 'getProductByCode']);
         Route::resource("audit", AuditController::class)->only(['destroy', 'index', 'show']);
     });
 
