@@ -220,7 +220,7 @@ class TransactionRepository extends BaseRepository implements TransactionInterfa
 
     public function getTotalIncome(?string $outlet_id = null, ?string $warehouse_id = null, ?int $month = null, ?int $year = null): mixed
     {
-        $query = $this->model->where('transaction_status', TransactionStatus::COMPLETE);
+        $query = $this->model->where('transaction_status', Transactionstatus::COMPLETE);
 
         if ($outlet_id) {
             $query->where('outlet_id', $outlet_id);
@@ -248,7 +248,7 @@ class TransactionRepository extends BaseRepository implements TransactionInterfa
             DATE_FORMAT(payment_time, "%Y-%m") as bulan,
             SUM(amount_price) as total_pendapatan
         ')
-            ->where('transaction_status', TransactionStatus::COMPLETE)
+            ->where('transaction_status', Transactionstatus::COMPLETE)
             ->groupBy(DB::raw('DATE_FORMAT(payment_time, "%Y-%m")'))
             ->orderBy('bulan', 'desc')
             ->get();
@@ -258,7 +258,7 @@ class TransactionRepository extends BaseRepository implements TransactionInterfa
     {
         return $this->model
             ->selectRaw('DATE(payment_time) as date, COUNT(*) as total_transaksi, SUM(amount_price) as total_nominal')
-            ->where('transaction_status', TransactionStatus::COMPLETE)
+            ->where('transaction_status', Transactionstatus::COMPLETE)
             ->groupBy('date')
             ->orderByDesc('date')
             ->get();
