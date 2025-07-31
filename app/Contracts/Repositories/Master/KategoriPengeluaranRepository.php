@@ -38,7 +38,7 @@ class KategoriPengeluaranRepository extends BaseRepository implements KategoriPe
     public function customPaginate(int $pagination = 8, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-            ->with('outlet', 'warehouse')
+            ->with('outlet', 'warehouse', 'expenditures')
             ->when($data, function ($query) use ($data) {
                 if (!empty($data["search"])) {
                     $query->where(function ($query2) use ($data) {
@@ -54,6 +54,7 @@ class KategoriPengeluaranRepository extends BaseRepository implements KategoriPe
                     $query->whereDate('created_at', '<=', $data["end_date"]);
                 }
             })
+            ->withCount('expenditures')
             ->paginate($pagination, ['*'], 'page', $page);
     }
 

@@ -19,18 +19,8 @@ class KategoriPengeluaranResource extends JsonResource
         return [
             'id' => $this->id,
             'nama' => $this->nama,
-            'outlet' => new OutletResource($this->whenLoaded('outlet')),
+            'total_item' => $this->expenditures_count,
             'created_at' => $this->created_at,
-            'warehouse' => [
-                'id' => $this->warehouse_id,
-                'store_id' => $this->warehouse->store_id ?? null,
-                'name' => $this->warehouse->name ?? null,
-                'adress' => $this->warehouse->adress ?? null,
-                'telp' => $this->warehouse->telp ?? null,
-                'person_responsible' => $this->warehouse->person_responsible ?? null,
-                'image' => $this->warehouse->image ?? null,
-                'is_delete' => $this->warehouse->is_delete ?? null,
-            ],
         ];
     }
 }
