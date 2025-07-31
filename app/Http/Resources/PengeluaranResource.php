@@ -23,10 +23,10 @@ class PengeluaranResource extends JsonResource
             'image' => $this->image,
             'tanggal_pengeluaran' => $this->tanggal_pengeluaran,
             'kategori_pengeluaran' => [
-                'id' => $this->kategori_pengeluaran->id,
-                'nama' => $this->kategori_pengeluaran->nama,
-                'outlet_id' => $this->kategori_pengeluaran->outlet_id,
-                'warehouse_id' => $this->kategori_pengeluaran->warehouse_id
+                'id' => $this->kategori_pengeluaran?->id,
+                'nama' => $this->kategori_pengeluaran?->nama,
+                'outlet_id' => $this->kategori_pengeluaran?->outlet_id,
+                'warehouse_id' => $this->kategori_pengeluaran?->warehouse_id
             ],
             'outlet' => new OutletResource($this->whenLoaded('outlet')),
             'warehouse' => [
