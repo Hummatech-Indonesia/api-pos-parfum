@@ -4,7 +4,7 @@ namespace App\Contracts\Repositories\Transaction;
 
 use App\Contracts\Interfaces\Transaction\TransactionInterface;
 use App\Contracts\Repositories\BaseRepository;
-use App\Enums\TransactionStatus;
+use App\Enums\Transactionstatus;
 use App\Models\Transaction;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
