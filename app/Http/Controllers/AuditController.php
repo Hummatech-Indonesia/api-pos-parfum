@@ -81,9 +81,9 @@ class AuditController extends Controller
                     return BaseResponse::Error("Inputan produk ke-" . ($index + 1) . " tidak ditemukan.", null);
                 }
 
-                if ($productDetail->product->store_id !== $validated['store_id']) {
-                    return BaseResponse::Error("Inputan produk ke-" . ($index + 1) . " tidak sesuai dengan toko.", null);
-                }
+                // if ($productDetail->product->store_id !== $validated['store_id']) {
+                //     return BaseResponse::Error("Inputan produk ke-" . ($index + 1) . " tidak sesuai dengan toko.", null);
+                // }
             }
 
             $mappedDetails = $this->service->mapAuditDetails($validated['products'], $audit);
