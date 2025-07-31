@@ -27,7 +27,7 @@ class PengeluaranRepository extends BaseRepository implements PengeluaranInterfa
     public function customQuery(array $data): mixed
     {
         return $this->model->query()
-            ->with('category', 'outlet', 'warehouse', 'kategori_pengeluaran')
+            ->with('outlet', 'warehouse', 'kategori_pengeluaran')
             ->when(count($data) > 0, function ($query) use ($data) {
                 foreach ($data as $index => $value) {
                     $query->where($index, $value);
@@ -38,7 +38,7 @@ class PengeluaranRepository extends BaseRepository implements PengeluaranInterfa
     public function customPaginate(int $pagination = 8, int $page = 1, ?array $data): mixed
     {
         return $this->model->query()
-            ->with('category', 'outlet', 'warehouse', 'kategori_pengeluaran')
+            ->with('outlet', 'warehouse', 'kategori_pengeluaran')
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (isset($data["search"])) {
                     $query->where(function ($query2) use ($data) {
@@ -59,7 +59,7 @@ class PengeluaranRepository extends BaseRepository implements PengeluaranInterfa
     public function show(mixed $id): mixed
     {
         return $this->model
-            ->with('category', 'outlet', 'warehouse', 'kategori_pengeluaran')
+            ->with('outlet', 'warehouse', 'kategori_pengeluaran')
             ->find($id);
     }
 

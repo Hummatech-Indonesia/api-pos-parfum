@@ -36,7 +36,6 @@ class PengeluaranService
                 "nominal_pengeluaran" => $data["nominal_pengeluaran"],
                 "kategori_pengeluaran_id" => $data["kategori_pengeluaran_id"],
                 "image" => $image,
-                "category_id" => $data["category_id"]
             ];
             if(auth()->user()->warehouse_id) {
                 $result['warehouse_id'] = auth()->user()->warehouse_id;
@@ -72,7 +71,6 @@ class PengeluaranService
                 "nominal_pengeluaran" => $data["nominal_pengeluaran"],
                 "kategori_pengeluaran_id" => $data["kategori_pengeluaran_id"],
                 "image" => $image,
-                "category_id" => $data["category_id"]
             ];
             if(auth()->user()->warehouse_id) {
                 $result['warehouse_id'] = auth()->user()->warehouse_id;
