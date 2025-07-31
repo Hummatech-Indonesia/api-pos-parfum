@@ -28,8 +28,8 @@ class PengeluaranResource extends JsonResource
                 'outlet_id' => $this->kategori_pengeluaran?->outlet_id,
                 'warehouse_id' => $this->kategori_pengeluaran?->warehouse_id
             ],
-            'outlet' => new OutletResource($this->whenLoaded('outlet')),
-            'warehouse' => [
+            'outlet' => $this->outlet_id ? new OutletResource($this->whenLoaded('outlet')) : null,
+            'warehouse' => $this->warehouse_id ? [
                 'id' => $this->warehouse_id,
                 'store_id' => $this->warehouse->store_id ?? null,
                 'name' => $this->warehouse->name ?? null,
@@ -38,7 +38,7 @@ class PengeluaranResource extends JsonResource
                 'person_responsible' => $this->warehouse->person_responsible ?? null,
                 'image' => $this->warehouse->image ?? null,
                 'is_delete' => $this->warehouse->is_delete ?? null,
-            ],
+            ] : null,
         ];
     }
 }
