@@ -41,10 +41,7 @@ class PengeluaranRepository extends BaseRepository implements PengeluaranInterfa
             ->with('outlet', 'warehouse', 'kategori_pengeluaran')
             ->when(count($data) > 0, function ($query) use ($data) {
                 if (isset($data["search"])) {
-                    $query->where(function ($query2) use ($data) {
-                        $query2->where('name', 'like', '%' . $data["search"] . '%')
-                            ->orwhere('address', 'like', '%' . $data["search"] . '%');
-                    });
+                    $query->where('nama_pengeluaran', 'like', '%' . $data["search"] . '%');
                     unset($data["search"]);
                 }
 
