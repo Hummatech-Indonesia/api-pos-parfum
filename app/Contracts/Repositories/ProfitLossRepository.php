@@ -53,7 +53,7 @@ final class ProfitLossRepository extends BaseRepository implements ProfitLossInt
             'pendapatan' => (float) $income,
             'pengeluaran' => [
                 'request_stock' => (float) $requestSpending,
-                'pengeluaran_lain' => $categorySpendings,
+                'pengeluaran_lain' => (float) $totalCategorySpendings,
                 'total' => (float) $totalSpending,
             ],
             'laba_rugi' => (float) $income - (float) $totalSpending,
@@ -111,8 +111,8 @@ final class ProfitLossRepository extends BaseRepository implements ProfitLossInt
                 'total' => (float) $totalIncome,
             ],
             'pengeluaran' => [
-                'warehouse_stock' => $warehouseSpendings,
-                'pengeluaran_lain' => $categorySpendings,
+                'warehouse_stock' => (float) $totalWarehouseSpendings,
+                'pengeluaran_lain' => (float) $totalCategorySpendings,
                 'total' => (float) $totalSpending,
             ],
             'laba_rugi' => (float) $totalIncome - (float) $totalSpending,
