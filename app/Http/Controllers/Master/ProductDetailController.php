@@ -230,6 +230,9 @@ class ProductDetailController extends Controller
             if ($request->outlet_id) $payload["outlet_id"] = $request->outlet_id;
 
             $data = $this->productDetail->customQuery($payload)->first();
+
+            if(!$data) return BaseResponse::Notfound("Product tidak ditemukan!");
+
             return BaseResponse::Ok("Berhasil mengambil data product ", $data);
         } catch (\Throwable $th) {
             return BaseResponse::Error($th->getMessage(), null);
