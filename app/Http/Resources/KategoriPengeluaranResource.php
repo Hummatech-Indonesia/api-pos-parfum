@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use App\Http\Resources\OutletResource;
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class KategoriPengeluaranResource extends JsonResource
@@ -19,6 +20,7 @@ class KategoriPengeluaranResource extends JsonResource
             'id' => $this->id,
             'nama' => $this->nama,
             'outlet' => new OutletResource($this->whenLoaded('outlet')),
+            'created_at' => $this->created_at,
             'warehouse' => [
                 'id' => $this->warehouse_id,
                 'store_id' => $this->warehouse->store_id ?? null,

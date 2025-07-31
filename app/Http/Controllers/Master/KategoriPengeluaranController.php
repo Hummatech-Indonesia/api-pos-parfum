@@ -37,6 +37,8 @@ class KategoriPengeluaranController extends Controller
         if ($request->search) $payload["search"] = $request->search;
         if ($request->warehouse_id) $payload["warehouse_id"] = $request->warehouse_id;
         if ($request->outlet_id) $payload["outlet_id"] = $request->outlet_id;
+        if ($request->start_date) $payload["created_at"] = $request->start_date;
+        if ($request->end_date) $payload["end_date"] = $request->end_date;
 
         try {
             $paginate = $this->kategoriPengeluaran->customPaginate($per_page, $page, $payload);
