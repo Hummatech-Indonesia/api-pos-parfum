@@ -219,8 +219,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get("unit/alltrashed", [UnitController::class, 'trashed']);
     Route::resource("unit", UnitController::class)->except(['create', 'edit']);
 
-    // Route::get("income/statement/outlet", [ProfitLossController::class, 'index']);
-    // Route::get("income/statement/warehouse", [ProfitLossController::class, 'warehouseReport']);
+    //API FOR LABA RUGI
+    Route::get("income/statement/outlet", [ProfitLossController::class, 'profitLossOutlet']);
+    Route::get("income/statement/warehouse", [ProfitLossController::class, 'profitLossWarehouse']);
 
     Route::middleware(['role:warehouse|outlet|admin|cashier|employee'])->get('/dashboard', [DashboardController::class, 'index']);
 });
