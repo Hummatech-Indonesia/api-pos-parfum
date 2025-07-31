@@ -39,10 +39,6 @@ class PengeluaranResource extends JsonResource
                 'image' => $this->warehouse->image ?? null,
                 'is_delete' => $this->warehouse->is_delete ?? null,
             ],
-            'category' => [
-                'id' => $this->category->id,
-                'name' => $this->category->name
-            ]
         ];
     }
 }

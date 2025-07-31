@@ -30,10 +30,6 @@ return new class extends Migration
                     ->nullable()
                     ->references('id')
                     ->on('warehouses');
-                $table->foreignId('category_id');
-                $table->foreign("category_id")
-                    ->references('id')
-                    ->on('categories');
                 $table->softDeletes();
                 $table->timestamps();
             });

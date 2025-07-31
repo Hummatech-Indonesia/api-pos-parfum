@@ -27,7 +27,6 @@ class PengeluaranRequest extends FormRequest
             'deskripsi' => 'required',
             'image' => 'nullable|image|max:2024',
             'kategori_pengeluaran_id' => 'required|exists:kategori_pengeluaran,id',
-            'category_id' => 'required|exists:categories,id'
         ];
     }
 
@@ -41,8 +40,6 @@ class PengeluaranRequest extends FormRequest
             'image.max' => 'Ukuran gambar tidak boleh lebih dari 2MB!',
             'kategori_pengeluaran_id.required' => 'Kategori pengeluaran tidak boleh kosong!',
             'kategori_pengeluaran_id.exists' => 'Kategori pengeluaran yang dipilih tidak valid!',
-            'category_id.required' => 'Kategori tidak boleh kosong!',
-            'category_id.exists' => 'Kategori yang dipilih tidak valid!'
         ];
     }
 }

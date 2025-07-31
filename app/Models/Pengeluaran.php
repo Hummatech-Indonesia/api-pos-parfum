@@ -30,10 +30,6 @@ class Pengeluaran extends Model
     {
         return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
     }
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(Category::class, 'category_id', 'id');
-    }
     public function kategori_pengeluaran(): BelongsTo
     {
         return $this->belongsTo(KategoriPengeluaran::class, 'kategori_pengeluaran_id', 'id');
