@@ -56,4 +56,8 @@ class StoreRepository extends BaseRepository implements StoreInterface
         return $this->show($id)->update($data);
     }
 
+    public function getAllStoreId() 
+    {
+        return $this->model->pluck('id')->toArray();
+    }
 }

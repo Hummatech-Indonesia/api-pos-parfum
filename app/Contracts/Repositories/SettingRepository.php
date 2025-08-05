@@ -37,10 +37,17 @@ class SettingRepository extends BaseRepository implements SettingInterface
 
     public function delete(mixed $id): mixed
     {
-        $model = $this->model->select('id')->findOrFail($id);
-        $model->delete();
+        $model = $this->model->select('code')->findOrFail($id);
 
-        return $model->fresh();
+        // fitur hapus semua data setting dengan code yang sama
+        $jumlahHapus = $this->model->where('code', $model->code)->count();
+        $this->model->where('code', $model->code)
+             ->delete();
+
+        // $model->delete();
+
+        $model->fresh();
+        return "Berhasil menghapus $jumlahHapus data setting dengan code {$model->code}";
     }
 
     public function customPaginate(int $pagination = 8, int $page = 1, ?array $data): mixed

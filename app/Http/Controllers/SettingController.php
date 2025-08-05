@@ -2,20 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use App\Helpers\BaseResponse;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\SettingRequest;
 use App\Contracts\Repositories\SettingRepository;
-use App\Models\Setting;
+use App\Contracts\Repositories\Auth\StoreRepository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class SettingController extends Controller
 {
-    private $settingRepository;
-    public function __construct(SettingRepository $settingRepository)
+    private SettingRepository $settingRepository;
+    private StoreRepository $storeRepository;
+    
+    public function __construct(SettingRepository $settingRepository, StoreRepository $storeRepository)
     {
         $this->settingRepository = $settingRepository;
+        $this->storeRepository = $storeRepository;
     }
     /**
      * Display a listing of the resource.
@@ -51,17 +55,27 @@ class SettingController extends Controller
     {
         $data = $request->validated();
 
-        if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $data['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
+        // if (auth()?->user()?->store?->id || auth()?->user()?->store_id) $data['store_id'] = auth()?->user()?->store?->id ?? auth()?->user()?->store_id;
 
+        $storeId = $this->storeRepository->getAllStoreId();
+        if (count($storeId) == 0) {
+            return BaseResponse::Error("Tidak ada store yang tersedia", null);
+        }
+        
         DB::beginTransaction();
 
         try {
+            $hasil = [];
 
-            $settingData = $this->settingRepository->store($data);
+            foreach ($storeId as $id) {
+                $data['store_id'] = $id; // Set store_id for each store
+                $setting = $this->settingRepository->store($data);
+                $hasil[] = $setting;
+            }
 
             DB::commit();
 
-            return BaseResponse::Ok('Berhasil menambahkan setting', $settingData);
+            return BaseResponse::Ok('Berhasil menambahkan setting', $hasil);
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
@@ -122,10 +136,11 @@ class SettingController extends Controller
 
         try {
 
-            $setting->delete();
+            $message = $this->settingRepository->delete($setting->id);
 
             DB::commit();
-            return BaseResponse::Ok('Berhasil menghapus setting', null);
+            // return BaseResponse::Ok('Berhasil menghapus setting', null);
+            return BaseResponse::Ok($message, null);
         } catch (\Throwable $th) {
             DB::rollBack();
             return BaseResponse::Error($th->getMessage(), null);
