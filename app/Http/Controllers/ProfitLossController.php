@@ -27,21 +27,47 @@ class ProfitLossController extends Controller
         return BaseResponse::Ok("Berhasil mengambil laporan", $data);
     }
 
-    public function warehouseReport(Request $request)
+    public function profitLossOutlet(Request $request)
+    {
+        $user = auth()->user();
+
+        if (!$user->hasRole('outlet')) {
+            return BaseResponse::Custom(false, 'Role tidak sesuai. Hanya user dengan role outlet yang diizinkan', null, 403);
+        }
+        try {
+            $outlet_id = auth()->user()->outlet_id ?? null;
+
+            if (!$outlet_id) {
+                return BaseResponse::Error('User tidak memiliki outlet', null, 400);
+            }
+
+            $month = $request->input('month');
+            $year = $request->input('year');
+
+            $data = $this->profitLossRepository->getOutletProfitLoss($outlet_id, $month, $year);
+
+            return BaseResponse::Ok('Berhasil mengambil data laba rugi', $data);
+        } catch (\Throwable $th) {
+            return BaseResponse::Error('Gagal mengambil data laba rugi', $th->getMessage());
+        }
+    }
+
+    public function profitLossWarehouse(Request $request)
     {
         $user = auth()->user();
 
         if (!$user->hasRole('warehouse')) {
-            return BaseResponse::Error('Role tidak sesuai. Hanya pengguna dengan role warehouse yang diizinkan.', 403);
+            return BaseResponse::Custom(false, 'Role tidak sesuai. Hanya pengguna dengan role warehouse yang diizinkan.', null, 403);
         }
         try {
-            $month = $request->input('month');
-            $year = $request->input('year');
-            $warehouseId = auth()->user()->warehouse_id; // atau dari $request
+            $warehouseId = auth()->user()->warehouse_id;
 
             if (!$warehouseId) {
                 return BaseResponse::Error('User tidak terkait dengan warehouse', 400);
             }
+
+            $month = $request->input('month');
+            $year = $request->input('year');
 
             $data = $this->profitLossRepository->getWarehouseProfitLoss($warehouseId, $month, $year);
 

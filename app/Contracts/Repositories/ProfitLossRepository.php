@@ -3,58 +3,115 @@
 namespace App\Contracts\Repositories;
 
 use App\Contracts\Interfaces\ProfitLossInterface;
+use App\Enums\StockRequestStatus;
+use App\Enums\Transactionstatus;
+use App\Models\Pengeluaran;
+use App\Models\StockRequest;
+use App\Models\Transaction;
+use App\Models\WarehouseStock;
 use Illuminate\Support\Facades\DB;
 
 final class ProfitLossRepository extends BaseRepository implements ProfitLossInterface
 {
-    public function getOutletProfitLoss(string $outletId, ?int $month = null, ?int $year = null): array
+    public function getOutletProfitLoss(string $outlet_id, ?int $month = null, ?int $year = null): array
     {
-        $month = $month ? (int) $month : null;
-        $year = $year ?? now()->year;
+        $income = Transaction::where('outlet_id', $outlet_id)
+            ->selectRaw('SUM(amount_price) as amount')
+            ->where('transaction_status', Transactionstatus::COMPLETE)
+            ->when($month, fn($q) => $q->whereMonth('payment_time', $month))
+            ->when($year, fn($q) => $q->whereYear('payment_time', $year))
+            ->get()
+            ->map(fn($item) => [
+                'name' => $item->transaction_code ?? null,
+                'amount' => (float) $item->amount,
+            ]);
 
-        $pendapatan = DB::table('transaction_details as td')
-            ->join('transactions as t', 'td.transaction_id', '=', 't.id')
-            ->where('t.outlet_id', $outletId)
-            ->when($month, fn($q) => $q->whereMonth('td.created_at', $month))
-            ->whereYear('td.created_at', $year)
-            ->selectRaw('SUM(td.price * td.quantity) as total')
-            ->value('total') ?? 0;
+        $requestSpending = StockRequest::with('detailProduct')
+            ->where('outlet_id', $outlet_id)
+            ->selectRaw('SUM(total_price) as amount')
+            ->where('status', StockRequestStatus::APPROVED)
+            ->when($month, fn($q) => $q->whereMonth('created_at', $month))
+            ->when($year, fn($q) => $q->whereYear('created_at', $year))
+            ->get()
+            ->map(fn($item) => [
+                'name' => $item->detailProduct?->product?->name ?? null,
+                'amount' => (float) $item->amount,
+            ]);
 
-        $pengeluaran = DB::table('stock_request_details as srd')
-            ->join('stock_requests as sr', 'srd.stock_request_id', '=', 'sr.id')
-            ->where('sr.status', 'approved')
-            ->where('sr.outlet_id', $outletId)
-            ->when($month, fn($q) => $q->whereMonth('srd.created_at', $month))
-            ->whereYear('srd.created_at', $year)
-            ->selectRaw('SUM(price) as total')
-            ->value('total') ?? 0;
+        $categorySpendings = Pengeluaran::with('kategori_pengeluaran')
+            ->selectRaw('SUM(nominal_pengeluaran) as amount')
+            ->where('outlet_id', $outlet_id)
+            ->when($month, fn($q) => $q->whereMonth('tanggal_pengeluaran', $month))
+            ->when($year, fn($q) => $q->whereYear('tanggal_pengeluaran', $year))
+            ->get()
+            ->map(fn($item) => [
+                'name' => $item->kategori_pengeluaran?->nama ?? null,
+                'amount' => (float) $item->amount,
+            ]);
+
+        $pengeluaran = $requestSpending->merge($categorySpendings)->values();
 
         return [
-            'pendapatan' => (float) $pendapatan,
-            'pengeluaran' => (float) $pengeluaran,
-            'laba_rugi' => (float) $pendapatan - (float) $pengeluaran,
+            'pendapatan' => $income,
+            'pengeluaran' => $pengeluaran,
+            'total' => (float) $income->sum('amount') - $pengeluaran->sum('amount'),
         ];
     }
 
-    public function getWarehouseProfitLoss(string $warehouseId, ?int $month = null, ?int $year = null): array
+    public function getWarehouseProfitLoss(string $warehouse_id, ?int $month = null, ?int $year = null): array
     {
-        $month = $month ? (int) $month : null;
-        $year = $year ?? now()->year;
+        $transactionIncome = Transaction::where('warehouse_id', $warehouse_id)
+            ->selectRaw('SUM(amount_price) as amount')
+            ->where('transaction_status', Transactionstatus::COMPLETE)
+            ->when($month, fn($q) => $q->whereMonth('payment_time', $month))
+            ->when($year, fn($q) => $q->whereYear('payment_time', $year))
+            ->get()
+            ->map(fn($item) => [
+                'name' => $item->transaction_code ?? null,
+                'amount' => (float) $item->amount,
+            ]);
 
-        $pendapatan = DB::table('transaction_details as td')
-            ->join('transactions as t', 'td.transaction_id', '=', 't.id')
-            ->where('t.warehouse_id', $warehouseId)
-            ->when($month, fn($q) => $q->whereMonth('td.created_at', $month))
-            ->whereYear('td.created_at', $year)
-            ->selectRaw('SUM(td.price * td.quantity) as total')
-            ->value('total') ?? 0;
+        $requestIncome = StockRequest::with('detailProduct')
+            ->where('warehouse_id', $warehouse_id)
+            ->selectRaw('SUM(total_price) as amount')
+            ->where('status', StockRequestStatus::APPROVED)
+            ->when($month, fn($q) => $q->whereMonth('created_at', $month))
+            ->when($year, fn($q) => $q->whereYear('created_at', $year))
+            ->get()
+            ->map(fn($item) => [
+                'name' => $item->detailProduct?->product?->name ?? null,
+                'amount' => (float) $item->amount,
+            ]);
 
-        $pengeluaran = 0;
+        $pendapatan = $transactionIncome->merge($requestIncome)->values();
+
+        $warehouseSpendings = WarehouseStock::with('productDetail')
+            ->selectRaw('SUM(total_price) as amount')
+            ->when($month, fn($q) => $q->whereMonth('tanggal_pengeluaran', $month))
+            ->when($year, fn($q) => $q->whereYear('tanggal_pengeluaran', $year))
+            ->get()
+            ->map(fn($item) => [
+                'name' => $item->productDetail?->product?->name ?? null,
+                'amount' => (float) $item->amount,
+            ]);
+
+        $categorySpendings = Pengeluaran::with('kategori_pengeluaran')
+            ->selectRaw('SUM(nominal_pengeluaran) as amount')
+            ->where('warehouse_id', $warehouse_id)
+            ->when($month, fn($q) => $q->whereMonth('tanggal_pengeluaran', $month))
+            ->when($year, fn($q) => $q->whereYear('tanggal_pengeluaran', $year))
+            ->get()
+            ->map(fn($item) => [
+                'name' => $item->kategori_pengeluaran?->nama ?? null,
+                'amount' => (float) $item->amount,
+            ]);
+
+        $pengeluaran = $warehouseSpendings->merge($categorySpendings)->values();
 
         return [
-            'pendapatan' => (float) $pendapatan,
-            'pengeluaran' => (float) $pengeluaran,
-            'laba_rugi' => (float) $pendapatan - (float) $pengeluaran,
+            'pendapatan' => $pendapatan,
+            'pengeluaran' => $pengeluaran,
+            'total' => (float) $pendapatan->sum('amount') - $pengeluaran->sum('amount'),
         ];
     }
 }
